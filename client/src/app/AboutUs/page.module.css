@@ -1,0 +1,119 @@
+.aboutBody {
+  background: radial-gradient(
+    circle at top,
+    #1f2933 0,
+    #1b202b 50%,
+    #020204 100%
+  );
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 40px;
+}
+
+.aboutHeader {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  background-color: black;
+}
+
+.aboutHeader > div {
+    width: 40%;
+}
+
+.aboutHeader > div h1 {
+    font-size: 46px;
+    margin-bottom: 20px;
+}
+
+.aboutStore {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0px 8px 25px rgba(0, 0, 0, 0.4),
+    inset 0px 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0px -1px 3px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  margin-top: 80px;
+  width: 80%;
+  height: 300px;
+  padding: 5vw;
+}
+
+.aboutStore h2 {
+  justify-self: start;
+  margin-bottom: 40px;
+}
+
+.aboutStore p {
+  width: 80%;
+  color: #d7d7d7;
+}
+
+.aboutMember {
+  margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  margin-bottom: 50px;
+}
+
+.memberCard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  height: 600px;
+}
+
+.memberHeading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.memberHeading h2 {
+    font-size: 32px;
+}
+
+.memberInfo {
+  border: 2px solid white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0px 8px 25px rgba(0, 0, 0, 0.4),
+    inset 0px 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0px -1px 3px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  height: 300px;
+  padding: 20px;
+}
+
+.memberInfo img {
+  width: 80px;
+  height: 80px;
+  border-radius: 999%;
+}
+
+.memberInfo h3,
+.memberInfo p {
+    font-size: 16px;
+    color: #d7d7d7;
+}
