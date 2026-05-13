@@ -1,0 +1,149 @@
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "vazir";
+  margin-top: 80px;
+  padding: 0 15px;
+  position: relative;
+}
+
+.dashboardTitle {
+  font-size: 26px;
+  margin-bottom: 60px;
+}
+
+.sliderWrapper {
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1200px;
+  background-color: red;
+}
+
+.dashboardCards {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  /* background-color: red; */
+}
+
+.cardsContainer {
+  display: flex;
+  transition: transform 0.4s ease-in-out;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0 3px;  
+  padding: 20px;
+  text-align: center;
+}
+
+.cards p {
+  font-size: 1rem;
+  color: #ccc;
+  margin-top: 10px;
+}
+
+.cardImage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  margin-bottom: 10px;
+}
+
+.navBtn {
+  position: absolute;
+  bottom: -50px;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  /* z-index: 99; */
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  transition: background-color 0.3s ease;
+}
+
+.navBtn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+}
+
+.navBtn.prev {
+  left: 80px;
+}
+
+.navBtn.next {
+  left: 30px;
+}
+
+
+@media (max-width: 1024px) {
+  .navBtn.prev {
+    left: 0px;
+  }
+  .navBtn.next {
+    right: 0px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardTitle {
+    font-size: 22px;
+    margin-bottom: 40px;
+  }
+
+  .navBtn {
+    display: none;
+  }
+
+  .dashboardCards {
+    /* overflow-x: auto; */
+    /* scroll-snap-type: x mandatory;  */
+    /* -webkit-overflow-scrolling: touch; */
+    margin-top: 10px;
+  }
+
+
+  .cards {
+    flex: 0 0 60%;
+    margin: 0 5px;
+    scroll-snap-align: start;
+    min-width: 250px;
+    padding: 15px;
+  }
+
+  .cards p {
+      font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cards {
+    flex: 0 0 80%;
+    min-width: 200px;
+  }
+}
