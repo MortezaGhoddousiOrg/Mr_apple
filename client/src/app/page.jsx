@@ -17,91 +17,128 @@ import FeaturedProduct from "./Components/FeaturedProducts/FeaturedProducts";
 export default function Home() {
   const Router = useRouter();
 
-  const [category1Products, setCategory1Products] = useState([]);
-  const [category2Products, setCategory2Products] = useState([]);
-  const [category3Products, setCategory3Products] = useState([]);
-  const [category4Products, setCategory4Products] = useState([]);
+  // const [category1Products, setCategory1Products] = useState([]);
+  // const [category2Products, setCategory2Products] = useState([]);
+  // const [category3Products, setCategory3Products] = useState([]);
+  // const [category4Products, setCategory4Products] = useState([]);
 
-  useEffect(() => {
-    const fetchHome = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:5000/api/products/limit6",
-        );
+  // useEffect(() => {
+  //   const fetchHome = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         "http://localhost:5000/api/products/limit6",
+  //       );
 
-        const data = res.data;
+  //       const data = res.data;
 
-        const sorted = [...data].sort((a, b) => (a.rn ?? 0) - (b.rn ?? 0));
+  //       const sorted = [...data].sort((a, b) => (a.rn ?? 0) - (b.rn ?? 0));
 
-        setCategory1Products(
-          sorted.filter((x) => x.category_id === 1).slice(0, 6),
-        );
-        setCategory2Products(
-          sorted.filter((x) => x.category_id === 2).slice(0, 6),
-        );
-        setCategory3Products(
-          sorted.filter((x) => x.category_id === 3).slice(0, 6),
-        );
-        setCategory4Products(
-          sorted.filter((x) => x.category_id === 4).slice(0, 6),
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
+  //       setCategory1Products(
+  //         sorted.filter((x) => x.category_id === 1).slice(0, 6),
+  //       );
+  //       setCategory2Products(
+  //         sorted.filter((x) => x.category_id === 2).slice(0, 6),
+  //       );
+  //       setCategory3Products(
+  //         sorted.filter((x) => x.category_id === 3).slice(0, 6),
+  //       );
+  //       setCategory4Products(
+  //         sorted.filter((x) => x.category_id === 4).slice(0, 6),
+  //       );
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
 
-    fetchHome();
-  }, []);
+  //   fetchHome();
+  // }, []);
 
-  const homepage = [
+  // const homepage = [
+  //   {
+  //     id: 1,
+  //     title: "آیفون | iPhone",
+  //     img: "/image-services/mobile.svg",
+  //     path: "/category/iphone",
+  //     data: category1Products,
+  //   },
+  //   {
+  //     id: 2,
+  //     title: "ساعت | Watch",
+  //     img: "/image-services/watch-square.svg",
+  //     path: "/category/watch",
+  //     data: category2Products,
+  //   },
+  //   {
+  //     id: 3,
+  //     title: "آیپد | iPad",
+  //     img: "/image-services/tablet.svg",
+  //     path: "/category/ipad",
+  //     data: category3Products,
+  //   },
+  //   {
+  //     id: 4,
+  //     title: "ایرپاد | AirPods",
+  //     img: "/image-services/airpod.svg",
+  //     path: "/category/airpods",
+  //     data: category4Products,
+  //   },
+  // ];
+
+  const [data, setDeta] = useState([
     {
-      id: 1,
-      title: "آیفون | iPhone",
-      img: "/image-services/mobile.svg",
-      path: "/category/iphone",
-      data: category1Products,
+      image: '/image-services/apple-iphone-17-pro-max-cover.png',
+      title: "آیفون 17 پرو مکس",
+      description: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+      price: 1000000000
     },
-    // {
-    //   id: 2,
-    //   title: "ساعت | Watch",
-    //   img: "/image-services/watch-square.svg",
-    //   path: "/category/watch",
-    //   data: category2Products,
-    // },
-    // {
-    //   id: 3,
-    //   title: "آیپد | iPad",
-    //   img: "/image-services/tablet.svg",
-    //   path: "/category/ipad",
-    //   data: category3Products,
-    // },
-    // {
-    //   id: 4,
-    //   title: "ایرپاد | AirPods",
-    //   img: "/image-services/airpod.svg",
-    //   path: "/category/airpods",
-    //   data: category4Products,
-    // },
-  ];
+    {
+      image: '/image-services/apple-iphone-17-pro-max-cover.png',
+      title: "آیفون 17 پرو مکس",
+      description: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+      price: 1000000000
+    },
+    {
+      image: '/image-services/apple-iphone-17-pro-max-cover.png',
+      title: "آیفون 17 پرو مکس",
+      description: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+      price: 1000000000
+    },
+    {
+      image: '/image-services/apple-iphone-17-pro-max-cover.png',
+      title: "آیفون 17 پرو مکس",
+      description: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+      price: 1000000000
+    },
+    {
+      image: '/image-services/apple-iphone-17-pro-max-cover.png',                                                                                                                                                                                       
+      title: "آیفون 17 پرو مکس",
+      description: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+      price: 1000000000
+    },
+    {
+      image: '/image-services/apple-iphone-17-pro-max-cover.png',
+      title: "آیفون 17 پرو مکس",
+      description: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+      price: 1000000000
+    },
+
+  ])
+
+  const title = "محصولات";
+
   return (
     <div>
-      <Header />
       <Content />
       <FeaturedProduct />
       <Dashboard />
       <InfoSection />
-      {homepage.map((cat) => (
-        <Service
-          key={cat.id}
-          data={cat.data}
-          title={cat.title}
-          img={cat.img}
-          button="بیشتر"
-          onMoreClick={() => Router(cat.path)}
-        />
-      ))}
-
-      <Footer />
+      <Service
+        data={data}
+        title={title}
+        // img={img}
+        button="بیشتر"
+        // onMoreClick={() => Router("/product")}
+      />
     </div>
   );
 }

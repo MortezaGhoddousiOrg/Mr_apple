@@ -1,15 +1,18 @@
 .aboutBody {
-  background: radial-gradient(
+  /* background: radial-gradient(
     circle at top,
     #1f2933 0,
     #1b202b 50%,
     #020204 100%
-  );
-  color: white;
+  ); */
+
+  background-color: var(--white);
+  color: black;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-bottom: 40px;
+  font-family: "vazir";
 }
 
 .aboutHeader {
@@ -19,14 +22,15 @@
   justify-content: center;
   align-items: center;
   gap: 60px;
-  background-color: black;
+  background-color: var(--blue);
+  color: white;
 }
 
-.aboutHeader > div {
+.aboutHeader div {
     width: 40%;
 }
 
-.aboutHeader > div h1 {
+.aboutHeader div h1 {
     font-size: 46px;
     margin-bottom: 20px;
 }
@@ -52,12 +56,13 @@
 
 .aboutStore h2 {
   justify-self: start;
+  font-size: 24px;
   margin-bottom: 40px;
 }
 
 .aboutStore p {
   width: 80%;
-  color: #d7d7d7;
+  color: var(--text);
 }
 
 .aboutMember {
@@ -115,5 +120,5 @@
 .memberInfo h3,
 .memberInfo p {
     font-size: 16px;
-    color: #d7d7d7;
+    color: var(--text);
 }

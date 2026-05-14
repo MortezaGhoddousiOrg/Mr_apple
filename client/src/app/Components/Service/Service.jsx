@@ -9,7 +9,7 @@ export default function Service({
   data = [],
   title,
   button,
-  img,
+  // image,
   onMoreClick,
   setNotif,
 }) {
@@ -93,13 +93,13 @@ export default function Service({
   return (
     <div className={styles.servicesBody}>
       <div className={styles.servicesHeader}>
-        <Image
-          src={img}
+        {/* <Image
+          src={"/image-services/mobile.svg"}
           className={styles.iconImage}
           width={20}
           height={20}
           alt="icon"
-        />
+        /> */}
         {/* <img className={styles.iconImage} src={img} alt="icon" /> */}
         <h2 className={styles.iconTitle}>{title}</h2>
       </div>
@@ -125,10 +125,10 @@ export default function Service({
               transition: "transform 0.4s ease-in-out",
             }}
           >
-            {data.map((item) => (
+            {data.map((item, index) => (
               <div
                 className={styles.serviceCard}
-                key={item.id}
+                key={index}
                 style={{ flex: `0 0 ${100 / visibleCards}%` }}
               >
                 {/* <Image
@@ -168,7 +168,7 @@ export default function Service({
                   </p>
                 </div>
                 {button && (
-                  <button className={styles.serviceCardLastButton}>
+                  <button className={styles.serviceCardLastButton} onClick={onMoreClick}>
                     {button}
                   </button>
                 )}
