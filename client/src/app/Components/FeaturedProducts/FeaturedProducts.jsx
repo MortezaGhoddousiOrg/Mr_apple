@@ -7,49 +7,54 @@ import Image from "next/image";
 export default function FeaturedProduct() {
   const [featuredItems, setFeaturedItems] = useState([
     {
-      img: "/image-dashboard/mac-m5.png",
+      img: "/image-featuredProduct/mac-m5.png",
       title: "مک",
       nav: "/category/iphone",
     },
     {
-      img: "/image-dashboard/iphone2025.png",
+      img: "/image-featuredProduct/iphone2025.png",
       title: "آیفون",
       nav: "/category/iphone",
     },
     {
-      img: "/image-dashboard/ipads.png",
+      img: "/image-featuredProduct/ipads.png",
       title: "آیپد",
       nav: "/category/ipad",
     },
     {
-      img: "/image-dashboard/watch2025.png",
+      img: "/image-featuredProduct/watch2025.png",
       title: "اپل واچ",
       nav: "/category/watch",
     },
     {
-      img: "/image-dashboard/airpod2025.png",
+      img: "/image-featuredProduct/airpod2025.png",
       title: "ایرپاد",
       nav: "/category/airpods",
     },
     {
-      img: "/image-dashboard/airpod2025.png",
+      img: "/image-featuredProduct/airpod2025.png",
       title: "ایرپاد",
       nav: "/category/airpods",
     },
     {
-      img: "/image-dashboard/airpod2025.png",
+      img: "/image-featuredProduct/airpod2025.png",
       title: "ایرپاد",
       nav: "/category/airpods",
     },
     {
-      img: "/image-dashboard/airpod2025.png",
+      img: "/image-featuredProduct/airpod2025.png",
       title: "ایرپاد",
       nav: "/category/airpods",
     },
     {
-      img: "/image-dashboard/airpod2025.png",
+      img: "/image-featuredProduct/airpod2025.png",
       title: "ایرپاد",
       nav: "/category/airpods",
+    },
+    {
+      img: "/image-featuredProduct/mac-m5.png",
+      title: "مک",
+      nav: "/category/iphone",
     },
     // { img: "/image-dashboard/accesori2026.png", title: "لوازم جانبی" },
   ]);
@@ -58,7 +63,6 @@ export default function FeaturedProduct() {
   const [visible, setVisible] = useState(6);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
-  const cardGap = 20;
 
   useEffect(() => {
     const handleResize = () => {
@@ -80,10 +84,10 @@ export default function FeaturedProduct() {
     if (index > featuredItems.length - visible) {
       setIndex(Math.max(featuredItems.length - visible, 0));
     }
-  }, [visible, featuredItems.length]);
+  }, [index, visible, featuredItems.length]);
 
   const nextSlide = () => {
-    if (index >= featuredItems.length + 1 - visible) return;
+    if (index >= featuredItems.length - visible) return;
     setIndex((prev) => prev + 1);
   };
 
@@ -113,6 +117,20 @@ export default function FeaturedProduct() {
 
   const cardsWidth = 100 / visible;
   const translateValue = `translateX(${index * cardsWidth}%)`;
+
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setIndex((prevIndex) => {
+        if (prevIndex >= featuredItems.length - visible) {
+          return 0;
+        }
+        return prevIndex + 1;
+      });
+    }, 3000);
+    
+  }, [visible, featuredItems.length]);
 
   return (
     <div className={style.dashboardContainer}>
@@ -162,7 +180,7 @@ export default function FeaturedProduct() {
       <button
         className={`${style.navBtn} ${style.next}`}
         onClick={nextSlide}
-        disabled={index >= featuredItems.length + 1 - visible}
+        disabled={index >= featuredItems.length - visible}
         aria-label="اسلاید بعدی"
       >
         &gt;

@@ -16,90 +16,13 @@ export default function Header() {
     return () => (document.body.style.overflow = "unset");
   }, [isOpen]);
 
-  const togglesearch = () => {
-    setIsOpen(!isOpen);
-  };
+    const togglesearch = () => {
+      setIsOpen(!isOpen);
+    };
 
-  const handleMenuClick = (key) => {
-    setActiveMenu((prev) => (prev === key ? null : key));
-  };
-
-  const menus = [
-    {
-      key: "iphone",
-      label: "آیفون",
-      items: [
-        "آیفون 17",
-        "آیفون 17 پرو",
-        "آیفون 17 پرو مکس",
-        "آیفون 16",
-        "آیفون 16 پرو",
-        "آیفون 16 پرو مکس",
-        "آیفون 16 پرو مکس",
-        "آیفون 16 پرو مکس",
-        "آیفون 16 پرو مکس",
-        "آیفون 16 پرو مکس",
-        "آیفون 16 پرو مکس",
-        "آیفون 16 پرو مکس",
-        "آیفون 16 پرو مکس",
-        "آیفون 16 پرو مکس",
-        "آیفون 16 پرو مکس",
-      ],
-    },
-    {
-      key: "ipad",
-      label: "آیپد",
-      items: [
-        "آیپد پرو",
-        "آیپد ایر",
-        "آیپد پرو 13 اینچ",
-        "آیپد پرو 14 اینچ",
-        "آیپد پرو 14 اینچ",
-        "آیپد پرو 14 اینچ",
-        "آیپد پرو 14 اینچ",
-        "آیپد پرو 14 اینچ",
-        "آیپد پرو 14 اینچ",
-        "آیپد پرو 14 اینچ",
-        "آیپد پرو 14 اینچ",
-      ],
-    },
-    {
-      key: "watch",
-      label: "اپل واچ",
-      items: [
-        "اپل واچ سری 11",
-        "اپل واچ اولترا",
-        "اپل واچ SE",
-        "اپل واچ سری 10",
-        "اپل واچ سری 10",
-        "اپل واچ سری 10",
-        "اپل واچ سری 10",
-        "اپل واچ سری 10",
-        "اپل واچ سری 10",
-        "اپل واچ سری 10",
-        "اپل واچ سری 10",
-        "اپل واچ سری 10",
-      ],
-    },
-    {
-      key: "airpod",
-      label: "ایرپاد",
-      items: ["ایرپاد پرو نسل 3", 
-        "ایرپاد نسل 2", 
-        "ایرپاد نسل 2", 
-        "ایرپاد نسل 2", 
-        "ایرپاد نسل 2", 
-        "ایرپاد نسل 2", 
-        "ایرپاد نسل 2", 
-        "ایرپاد نسل 2", 
-        "ایرپاد نسل 2", 
-        "ایرپاد نسل 2", 
-        "ایرپاد نسل 2", 
-        "ایرپاد مکس", 
-        "ایرپاد 4",
-      ],
-    },
-  ];
+    // const handleMenuClick = (key) => {
+    //   setActiveMenu((prev) => (prev === key ? null : key));
+    // }
 
   const isActiveLink = (href) => pathname === href;
 
@@ -120,50 +43,25 @@ export default function Header() {
             width={25}
             height={25}
             alt="search"
-            onClick={togglesearch}
+            // onClick={togglesearch}
           />
         </li>
         <li className={pathname === "/" ? style.active : ""}>
           <Link href="/">خانه</Link>
         </li>
 
-        <li className={pathname === "/product" ? style.active : ""}>
+        <li className={pathname === "/Product" ? style.active : ""}>
           <Link href="/Product">محصولات</Link>
         </li>
 
-        <li className={pathname === "/contact" ? style.active : ""}>
+        <li className={pathname === "/ContactUs" ? style.active : ""}>
           <Link href="/ContactUs">ارتباط با ما</Link>
         </li>
 
-        <li className={pathname === "/about" ? style.active : ""}>
+        <li className={pathname === "/AboutUs" ? style.active : ""}>
           <Link href="/AboutUs">درباره ما</Link>
         </li>
 
-        <nav className={style.menuContainer}>
-          <ul className={style.headerMenu}>
-            {menus.map((menu) => (
-              <li
-                key={menu.key}
-                onClick={() => handleMenuClick(menu.key)}
-                className={style.headerMenuItem}
-              >
-                {menu.label}
-
-                {activeMenu === menu.key && (
-                  <div className={style.menu}>
-                    <ul className={style.containerMenuopen}>
-                      {menu.items.map((item, index) => (
-                        <li key={index} className={style.menuopen}>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
         <li>
           <Image
             src="/image-header/apple.svg"

@@ -830,7 +830,6 @@
     transform: scale(1.02);
   }
 
-  /* ✅ کارت دوم */
   .card:nth-child(2) .image {
     transform: scale(1);
     /* margin-bottom: 40px; */
@@ -838,7 +837,7 @@
   }
 
   .card:nth-child(2):hover .image {
-    transform: scale(1.1);
+    transform: scale(0.96);
   }
 
   .card:nth-child(2) .title {
@@ -893,7 +892,7 @@
   }
 
   .card:nth-child(2):hover .image {
-    transform: scale(1.15);
+    transform: scale(1.06);
   }
 
   .card:nth-child(2) .title {
@@ -945,7 +944,7 @@
   }
 
   .card:nth-child(2):hover .image {
-    transform: scale(1.2);
+    transform: scale(1.1);
   }
 
   .card:nth-child(2) .title {
@@ -991,7 +990,7 @@
   }
 
   .card:nth-child(2):hover .image {
-    transform: scale(1.25);
+    transform: scale(1.14);
   }
 
   .card:nth-child(2) .title {
@@ -1027,8 +1026,8 @@
     transform: scale(1.08);
   }
 
-  .card:nth-child(2) .image {
-    transform: scale(1.32);
+  .card:nth-child(2):hover .image {
+    transform: scale(1.22);
   }
 
   .card:nth-child(2):hover .image {
@@ -1069,7 +1068,7 @@
   }
 
   .card:nth-child(2):hover .image {
-    transform: scale(1.45);
+    transform: scale(1.28);
   }
 }
 
@@ -1117,6 +1116,6 @@
   }
 
   .card:nth-child(2):hover .image {
-    transform: scale(1.5);
+    transform: scale(1.32);
   }
 }

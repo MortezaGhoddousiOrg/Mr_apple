@@ -20,9 +20,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  max-width: 1200px;
-  background-color: red;
+  width: 93%;
 }
 
 .dashboardCards {
@@ -31,7 +29,6 @@
   width: 100%;
   overflow: hidden;
   position: relative;
-  /* background-color: red; */
 }
 
 .cardsContainer {
@@ -46,7 +43,6 @@
   align-items: center;
   cursor: pointer;
   flex-shrink: 0;
-  margin: 0 3px;  
   padding: 20px;
   text-align: center;
 }
@@ -67,7 +63,7 @@
 
 .navBtn {
   position: absolute;
-  bottom: -50px;
+  top: 65%;
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
@@ -76,7 +72,6 @@
   width: 40px;
   height: 40px;
   font-size: 24px;
-  /* z-index: 99; */
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -89,61 +84,13 @@
 }
 
 .navBtn:disabled {
-  opacity: 0.3;
+  display: none;
 }
 
 .navBtn.prev {
-  left: 80px;
+  right: 15px;
 }
 
 .navBtn.next {
-  left: 30px;
-}
-
-
-@media (max-width: 1024px) {
-  .navBtn.prev {
-    left: 0px;
-  }
-  .navBtn.next {
-    right: 0px;
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboardTitle {
-    font-size: 22px;
-    margin-bottom: 40px;
-  }
-
-  .navBtn {
-    display: none;
-  }
-
-  .dashboardCards {
-    /* overflow-x: auto; */
-    /* scroll-snap-type: x mandatory;  */
-    /* -webkit-overflow-scrolling: touch; */
-    margin-top: 10px;
-  }
-
-
-  .cards {
-    flex: 0 0 60%;
-    margin: 0 5px;
-    scroll-snap-align: start;
-    min-width: 250px;
-    padding: 15px;
-  }
-
-  .cards p {
-      font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .cards {
-    flex: 0 0 80%;
-    min-width: 200px;
-  }
+  left: 15px;
 }

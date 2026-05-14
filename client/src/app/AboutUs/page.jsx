@@ -6,7 +6,7 @@ import style from "@/app/AboutUs/page.module.css";
 export default function Aboutus() {
   const [dataFake, setDataFake] = useState([
     {
-      img: "/image-about/iphone2025-baner.png",
+      img: "/image-about/images (3).jfif",
       name: "مریم نادری",
       job: "مدیر پشتیبانی مشتریان",
       description:
@@ -14,7 +14,7 @@ export default function Aboutus() {
     },
 
     {
-      img: "/image-about/iphone2025-baner.png",
+      img: "/image-about/images (3).jfif",
       name: "آرمان رضایی",
       job: "مدیر فنی و فناوری اطلاعات",
       description:
@@ -22,28 +22,28 @@ export default function Aboutus() {
     },
 
     {
-      img: "/image-about/iphone2025-baner.png",
+      img: "/image-about/images (3).jfif",
       name: "نیلوفر موسوی",
       job: "طراح تجربه کاربری (UX/UI)",
       description:
         "مسئول طراحی مینیمال و هماهنگ با فلسفه‌ی اپل برای بخش‌های مختلف سایت. تمرکز بر سادگی و زیبایی تعامل کاربر.",
     },
     {
-      img: "/image-about/iphone2025-baner.png",
+      img: "/image-about/images (3).jfif",
       name: "محمد شریفی",
       job: " متخصص محصولات اپل (Product Expert)",
       description:
         "پاسخ‌گوی جزئیات تخصصی محصولات مانند مک‌بوک، آیفون و آی‌پد. راهنمای انتخاب هوشمندانه‌ی شما.",
     },
     {
-      img: "/image-about/iphone2025-baner.png",
+      img: "/image-about/images (3).jfif",
       name: "سحر احمدی",
       job: "مدیر ارتباطات و محتوا",
       description:
         "مسئول تولید محتوا، اطلاع‌رسانی و هماهنگی کمپین‌های تبلیغاتی. لحن برند را با حس اپلی و حرفه‌ای حفظ می‌کند.",
     },
     {
-      img: "/image-about/iphone2025-baner.png",
+      img: "/image-about/images (3).jfif",
       name: "کامران ابوطالبی",
       job: "مدیر واحد سفارشات و لجستیک",
       description:
@@ -80,13 +80,13 @@ export default function Aboutus() {
       <section className={style.aboutMember}>
         <div className={style.memberHeading}>
           <h2>آشنا شدن با ما </h2>
-          <p>همکاران ما در مجموعه‌ی فلان </p>
+          <p>همکاران ما در مجموعه‌ی مستر اپل</p>
         </div>
 
         <div className={style.memberCard}>
           {dataFake.map((item, index) => (
             <div key={index} className={style.memberInfo}>
-              <img src={item.img} alt="" />
+              <img src={item.img} alt={item.name} />
               <h2>{item.name}</h2>
               <h3>{item.job}</h3>
               <p>{item.description}</p>

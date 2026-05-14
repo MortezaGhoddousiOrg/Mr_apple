@@ -1,11 +1,13 @@
 .servicesBody {
   width: 100%;
-  margin: 40px 0;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
   font-family: "vazir";
+  margin-top: 100px;
+  user-select: none;
+  transition: all 0.3s ease; 
 }
 
 .servicesHeader {
@@ -14,6 +16,7 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 20px;
+  transition: all 0.3s ease;
 }
 
 .iconImage {
@@ -22,6 +25,7 @@
 
 .iconTitle {
   font-size: 16px;
+  margin-right: 50px;
 }
 
 .more {
@@ -41,6 +45,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .sliderContainer {
@@ -48,6 +53,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.3s ease;
 }
 
 .servicesSlider {
