@@ -1,0 +1,570 @@
+.bodyContact {
+  background-color: var(--white);
+  font-family: "vazir";
+  color: var(--text);
+}
+
+.headerContact {
+  position: relative;
+  overflow: hidden;
+
+  min-height: 100vh;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 40px;
+
+  padding: 120px 7vw 60px;
+
+  background: radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.1),
+      transparent 35%
+    ),
+    linear-gradient(135deg, #0f73b3 0%, #074a74 100%);
+
+  color: white;
+}
+
+.headerContact::before {
+  content: "";
+  position: absolute;
+
+  top: -150px;
+  right: -100px;
+
+  width: 350px;
+  height: 350px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.1);
+
+  filter: blur(80px);
+}
+
+/* .headerContact::after {
+  content: "✦";
+
+  position: absolute;
+
+  left: 10%;
+  top: 22%;
+
+  font-size: 120px;
+
+  color: rgba(255,255,255,.05);
+
+  animation: floatStar 7s ease-in-out infinite;
+} */
+
+.heroContent {
+  width: 50%;
+  position: relative;
+  z-index: 3;
+}
+
+.contactBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 18px;
+
+  margin-bottom: 24px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.14);
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  color: rgba(255, 255, 255, 0.92);
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.contactBadge i {
+  font-size: 18px;
+}
+
+.titleContact {
+  font-size: 64px;
+  font-weight: 900;
+
+  letter-spacing: -2px;
+
+  line-height: 1.15;
+
+  margin-bottom: 22px;
+
+  background: linear-gradient(to right, #ffffff, #d7ecff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.descriptionContact {
+  font-size: 17px;
+  line-height: 2.1;
+
+  color: rgba(255, 255, 255, 0.85);
+
+  max-width: 650px;
+}
+
+.heroFeatures {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  flex-wrap: wrap;
+
+  margin-top: 34px;
+}
+
+.heroFeatureItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 16px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.12);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  color: white;
+
+  font-size: 14px;
+}
+
+.heroFeatureItem i {
+  font-size: 18px;
+}
+
+.heroButtons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  margin-top: 36px;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  height: 54px;
+
+  padding: 0 28px;
+
+  border-radius: 999px;
+
+  text-decoration: none;
+
+  transition: 0.3s;
+}
+
+.primaryBtn {
+  background: white;
+
+  color: #0f73b3;
+
+  font-weight: 700;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.primaryBtn:hover {
+  transform: translateY(-4px);
+}
+
+.secondaryBtn {
+  background: rgba(255, 255, 255, 0.12);
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  color: white;
+}
+
+.secondaryBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.heroLine {
+  margin-top: 36px;
+
+  width: 180px;
+  height: 2px;
+
+  border-radius: 999px;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.95),
+    rgba(255, 255, 255, 0)
+  );
+
+  animation: lineGlow 3s linear infinite;
+}
+
+/* .floatingIcon1,
+.floatingIcon2,
+.floatingIcon3 {
+  position: absolute;
+  color: rgba(255,255,255,.08);
+  z-index: 1;
+}
+
+.floatingIcon1 {
+  top: 18%;
+  right: 18%;
+  font-size: 60px;
+  animation: floatStar 6s ease-in-out infinite;
+}
+
+.floatingIcon2 {
+  bottom: 18%;
+  left: 14%;
+  font-size: 54px;
+  animation: floatStar 8s ease-in-out infinite;
+}
+
+.floatingIcon3 {
+  top: 48%;
+  left: 48%;
+  font-size: 44px;
+  animation: floatStar 7s ease-in-out infinite;
+} */
+
+/* image */
+
+.heroImageWrapper {
+  width: 40%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+  z-index: 3;
+}
+
+.heroImage {
+  width: 420px;
+  height: auto;
+
+  object-fit: contain;
+
+  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.35)) saturate(1.05);
+
+  animation: floatImage 5s ease-in-out infinite;
+}
+
+.infoContact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0 5vw;
+  height: 400px;
+  margin-bottom: 200px;
+  margin-top: 100px;
+}
+
+.infoContact ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 40px;
+}
+
+.infoContact ul li {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.infoContact ul li i {
+  font-size: 26px;
+}
+
+.mapContact {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+}
+
+.contactFormSection {
+  margin-bottom: 100px;
+  width: 100%;
+  height: 500px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contactFormSection h2 {
+  margin-bottom: 3%;
+  font-size: 28px;
+}
+
+.contactForm {
+  padding: 2vw 5vw;
+
+  width: 70%;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.contactFormSelect {
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 1rem;
+  border: 2px solid var(--blue);
+  outline: none;
+  font-family: "vazir";
+}
+
+.formInputFirst {
+  display: flex;
+  gap: 30px;
+}
+
+.formInputFirst input {
+  padding: 10px;
+  border: 2px solid var(--blue);
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  font-family: "vazir";
+}
+
+.formInput textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--blue);
+  font-size: 1rem;
+  outline: none;
+  font-family: "vazir";
+}
+
+.contactForm button {
+  width: 80%;
+  align-self: center;
+
+  background: linear-gradient(135deg, #0f73b3 0%, #3aa0e0 100%);
+
+  color: white;
+
+  padding: 10px;
+
+  border-radius: 99px;
+
+  cursor: pointer;
+
+  font-family: "vazir";
+  font-size: 1.1rem;
+
+  border: none;
+}
+
+/* ================= FAQ (QUESTION SECTION) ================= */
+
+.questionSection {
+  width: 100%;
+  padding: 80px 6vw;
+  margin-top: 40px;
+}
+
+.questionSection h2 {
+  font-size: 28px;
+  margin-bottom: 30px;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+}
+
+.question {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.questionItem {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+
+  border-radius: 12px;
+
+  padding: 16px 18px;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.questionItem:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.questionHeader {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.questionHeader i {
+  font-size: 22px;
+  transition: 0.3s;
+}
+
+/* body وقتی بسته است */
+.questionBody {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  padding-top: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+}
+
+/* body وقتی باز است */
+.questionBodyShow {
+  max-height: 250px;
+  opacity: 1;
+  margin-top: 12px;
+  line-height: 2;
+  color: var(--text-light);
+  transition: max-height 0.5s ease, opacity 0.3s ease;
+}
+
+/* موبایل */
+@media (max-width: 750px) {
+  .questionSection {
+    padding: 60px 20px;
+  }
+
+  .questionHeader {
+    font-size: 16px;
+  }
+
+  .questionSection h2 {
+    font-size: 24px;
+  }
+}
+
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes lineGlow {
+  0% {
+    opacity: 0.5;
+    transform: translateX(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(12px);
+  }
+  100% {
+    opacity: 0.5;
+    transform: translateX(0);
+  }
+}
+
+@keyframes floatStar {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-20px) rotate(8deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes floatImage {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-18px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 950px) {
+  .headerContact {
+    flex-direction: column-reverse;
+    text-align: center;
+
+    padding: 120px 20px 60px;
+
+    gap: 30px;
+  }
+
+  .heroContent {
+    width: 100%;
+  }
+
+  .heroImageWrapper {
+    width: 100%;
+  }
+
+  .titleContact {
+    font-size: 42px;
+    line-height: 1.4;
+  }
+
+  .descriptionContact {
+    font-size: 15px;
+  }
+
+  .heroButtons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .heroFeatures {
+    justify-content: center;
+  }
+
+  .heroLine {
+    margin-inline: auto;
+  }
+
+  .heroImage {
+    width: 260px;
+  }
+
+  /* .floatingIcon1,
+  .floatingIcon2,
+  .floatingIcon3{
+    display:none;
+  } */
+}
