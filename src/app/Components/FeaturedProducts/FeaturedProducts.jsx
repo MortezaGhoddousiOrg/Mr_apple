@@ -1,0 +1,184 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import style from "@/app/Components/FeaturedProducts/FeaturedProducts.module.css";
+import Image from "next/image";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+
+export default function FeaturedProduct() {
+  const [featuredItems, setFeaturedItems] = useState([
+    {
+      img: "/image-featuredProduct/iphone2025.png",
+      title: "آیفون",
+      path: "iPhone",
+    },
+    {
+      img: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
+      title: "لوازم جانبی",
+      path: "Accessories",
+    },
+    {
+      img: "/image-featuredProduct/ipads.png",
+      title: "آیپد",
+      path: "iPad",
+    },
+    {
+      img: "/image-featuredProduct/iphone2025.png",
+      title: "کارکرده",
+      path: "usedProducts",
+    },
+    {
+      img: "/image-featuredProduct/iphone2025.png",
+      title: "آیفون",
+      path: "iPhone",
+    },
+    {
+      img: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
+      title: "لوازم جانبی",
+      path: "Accessories",
+    },
+    {
+      img: "/image-featuredProduct/ipads.png",
+      title: "آیپد",
+      path: "iPad",
+    },
+    {
+      img: "/image-featuredProduct/iphone2025.png",
+      title: "کارکرده",
+      path: "usedProducts",
+    },
+  ]);
+
+  // useEffect(() => {
+  //   const axioshome = async () => {
+  //     try {
+  //       const response = await api.get("/category/parent");
+  //       console.log(response.data);
+  //       setFeaturedItems(response.data);
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
+
+  //   axioshome();
+  // }, []);
+
+  const [visible, setVisible] = useState(6);
+  const [index, setIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+
+  const containerRef = useRef(null);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) setVisible(2);
+      else if (window.innerWidth < 1024) setVisible(4);
+      else setVisible(6);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const extendedItems = [...featuredItems, ...featuredItems.slice(0, visible)];
+
+  const nextSlide = () => {
+    setIndex((prev) => prev + 1);
+  };
+
+  const prevSlide = () => {
+    if (index <= 0) return;
+    setIndex((prev) => prev - 1);
+  };
+
+  useEffect(() => {
+    if (index === featuredItems.length) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setIndex(0);
+      }, 400);
+    }
+  }, [index, featuredItems.length]);
+
+  useEffect(() => {
+    if (!isTransitioning) {
+      requestAnimationFrame(() => {
+        setIsTransitioning(true);
+      });
+    }
+  }, [isTransitioning]);
+
+  const cardsWidth = 100 / visible;
+  const translateValue = `translateX(${index * cardsWidth}%)`;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  if (featuredItems.length == 0) {
+    return (
+      <div className={style.box}>
+        <h2 className={style.title}>هیچ دسته بندی برای محصولات وجود نداره</h2>
+        <p className={style.description}>
+          متأسفانه هیچ محصولی برای نمایش وجود ندارد. لطفاً کمی بعد دوباره تلاش
+          کنید یا فیلترهای جستجو را تغییر دهید.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={style.dashboardContainer}>
+      <button className={`${style.navBtn} ${style.prev}`} onClick={prevSlide}>
+        &lt;
+      </button>
+
+      <div className={style.sliderWrapper}>
+        <div className={style.dashboardCards}>
+          <div
+            ref={containerRef}
+            className={style.cardsContainer}
+            style={{
+              transform: translateValue,
+              transition: isTransitioning
+                ? "transform 0.4s ease-in-out"
+                : "none",
+            }}
+          >
+            {extendedItems.map((item, index) => (
+              <div
+                key={index}
+                className={style.cards}
+                style={{ flex: `0 0 ${100 / visible}%` }}
+                onClick={() => router.push(`/Category/${item.path}`)}
+              >
+                <div className={style.cardImage}>
+                  <Image
+                    className={style.image}
+                    src={item.img}
+                    alt={item.title}
+                    width={125}
+                    height={115}
+                  />
+                </div>
+                <p>{item.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <button className={`${style.navBtn} ${style.next}`} onClick={nextSlide}>
+        &gt;
+      </button>
+    </div>
+  );
+}
