@@ -24,7 +24,7 @@ export default function Service({
   const { setProductBuy } = useAuth();
 
   const router = useRouter();
- useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 600) {
         setVisibleCards(1);
@@ -41,7 +41,7 @@ export default function Service({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
+
   useEffect(() => {
     if (index > data.length - visibleCards) {
       setIndex(Math.max(data.length - visibleCards, 0));
@@ -122,7 +122,20 @@ export default function Service({
           onClick={prevSlide}
           disabled={index === 0}
         >
-          ❮
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
         </button>
 
         <div
@@ -188,9 +201,7 @@ export default function Service({
               <div className={styles.serviceCardLast}>
                 <div className={styles.serviceCardLastDiv}>
                   <h2>{title}</h2>
-                  <p>
-                    برای نمایش بیشتر کلیک کنید
-                  </p>
+                  <p>برای نمایش بیشتر کلیک کنید</p>
                 </div>
                 {button && (
                   <button
@@ -210,10 +221,22 @@ export default function Service({
           onClick={nextSlide}
           disabled={index >= data.length + 1 - visibleCards}
         >
-          ❯
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5"></path>
+            <path d="m12 19-7-7 7-7"></path>
+          </svg>
         </button>
       </div>
     </div>
   );
 }
-

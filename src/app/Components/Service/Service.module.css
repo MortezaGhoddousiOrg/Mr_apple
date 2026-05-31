@@ -274,6 +274,37 @@
   margin-right: 3px;
 }
 
+.box {
+  width: 100%;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  border: 1px dashed #d1d5db;
+  border-radius: 16px;
+  background: #fafafa;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.description {
+  margin: 0;
+  max-width: 420px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #6b7280;
+}
+
 @media (min-width: 250px) and (max-width: 400px) {
   .iconTitle {
     font-size: 20px;

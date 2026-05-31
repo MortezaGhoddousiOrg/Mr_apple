@@ -2,7 +2,7 @@ import { useState } from "react";
 import styles from "@/app/PanelUser/ProfileSetting/page.module.css";
 
 export default function ProfileSettings() {
-  const [hasData, setHasData] = useState(false); 
+  const [hasData, setHasData] = useState(true); 
   const [isEditing, setIsEditing] = useState(false);
 
   const [userData, setUserData] = useState({
