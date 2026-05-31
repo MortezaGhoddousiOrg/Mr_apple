@@ -159,8 +159,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 AUTH_USER_MODEL = 'authuser.User'
 
-ZARINPAL_MERCHANT_ID = "123456789012345678901234567890123456"
-ZARINPAL_CALLBACK_URL = "http://localhost:4000/api/orders/payments/zarinpal/verify/"
+ZARINPAL_MERCHANT_ID = os.getenv("ZARINPAL_MERCHANT_ID")
+ZARINPAL_CALLBACK_URL = os.getenv("ZARINPAL_CALLBACK_URL")
+ZARINPAL_SANDBOX = os.getenv("ZARINPAL_SANDBOX") == "True" 
 
 from datetime import timedelta
 
