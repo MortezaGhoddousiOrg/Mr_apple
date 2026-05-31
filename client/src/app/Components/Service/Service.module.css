@@ -1,0 +1,229 @@
+.servicesBody {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: "vazir";
+  margin-top: 100px;
+  user-select: none;
+  transition: all 0.3s ease; 
+}
+
+.servicesHeader {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.iconImage {
+  margin-right: 40px;
+}
+
+.iconTitle {
+  font-size: 16px;
+  margin-right: 50px;
+}
+
+.more {
+  position: absolute;
+  top: 0;
+  left: 3%;
+  padding: 5px;
+  box-shadow: 10px 0px 40px rgba(0, 0, 0, 0.15);
+  font-family: "vazir";
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+  box-shadow:
+    0px 8px 25px rgba(0, 0, 0, 0.4),
+    inset 0px 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0px -1px 3px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sliderContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.servicesSlider {
+  overflow: hidden;
+  width: 90%;
+}
+
+.servicesAll {
+  display: flex;
+  gap: 20px;
+  width: 94%;
+}
+
+.serviceCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+  height: 430px;
+  width: 250px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+  /* box-shadow:
+    0px 8px 25px rgba(0, 0, 0, 0.4),
+    inset 0px 1px 2px rgba(255, 255, 255, 0.3),
+    inset 0px -1px 3px rgba(0, 0, 0, 0.2); */
+  background-color: white;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 0 1.5vw;
+  cursor: pointer;
+  border-radius: 24px;
+}
+
+.serviceCardLast {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  background-color: white;
+  border-radius: 24px;
+  width: 250px;
+  height: 100%;
+  color: #d7dbe0;
+  /* background: radial-gradient(
+    circle at top,
+    #7a8da1 0,
+    #536274 50%,
+    #2c3642 100%
+  ); */
+  /* background-color: red; */
+  background: linear-gradient(135deg, #0f73b3 0%, #3aa0e0 100%);
+  color: #d5efff;
+  
+  transition: all 0.3s ease;
+  
+}
+
+.serviceCardLastDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.serviceCardLastP {
+  font-size: 14px;
+  
+}
+
+.serviceCardLastButton {
+  width: 50%;
+  padding: 8px 12px;
+  border: none;
+  font-family: "vazir";
+  border-radius: 20px;
+  /* background: linear-gradient(135deg, #4b5563, #9ca3af); */
+  background: linear-gradient(135deg, #0f73b3 0%, #3aa0e0 100%);
+color: #ffffff;
+
+background: linear-gradient(135deg, #0f73b3 0%, #074a74 100%);
+color: #ffffff;
+
+transition: all 0.3s ease;
+
+
+/* background-color: white; */
+/* color: #0b0d10; */
+font-size: 14px;
+cursor: pointer;
+}
+
+.serviceCardLastButton:hover {
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #3aa0e0 0%, #0f73b3 100%);
+}
+
+
+.serviceImage {
+  width: 100%;
+  height: 180px;
+  margin: 15px 0;
+  object-fit: contain;
+}
+
+.serviceTitle {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 10px;
+  align-self: flex-start;
+}
+
+.serviceDescription {
+  font-size: 14px;
+  width: 100%;
+}
+
+.servicePrice {
+  align-self: end;
+  margin-left: 5px;
+}
+
+.serviceBtn {
+  align-self: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  margin: 10px 0;
+  font-family: "vazir";
+  cursor: pointer;
+  color: white;
+  background-color: #0f73b3;
+  font-size: 15px;
+}
+
+.moreBtn {
+  padding: 8px 16px;
+  border: none;
+  background-color: #000;
+  color: white;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.navBtn {
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  /* top: -55px; */
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  background: #d2d2d2;
+  color: var(--blue);
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.navBtn.left {
+  left: 12px;
+}
+
+.navBtn.right {
+  right: 12px;
+}
+
+.navBtn:disabled {
+  display: none;
+}
