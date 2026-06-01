@@ -70,6 +70,10 @@ export default function Training() {
                 </div>
             </header>
 
+            <div>
+                
+            </div>
+
             <section className={styles.mainLayout}>
                 <aside className={styles.sidebar}>
                     <input className={styles.searchBar} type="text" placeholder="جستجو..." />
