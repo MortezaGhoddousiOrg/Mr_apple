@@ -1,0 +1,106 @@
+.productGalleryContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.mainImageDisplay {
+  width: 100%;
+  max-width: 350px;
+  height: 350px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.thumbnailContainer {
+  display: flex;
+  overflow-x: auto;
+  padding-bottom: 15px;
+  width: 100%;
+  justify-content: center;
+  gap: 10px;
+}
+
+.thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+  border-color: #007bff;
+}
+
+.fullscreenOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.fullscreenImage {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+}
+
+.fullscreenControls {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transform: translateY(-50%);
+  z-index: 999;
+}
+
+.fullscreenControls button {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  border: none; 
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  border-radius: 100%;
+  margin: 0 20px;
+  display: flex;
+  justify-content: center;
+  /* align-items: center; */
+}
+
+.fullscreenControls button:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.closeFullscreenButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.closeFullscreenButton:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
