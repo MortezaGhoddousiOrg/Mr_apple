@@ -1,44 +1,26 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.productBody {
+  background-color: var(--white);
+  color: var(--text);
+  font-family: "vazir";
+  position: relative;
 }
 
-.product-body {
-  background: radial-gradient(
-    circle at top,
-    #1f2933 0,
-    #1b202b 50%,
-    #020204 100%
-  );
+.productHeader {
+  height: 100vh;
+  background-color: var(--blue);
   color: white;
 }
 
-.product-header {
-  height: 100vh;
-  background-color: #020204;
-  /* margin-bottom: 80px; */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.productHeader div {
+  margin-right: 0px;
 }
 
-.product-header div {
-  margin-right: 60px;
-}
-
-.product-header div h1 {
-  font-size: 38px;
+.productHeader div h1 {
+  font-size: 28px;
   margin-bottom: 15px;
 }
 
-.product-header img {
-  width: 100%;
-  height: 100%;
-  margin-top: 100px;
-}
-
-.product-page {
+.productPage {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -46,7 +28,7 @@
   padding: 40px;
 }
 
-.product-page button {
+.productPage button {
   padding: 6px;
   border: none;
   border-radius: 5px;
@@ -54,10 +36,109 @@
   cursor: pointer;
 }
 
-.product-page button:disabled {
+.productPage button:disabled {
   display: none;
 }
 
 .ref {
   padding-top: 100px;
+}
+
+/* ========= HERO SECTION (Products Page) ========= */
+.heroProducts {
+  height: 100vh;
+  background-color: #000;
+  color: white;
+  display: grid;
+  grid-template-columns: 1fr 4fr;
+  grid-template-rows: 100%;
+  padding: 0 6vw 0 3vw;
+  gap: 0;
+  overflow: hidden;
+}
+
+.heroContent {
+  max-width: 500px;
+  text-align: right;
+  align-self: center;  
+}
+
+.heroTitle {
+  font-size: clamp(34px, 5vw, 46px);
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.heroDescription {
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 30px;
+  text-align: justify;
+}
+
+.heroFeatures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 22px;
+  align-items: center;
+}
+
+.heroFeatureItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.heroFeatureItem svg {
+  border: none;   /* قبلی حذف شد */
+  padding: 0;     /* قبلی حذف شد */
+}
+
+
+.heroImageContainer {
+  align-self: center;
+}
+
+.heroImage {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  object-fit: cover;
+  filter: brightness(1.5);
+}
+
+/* ========= RESPONSIVE ========= */
+@media (max-width: 1000px) {
+  .heroProducts {
+    flex-direction: column-reverse;
+    justify-content: center;
+    text-align: center;
+    padding: 110px 5vw 60px;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .heroContent {
+    max-width: 100%;
+    margin-top: 20px;
+  }
+
+  .heroFeatures {
+    justify-content: center;
+  }
+
+  .heroImageContainer {
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  .heroImage {
+    width: 100%;
+    max-width: 340px;
+  }
 }

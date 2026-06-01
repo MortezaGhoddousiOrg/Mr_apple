@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import style from "@/app/AboutUs/page.module.css";
 
 export default function Aboutus() {
@@ -12,7 +13,6 @@ export default function Aboutus() {
       description:
         "مسئول تعامل با مشتریان و تضمین رضایت آن‌ها در تمامی مراحل خرید. با دقت و صمیمیت پاسخ‌گوی هر سوال شماست.",
     },
-
     {
       img: "/image-about/images (3).jfif",
       name: "آرمان رضایی",
@@ -20,7 +20,6 @@ export default function Aboutus() {
       description:
         "نظارت بر عملکرد فنی وب‌سایت، بروزرسانی‌ها و امنیت زیرساخت‌ها. عاشق کدنویسی تمیز و تجربه‌ی کاربری سریع.",
     },
-
     {
       img: "/image-about/images (3).jfif",
       name: "نیلوفر موسوی",
@@ -50,18 +49,45 @@ export default function Aboutus() {
         "تضمین آماده‌سازی سریع، بسته‌بندی استاندارد و تحویل به‌موقع سفارش‌ها. دقت و زمان‌بندی نقطه قوت اوست.",
     },
   ]);
+
   return (
     <div className={style.aboutBody}>
       <header className={style.aboutHeader}>
-        <div>
-          <h1>درباره ما</h1>
-          <p>
-            ما در مجموعه‌ی AppleHub همیشه آماده شنیدن صدای شما هستیم. اگر پرسشی،
-            پیشنهادی یا درخواستی دارید، تیم پشتیبانی ما در کنار شماست تا بهترین
-            تجربه را از محصولات اپل برایتان رقم بزند.
+        <div className={style.heroContent}>
+          <h1 className={style.aboutTitle}>درباره ما</h1>
+
+          <p className={style.aboutDescription}>
+            ما در AppleHub تلاش می‌کنیم تجربه‌ای متفاوت از خرید محصولات اپل برای
+            کاربران ایرانی فراهم کنیم؛ تجربه‌ای مینیمال، مطمئن و الهام‌گرفته از
+            فلسفه طراحی اپل.
           </p>
+
+          <div className={style.heroFeatures}>
+            <div className={style.heroFeatureItem}>
+              <svg viewBox="0 0 24 24">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+              <span>تیم متخصص محصولات اپل</span>
+            </div>
+
+            <div className={style.heroFeatureItem}>
+              <svg viewBox="0 0 24 24">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+              <span>پشتیبانی سریع و تخصصی</span>
+            </div>
+          </div>
         </div>
-        <img src="/image-about/iphone2025-baner.png" alt="" />
+
+        <div className={style.heroImageWrapper}>
+          <Image
+            src="/image-about/IMG_SEGMENT_20260521_145912.png"
+            alt="About us"
+            width={420}
+            height={400}
+            className={style.heroImage}
+          />
+        </div>
       </header>
 
       <section className={style.aboutStore}>

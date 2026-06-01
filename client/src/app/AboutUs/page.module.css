@@ -1,124 +1,251 @@
-.aboutBody {
-  /* background: radial-gradient(
-    circle at top,
-    #1f2933 0,
-    #1b202b 50%,
-    #020204 100%
-  ); */
 
+.aboutBody {
   background-color: var(--white);
   color: black;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-bottom: 40px;
-  font-family: "vazir";
+  font-family: "vazir", sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .aboutHeader {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   height: 100vh;
+  min-height: auto;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 60px;
-  background-color: var(--blue);
+  gap: 40px;
+  padding: 140px 7vw 80px;
+  background: black;
+  color: white;
+  box-sizing: border-box;
+}
+
+.heroContent {
+  width: 50%;
+  z-index: 2;
+}
+
+.aboutTitle {
+  font-size: 58px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  letter-spacing: -2px;
+  background: linear-gradient(to right, #fff, #cfd8ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.aboutDescription {
+  font-size: 17px;
+  line-height: 2.1;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 620px;
+  margin-bottom: 30px;
+  text-align: justify;
+}
+
+.heroFeatures {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.heroFeatureItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
   color: white;
 }
 
-.aboutHeader div {
-    width: 40%;
+.heroFeatureItem svg {
+  width: 18px;
+  height: 18px;
+  stroke: white;
+  stroke-width: 2;
+  fill: none;
+}
+.heroImageWrapper {
+  width: 45%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 
-.aboutHeader div h1 {
-    font-size: 46px;
-    margin-bottom: 20px;
+.heroImage {
+  max-width: 100%;
+  height: auto;
+  transform: scale(
+    1.3
+  ); 
+  object-fit: contain;
+  filter: drop-shadow(0 20px 40px rgba(255, 255, 255, 0.15));
 }
 
 .aboutStore {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(18px);
-  box-shadow:
-    0px 8px 25px rgba(0, 0, 0, 0.4),
-    inset 0px 1px 2px rgba(255, 255, 255, 0.3),
-    inset 0px -1px 3px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 24px;
-  margin-top: 80px;
-  width: 80%;
-  height: 300px;
-  padding: 5vw;
+  margin-top: 60px;
+  width: 86%;
+  max-width: 1100px;
+  height: auto; 
+  padding: 40px 30px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
 .aboutStore h2 {
-  justify-self: start;
-  font-size: 24px;
-  margin-bottom: 40px;
+  font-size: 26px;
+  margin: 0 0 20px 0;
+  color: #111827;
 }
 
 .aboutStore p {
-  width: 80%;
-  color: var(--text);
+  width: 100%;
+  max-width: 800px;
+  color: #4b5563;
+  line-height: 2;
+  font-size: 16px;
+  margin: 0;
+  text-align: justify;
+  text-align-last: center;
 }
-
 .aboutMember {
   margin-top: 80px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
-  width: 90%;
+  width: 86%;
   margin-bottom: 50px;
+  max-width: 1100px;
+}
+.memberHeading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.memberHeading h2 {
+  font-size: 32px;
+  margin: 0 0 10px 0;
+}
+
+.memberHeading p {
+  color: #6b7280;
+  margin: 0;
 }
 
 .memberCard {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  height: 600px;
-}
-
-.memberHeading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 40px;
-}
-
-.memberHeading h2 {
-    font-size: 32px;
+  gap: 25px;
+  width: 100%;
+  height: auto;
 }
 
 .memberInfo {
-  border: 2px solid white;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(18px);
-  box-shadow:
-    0px 8px 25px rgba(0, 0, 0, 0.4),
-    inset 0px 1px 2px rgba(255, 255, 255, 0.3),
-    inset 0px -1px 3px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 24px;
-  height: 300px;
-  padding: 20px;
+  padding: 30px 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
 .memberInfo img {
-  width: 80px;
-  height: 80px;
-  border-radius: 999%;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.memberInfo h3,
+.memberInfo h2 {
+  font-size: 18px;
+  margin: 0 0 8px 0;
+  color: #111827;
+}
+
+.memberInfo h3 {
+  font-size: 14px;
+  color: #0f73b3;
+  margin: 0 0 15px 0;
+  font-weight: 600;
+}
+
 .memberInfo p {
-    font-size: 16px;
-    color: var(--text);
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.8;
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .memberCard {
+    grid-template-columns: repeat(2, 1fr); /* تغییر به ۲ ستونه در تبلت */
+  }
+}
+
+@media (max-width: 768px) {
+  .aboutHeader {
+    flex-direction: column; 
+    text-align: center;
+    padding: 100px 24px 60px;
+    gap: 20px;
+  }
+
+  .heroContent {
+    width: 100%;
+  }
+
+  .heroImageWrapper {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .aboutTitle {
+    font-size: 38px;
+  }
+
+  .aboutDescription {
+    text-align: center;
+    font-size: 15px;
+  }
+
+  .heroImage {
+    transform: scale(1); /* اندازه نرمال تصویر در موبایل */
+    max-height: 250px;
+  }
+
+  .heroFeatures {
+    justify-content: center;
+  }
+
+  .memberCard {
+    grid-template-columns: 1fr; /* تک ستونه شدن کارت‌ها در موبایل */
+  }
 }
