@@ -1,9 +1,16 @@
 @import "tailwindcss";
 
-@font-face {
+/* @font-face {
   font-family: "iphone";
   src: url(/SanFranciscoFont-master/SanFranciscoFont-master/SanFranciscoDisplay-Medium.otf);
+} */
+
+@font-face {
+  font-family: "iphone";
+  /* src: url("/Font Apple/sf-pro-text-regular.woff2") format("woff2"); */
+  src: url(/public/Font\ Apple/sf-pro-text-regular);
 }
+
 
 @font-face {
   font-family: "vazir";
@@ -63,4 +70,46 @@ body {
   background-color: white;
   background-color: var(--white);
   
+}
+
+
+.btnGlass {
+   /* border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 100%);
+  color: #ffffff;
+  font-family: "vazir", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  overflow: hidden;
+  backdrop-filter: blur(1.5px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);
+
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); */
+
+
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.155) 0%, rgba(255, 255, 255, 0.2) 100%);
+  color: #ffffff;
+  font-family: "vazir", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  overflow: hidden;
+  backdrop-filter: blur(1.5px);
+
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);
+
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  color: var(--blue);
 }

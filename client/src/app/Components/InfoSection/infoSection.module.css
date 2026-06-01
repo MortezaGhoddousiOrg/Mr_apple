@@ -1,8 +1,10 @@
+/* --- بخش‌های ثابت (بدون تغییر نسبت به کد خودتان) --- */
 .wrapper {
   background: #f5f6f6;
   padding: 120px 0;
   display: flex;
   justify-content: center;
+  overflow-x: hidden;
 }
 
 .grid {
@@ -11,18 +13,13 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  background: #f5f6f6;
   padding: 10px;
   border-radius: 40px;
+  overflow: hidden;
 }
 
-/* کارت */
-
 .card {
-  /* background: linear-gradient(180deg, #0f73b3, #0b639b); */
-  background-color: #f5f6f6;
-  /* background-color: #addcf0; */
-
+  background-color: #ffffff;
   border-radius: 30px;
   padding: 60px;
   position: relative;
@@ -30,37 +27,20 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: 0.4s ease;
+  transition: background-color 0.45s ease, transform 0.45s ease;
 }
 
-/* .card:hover {
-  transform: translateY(-10px);
-} */
-
-.card::before {
-  content: "";
-  position: absolute;
-  width: 340px;
-  height: 340px;
-  top: -120px;
-  right: -120px;
-  /* background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.35),
-    transparent 65%
-  ); */
-  filter: blur(60px);
+.card:hover {
+  background-color: #0f73b3;
+  transform: translateY(-6px);
 }
 
 .content {
   position: relative;
-
-  z-index: 2;
-
+  z-index: 10;
+  /* افزایش لایه برای جلوگیری از تداخل */
   direction: rtl;
-
   text-align: center;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -69,851 +49,226 @@
 
 .title {
   font-size: 44px;
-
   line-height: 1.3;
-
   font-weight: 900;
-
   color: #0f73b3;
-
   margin-bottom: 18px;
-
   font-family: vazir;
+  transition: color 0.45s ease;
+}
+
+.card:hover .title {
+  color: #ffffff;
 }
 
 .desc {
   font-size: 18px;
-
   line-height: 2;
-
   color: #0f73b3;
-
   max-width: 430px;
-
   font-family: vazir;
-
   text-align: center;
+  transition: color 0.45s ease;
 }
 
+.card:hover .desc {
+  color: #ffffff;
+}
+
+/* --- استایل دکمه‌ها و رفع باگ هاور --- */
 .actions {
   display: flex;
-
   gap: 14px;
-
   margin-top: 64px;
+  z-index: 20;
+  /* بالاترین لایه برای حل باگ هاور */
+  position: relative;
 }
 
-.buyBtn {
-  background: #0f73b3;
-
-  color: #fff;
-
-  border: 2px solid #0f73b3;
-
-  padding: 11px 24px;
-
-  border-radius: 999px;
-
-  font-size: 14px;
-
-  font-family: vazir;
-
-  cursor: pointer;
-
-  transition: 0.25s ease;
+.secondActions {
+  margin-top: 42px;
 }
 
-.buyBtn:hover {
-  transform: translateY(-3px);
-
-  background: #f5f5f5;
-
-  color: #0f73b3;
-}
-
+.buyBtn,
 .moreBtn {
-  background: transparent;
-
-  color: #0f73b3;
-
-  border: 2px solid #0f73b3;
-
-  padding: 9px 22px;
-
-  border-radius: 999px;
-
-  font-size: 14px;
-
-  font-family: vazir;
-
-  cursor: pointer;
-
-  transition: 0.25s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  min-width: 120px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+  color: #0f73b3 !important;
+  background: rgba(15, 115, 179, 0.1) !important;
 }
 
-.moreBtn:hover {
-  transform: translateY(-3px);
+.card:hover .buyBtn,
+.card:hover .moreBtn {
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px);
+}
 
-  background: #0f73b3;
-
-  color: #ffffff;
+.card:hover .buyBtn:hover,
+.card:hover .moreBtn:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+  transform: scale(1.05);
 }
 
 .imageBox {
   position: relative;
-
   width: 100%;
-
   height: 360px;
-
   margin-top: auto;
-
   display: flex;
-
   align-items: flex-end;
-
   justify-content: center;
-
-  z-index: 2;
+  z-index: 1;
+  /* لایه زیر دکمه‌ها */
+  pointer-events: none;
+  /* مهم: جلوگیری از مسدود کردن کلیک دکمه‌ها */
 }
 
 .image {
   object-fit: contain;
   transform: scale(1.1);
-  transition: 0.5s ease;
 }
 
-.card:hover .image {
-  transform: scale(1.04);
+.secondImageBox .image {
+  transform: scale(1.25);
 }
 
-.card:nth-child(2) {
-  /* background: linear-gradient(180deg, #0f73b3, #0c6aa5); */
-  background-color: #0f73b3;
-  /* background-color: #addcf0; */
+/* ==================================================
+   بخش ریسپانسیو اختصاصی (آپدیت جدید)
+   ================================================== */
+
+/* ۱. موبایل‌های بسیار کوچک (کمتر از 468 پیکسل) */
+@media (max-width: 467px) {
   .wrapper {
-    background: #f5f6f6;
-
-    padding: 120px 0;
-
-    display: flex;
-    justify-content: center;
-  }
-
-  .grid {
-    width: 100%;
-    max-width: 1400px;
-
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
-
-    background: #f5f6f6;
-
-    padding: 10px;
-
-    border-radius: 40px;
-  }
-
-  .card {
-    /* background: linear-gradient(180deg, #0f73b3, #0b639b); */
-    background-color: #f5f6f6;
-    /* background-color: #addcf0; */
-
-    border-radius: 30px;
-
-    padding: 60px;
-
-    position: relative;
-
-    min-height: 620px;
-
-    display: flex;
-    flex-direction: column;
-
-    overflow: hidden;
-
-    transition: 0.4s ease;
-  }
-
-  /* .card:hover {
-    transform: translateY(-10px);
-  } */
-
-  .card::before {
-    content: "";
-
-    position: absolute;
-
-    width: 340px;
-    height: 340px;
-
-    top: -120px;
-    right: -120px;
-
-    /* background: radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.35),
-      transparent 65%
-    ); */
-
-    filter: blur(60px);
-  }
-
-  .content {
-    position: relative;
-
-    z-index: 2;
-
-    direction: rtl;
-
-    text-align: center;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    margin-top: 20px;
-  }
-
-  .title {
-    font-size: 44px;
-
-    line-height: 1.3;
-
-    font-weight: 900;
-
-    color: #fff;
-
-    margin-bottom: 18px;
-
-    font-family: vazir;
-  }
-
-  .desc {
-    font-size: 18px;
-
-    line-height: 2;
-
-    color: #fff;
-
-    max-width: 430px;
-
-    font-family: vazir;
-
-    text-align: center;
-  }
-
-  .actions {
-    display: flex;
-
-    gap: 14px;
-
-    margin-top: 28px;
-  }
-
-  .buyBtn {
-    background: #fff;
-
-    color: #0f73b3;
-
-    border: 2px solid #fff;
-
-    padding: 11px 24px;
-
-    border-radius: 999px;
-
-    font-size: 14px;
-
-    font-family: vazir;
-
-    cursor: pointer;
-
-    transition: 0.3s ease;
-  }
-
-  .buyBtn:hover {
-    /* transform: translateY(-2px); */
-    background: #0f73b3;
-    color: #f5f6f6;
-  }
-
-  .moreBtn {
-    background: transparent;
-
-    color: #fff;
-
-    border: 2px solid #fff;
-
-    padding: 9px 22px;
-
-    border-radius: 999px;
-
-    font-size: 14px;
-
-    font-family: vazir;
-
-    cursor: pointer;
-
-    transition: 0.3s ease;
-  }
-
-  .moreBtn:hover {
-    background: #ffffff;
-
-    color: #0f73b3;
-  }
-
-  .imageBox {
-    position: relative;
-
-    width: 100%;
-
-    height: 360px;
-
-    margin-top: auto;
-
-    display: flex;
-
-    align-items: flex-end;
-
-    justify-content: center;
-
-    z-index: 2;
-  }
-}
-
-.card:nth-child(2) .image {
-  object-fit: contain;
-  transition: 0.5s ease;
-  transform: scale(1.4);
-  margin-top: 30px;
-}
-
-.card:nth-child(2):hover .image {
-  transform: scale(1.22);
-}
-
-/* .card:nth-child(3) {
-  background: linear-gradient(180deg, #0f73b3, #0d78bb);
-  background-color: #0f73b3;
-  background-color: #addcf0;
-  .wrapper {
-    background: #f5f6f6;
-
-    padding: 120px 0;
-
-    display: flex;
-    justify-content: center;
-  }
-
-  .grid {
-    width: 100%;
-    max-width: 1400px;
-
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
-
-    background: #f5f6f6;
-
-    padding: 10px;
-
-    border-radius: 40px;
-  }
-
-
-  .card {
-    background: linear-gradient(180deg, #0f73b3, #0b639b);
-    background-color: #f5f6f6;
-    background-color: #addcf0;
-
-    border-radius: 30px;
-
-    padding: 60px;
-
-    position: relative;
-
-    min-height: 620px;
-
-    display: flex;
-    flex-direction: column;
-
-    overflow: hidden;
-
-    transition: 0.4s ease;
-  }
-
-  .card:hover {
-    transform: translateY(-10px);
-  }
-
-
-  .card::before {
-    content: "";
-
-    position: absolute;
-
-    width: 340px;
-    height: 340px;
-
-    top: -120px;
-    right: -120px;
-
-    background: radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.35),
-      transparent 65%
-    );
-
-    filter: blur(60px);
-  }
-
-
-  .content {
-    position: relative;
-
-    z-index: 2;
-
-    direction: rtl;
-
-    text-align: center;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    margin-top: 20px;
-  }
-
-  .title {
-    font-size: 44px;
-
-    line-height: 1.3;
-
-    font-weight: 900;
-
-    color: #fff;
-
-    margin-bottom: 18px;
-
-    font-family: vazir;
-  }
-
-  .desc {
-    font-size: 18px;
-
-    line-height: 2;
-
-    color: #fff;
-
-    max-width: 430px;
-
-    font-family: vazir;
-
-    text-align: center;
-  }
-
-
-
-  .actions {
-    display: flex;
-
-    gap: 14px;
-
-    margin-top: 28px;
-  }
-
-  .buyBtn {
-    background: #fff;
-
-    color: #0f73b3;
-
-    border: none;
-
-    padding: 11px 24px;
-
-    border-radius: 999px;
-
-    font-size: 14px;
-
-    font-family: vazir;
-
-    cursor: pointer;
-
-    transition: 0.3s ease;
-  }
-
-  .buyBtn:hover {
-    transform: translateY(-2px);
-
-    background: #f5f5f5;
-  }
-
-  .moreBtn {
-    background: transparent;
-
-    color: #fff;
-
-    border: 2px solid #fff;
-
-    padding: 9px 22px;
-
-    border-radius: 999px;
-
-    font-size: 14px;
-
-    font-family: vazir;
-
-    cursor: pointer;
-
-    transition: 0.3s ease;
-  }
-
-  .moreBtn:hover {
-    background: #ffffff;
-
-    color: #2d2d2d;
-  }
-} */
-
-/* .card:nth-child(4) {
-  background: linear-gradient(180deg, #0f73b3, #095f95);
-  background-color: #0f73b3;
-  background-color: #addcf0;
-  .wrapper {
-    background: #f5f6f6;
-
-    padding: 120px 0;
-
-    display: flex;
-    justify-content: center;
-  }
-
-  .grid {
-    width: 100%;
-    max-width: 1400px;
-
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
-
-    background: #f5f6f6;
-
-    padding: 10px;
-
-    border-radius: 40px;
-  }
-
-
-  .card {
-    background: linear-gradient(180deg, #0f73b3, #0b639b);
-    background-color: #f5f6f6;
-    background-color: #addcf0;
-
-    border-radius: 30px;
-
-    padding: 60px;
-
-    position: relative;
-
-    min-height: 620px;
-
-    display: flex;
-    flex-direction: column;
-
-    overflow: hidden;
-
-    transition: 0.4s ease;
-  }
-
-  .card:hover {
-    transform: translateY(-10px);
-  }
-
-
-  .card::before {
-    content: "";
-
-    position: absolute;
-
-    width: 340px;
-    height: 340px;
-
-    top: -120px;
-    right: -120px;
-
-    background: radial-gradient(
-      circle,
-      rgba(255, 255, 255, 0.35),
-      transparent 65%
-    );
-
-    filter: blur(60px);
-  }
-
-
-  .content {
-    position: relative;
-
-    z-index: 2;
-
-    direction: rtl;
-
-    text-align: center;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    margin-top: 20px;
-  }
-
-  .title {
-    font-size: 44px;
-
-    line-height: 1.3;
-
-    font-weight: 900;
-
-    color: #0f73b3;
-
-    margin-bottom: 18px;
-
-    font-family: vazir;
-  }
-
-  .desc {
-    font-size: 18px;
-
-    line-height: 2;
-
-    color: #0f73b3;
-
-    max-width: 430px;
-
-    font-family: vazir;
-
-    text-align: center;
-  }
-
-
-  .actions {
-    display: flex;
-
-    gap: 14px;
-
-    margin-top: 28px;
-  }
-
-  .buyBtn {
-    background: #0f73b3;
-
-    color: #fff;
-
-    border: none;
-
-    padding: 11px 24px;
-
-    border-radius: 999px;
-
-    font-size: 14px;
-
-    font-family: vazir;
-
-    cursor: pointer;
-
-    transition: 0.3s ease;
-  }
-
-  .buyBtn:hover {
-    transform: translateY(-2px);
-
-    background: #f5f5f5;
-  }
-
-  .moreBtn {
-    background: transparent;
-
-    color: #0f73b3;
-
-    border: 2px solid #0f73b3;
-
-    padding: 9px 22px;
-
-    border-radius: 999px;
-
-    font-size: 14px;
-
-    font-family: vazir;
-
-    cursor: pointer;
-
-    transition: 0.3s ease;
-  }
-
-  .moreBtn:hover {
-    background: #ffffff;
-
-    color: #2d2d2d;
-  }
-} */
-
-@media (max-width: 479px) {
-  .wrapper {
-    padding: 70px 14px;
+    padding: 40px 10px;
   }
 
   .grid {
     grid-template-columns: 1fr;
-    gap: 14px;
-    border-radius: 24px;
+    gap: 15px;
   }
 
   .card {
-    padding: 24px;
-    height: 460px; /* ✅ برابر شدن ارتفاع */
-    border-radius: 24px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
+    padding: 20px;
+    height: 400px;
+    /* اندازه یکسان برای هر دو کارت */
+    min-height: 400px;
+    border-radius: 20px;
   }
 
   .title {
-    font-size: 24px;
-    line-height: 1.4;
+    font-size: 20px;
+    margin-bottom: 10px;
   }
 
   .desc {
-    font-size: 14px;
-    line-height: 1.85;
-    max-width: 100%;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    margin-top: 20px;
+    /* یکسان‌سازی فاصله در موبایل */
+  }
+
+  .secondActions {
+    margin-top: 20px;
+  }
+
+  /* حذف تفاوت مارجین در موبایل کوچک */
+
+  .buyBtn,
+  .moreBtn {
+    width: 100%;
+    /* دکمه‌های تمام عرض و یکسان */
+    height: 42px;
+    font-size: 13px;
+  }
+
+  .imageBox {
+    height: 150px;
+    margin-top: 15px;
+  }
+
+  .image {
+    transform: scale(1.4);
+  }
+
+  .secondImageBox .image {
+    transform: scale(1.5);
+  }
+}
+
+/* ۲. موبایل‌های متوسط (468 پیکسل تا 767 پیکسل) */
+@media (min-width: 468px) and (max-width: 767px) {
+  .wrapper {
+    padding: 60px 15px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .card {
+    padding: 30px;
+    height: 480px;
+    /* اندازه یکسان برای هر دو کارت */
+    min-height: 480px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+
+  .desc {
+    font-size: 15px;
   }
 
   .actions {
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    margin-top: 28px;
+    margin-top: 30px;
+  }
+
+  .secondActions {
+    margin-top: 30px;
   }
 
   .buyBtn,
   .moreBtn {
     width: 100%;
     height: 46px;
-    font-size: 13px;
   }
 
   .imageBox {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    height: 180px;
+    margin-top: 20px;
   }
 
   .image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform: scale(1);
+    transform: scale(1.6);
   }
 
-  .card:hover .image {
-    transform: scale(1.02);
-  }
-
-  .card:nth-child(2) .image {
-    transform: scale(1);
-    /* margin-bottom: 40px; */
-    margin-top: 0;
-  }
-
-  .card:nth-child(2):hover .image {
-    transform: scale(0.96);
-  }
-
-  .card:nth-child(2) .title {
-    font-size: 23px;
-  }
-
-  .card:nth-child(2) .desc {
-    max-width: 100%;
+  .secondImageBox .image {
+    transform: scale(1.7);
   }
 }
 
-/* ================================================== */
-/* 480px → 767px */
-@media (min-width: 480px) and (max-width: 767px) {
-  .wrapper {
-    padding: 80px 20px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .card {
-    padding: 30px;
-    min-height: 480px;
-  }
-
-  .title {
-    font-size: 30px;
-  }
-
-  .desc {
-    font-size: 15px;
-    max-width: 100%;
-  }
-
-  .actions {
-    margin-top: 34px;
-  }
-
-  .imageBox {
-    height: 220px;
-  }
-
-  .image {
-    transform: scale(1.05);
-  }
-
-  .card:nth-child(2) .image {
-    transform: scale(1.12);
-  }
-
-  .card:nth-child(2):hover .image {
-    transform: scale(1.06);
-  }
-
-  .card:nth-child(2) .title {
-    font-size: 29px;
-  }
-
-  .card:nth-child(2) .desc {
-    max-width: 100%;
-  }
-}
-
-/* ================================================== */
-/* 768px → 991px */
+/* ۳. تبلت (768px تا 991px) */
 @media (min-width: 768px) and (max-width: 991px) {
-  .wrapper {
-    padding: 90px 28px;
-  }
-
   .grid {
     grid-template-columns: 1fr;
-    gap: 18px;
     max-width: 760px;
   }
 
@@ -926,11 +281,6 @@
     font-size: 34px;
   }
 
-  .desc {
-    font-size: 16px;
-    max-width: 100%;
-  }
-
   .imageBox {
     height: 260px;
   }
@@ -938,150 +288,27 @@
   .image {
     transform: scale(1.06);
   }
-
-  .card:nth-child(2) .image {
-    transform: scale(1.18);
-  }
-
-  .card:nth-child(2):hover .image {
-    transform: scale(1.1);
-  }
-
-  .card:nth-child(2) .title {
-    font-size: 33px;
-  }
 }
 
-/* ================================================== */
-/* 992px → 1199px */
-@media (min-width: 992px) and (max-width: 1199px) {
-  .wrapper {
-    padding: 100px 30px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-  }
-
+/* ۴. لپ‌تاپ (992px تا 1399px) */
+@media (min-width: 992px) and (max-width: 1399px) {
   .card {
-    padding: 38px;
-    min-height: 560px;
-  }
-
-  .title {
-    font-size: 34px;
-  }
-
-  .desc {
-    font-size: 16px;
-  }
-
-  .imageBox {
-    height: 240px;
-  }
-
-  .image {
-    transform: scale(1.05);
-  }
-
-  .card:nth-child(2) .image {
-    transform: scale(1.22);
-  }
-
-  .card:nth-child(2):hover .image {
-    transform: scale(1.14);
-  }
-
-  .card:nth-child(2) .title {
-    font-size: 33px;
-  }
-}
-
-/* ================================================== */
-/* 1200px → 1399px */
-@media (min-width: 1200px) and (max-width: 1399px) {
-  .grid {
-    max-width: 1240px;
-  }
-
-  .card {
-    padding: 48px;
     min-height: 600px;
   }
 
   .title {
-    font-size: 40px;
-  }
-
-  .desc {
-    font-size: 17px;
-  }
-
-  .imageBox {
-    height: 300px;
-  }
-
-  .image {
-    transform: scale(1.08);
-  }
-
-  .card:nth-child(2):hover .image {
-    transform: scale(1.22);
-  }
-
-  .card:nth-child(2):hover .image {
-    transform: scale(1.36);
+    font-size: 38px;
   }
 }
 
-/* ================================================== */
-/* 1400px → 1599px */
-@media (min-width: 1400px) and (max-width: 1599px) {
-  .grid {
-    max-width: 1400px;
-  }
-
-  .card {
-    padding: 56px;
-    min-height: 640px;
-  }
-
-  .title {
-    font-size: 44px;
-  }
-
-  .desc {
-    font-size: 18px;
-  }
-
-  .imageBox {
-    height: 340px;
-  }
-
-  .image {
-    transform: scale(1.1);
-  }
-
-  .card:nth-child(2) .image {
-    transform: scale(1.4);
-  }
-
-  .card:nth-child(2):hover .image {
-    transform: scale(1.28);
-  }
-}
-
-/* ================================================== */
-/* 1600px+ */
-@media (min-width: 1600px) {
+/* ۵. مانیتور بزرگ (1400px تا 2000px) */
+@media (min-width: 1400px) {
   .wrapper {
     padding: 140px 40px;
   }
 
   .grid {
     max-width: 1580px;
-    gap: 20px;
   }
 
   .card {
@@ -1094,28 +321,7 @@
     font-size: 52px;
   }
 
-  .desc {
-    font-size: 20px;
-    max-width: 80%;
-  }
-
-  .actions {
-    margin-top: 54px;
-  }
-
   .imageBox {
     height: 400px;
-  }
-
-  .image {
-    transform: scale(1.15);
-  }
-
-  .card:nth-child(2) .image {
-    transform: scale(1.45);
-  }
-
-  .card:nth-child(2):hover .image {
-    transform: scale(1.32);
   }
 }

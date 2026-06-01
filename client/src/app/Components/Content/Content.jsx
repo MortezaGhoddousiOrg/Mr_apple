@@ -64,8 +64,8 @@
 import React, { useEffect, useState } from 'react';
 import style from '@/app/Components/Content/Content.module.css';
 
-const HERO_VIDEO = '/image-contact/hero.mp4';
-const SMALL_HERO_VIDEO = '/image-contact/smallHero.mp4';
+const HERO_VIDEO = '/image-content/hero.mp4';
+const SMALL_HERO_VIDEO = '/image-content/smallHero.mp4';
 
 export default function Content() {
   const [videoSrc, setVideoSrc] = useState(HERO_VIDEO);
@@ -81,7 +81,7 @@ export default function Content() {
   return (
     <section className={style.contentSection}>
       <div className={style.heroContent}>
-        <p className={style.contentTitle}>MR•APPLE</p>
+        <p className={style.contentTitle}>MR APPLE</p>
 
         <div className={style.VideoContainer}>
           <video

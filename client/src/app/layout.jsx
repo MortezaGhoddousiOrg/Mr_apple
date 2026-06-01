@@ -2,7 +2,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/app/Components/Header/Header";
 import Footer from "@/app/Components/Footer/Footer";
-
+import { AuthProvider } from "@/app/Context/Context";
+import Contentbox from "./ContentBox/Contentbox";
+// import Toast from "./ToastError/Toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,6 +15,11 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// const [notif, setNotif] = useState({
+//     message: "",
+//     type: "",
+//   });
 
 export const metadata = {
   title: "Create Next App",
@@ -26,10 +33,14 @@ export default function RootLayout({ children }) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Header />
-        {children}
-        <Footer />
-        </body>
+        <AuthProvider>
+          <Header />
+          <Contentbox />
+          {/* <Toast notif={notif} /> */}
+          {children}
+          <Footer />
+        </AuthProvider>
+      </body>
     </html>
   );
 }

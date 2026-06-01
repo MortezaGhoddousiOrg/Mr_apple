@@ -1,14 +1,27 @@
-import "./page.module.css";
+"use client";
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLoggedIn } from "../Context/logincontext";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import style from "@/app/Login/page.module.css";
+
+import { useRouter } from "next/navigation";
+import Code from "@/app/Code/Code";
 
 export default function Login({ setNotif }) {
   const [passshow, setPsssShow] = useState(false);
-  const navigate = useNavigate();
-  const { setIsLoggedIn } = useLoggedIn();
+  const router = useRouter();
+  const [code, setCode] = useState(false);
+
+  const [login, setLogin] = useState();
+  
+    useEffect(() => {
+      const local = localStorage.getItem("user");
+      if (local) {
+        setLogin(true);
+        router.push("/PanelUser")
+      } else {
+        setLogin(false);
+      }
+    }, []);
 
   const toggleshowpass = () => {
     setPsssShow((prev) => !prev);
@@ -31,13 +44,9 @@ export default function Login({ setNotif }) {
 
     const phoneRegex = /^09\d{9}$/;
 
-    if (!phoneRegex.test(loginData.phone))
+    if (!phoneRegex.test(loginData.phone)) {
       return setNotif({ message: "شماره موبایل معتبر نیست", type: "error" });
-
-    // const dataToSend = {
-    //   phone,
-    //   createdAt: new Date(),
-    // };
+    }
 
     try {
       const phone = loginData.phone;
@@ -46,24 +55,23 @@ export default function Login({ setNotif }) {
         loginTime: new Date().toISOString(),
       };
 
-      localStorage.setItem("user", phone);
+      localStorage.setItem("user", userData);
+      // console.log("User saved to LocalStorage:", phone);
 
-      console.log("User saved to LocalStorage:", userData);
-
-      setNotif({ message: "کد تایید برای شما ارسال شد", type: "success" });
+      // setNotif({ message: "کد تایید برای شما ارسال شد", type: "success" });
 
       setLoginData({
         phone: "",
       });
-        const userlocal = localStorage.getItem("user");
 
-        if (userlocal) {
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
-        }
+      // const userLocal = localStorage.getItem("user");
+      // if (userLocal) {
+      //   setIsLoggedIn(true);
+      // } else {
+      //   setIsLoggedIn(false);
+      // }
 
-      navigate("/code");
+      setCode(true);
     } catch (err) {
       console.error("Login error:", err);
       setNotif({
@@ -74,29 +82,33 @@ export default function Login({ setNotif }) {
   };
 
   return (
-    <div className="login-body">
-      <main className="login-content">
-        <h2 className="login-title">به صفحه ورود خوش آمدید</h2>
-        <p className="login-description">
+    <div className={style.loginBody}>
+      <main className={style.loginContent}>
+        <h2 className={style.loginTitle}>به صفحه ورود خوش آمدید</h2>
+        <p className={style.loginDescription}>
           برای دسترسی به امکانات ویژه و تجربه شخصی سازی شده، لطفا وارد حساب
           کاربری خود شوبد
         </p>
 
-        <form className="login-first" onSubmit={handleSubmit} noValidate>
-          <div className="login-input">
-            <input
-              type="text"
-              name="phone"
-              value={loginData.phone}
-              onChange={handleChange}
-              required
-            />
+        {code ? (
+          <Code />
+        ) : (
+          <form className={style.loginFirst} onSubmit={handleSubmit} noValidate>
+            <div className={style.loginInput}>
+              <input
+                type="text"
+                name="phone"
+                value={loginData.phone}
+                onChange={handleChange}
+                required
+              />
 
-            <label>شماره تلفن</label>
-          </div>
+              <label>شماره تلفن</label>
+            </div>
 
-          <button type="submit">ورود</button>
-        </form>
+            <button type="submit">ورود</button>
+          </form>
+        )}
       </main>
     </div>
   );
