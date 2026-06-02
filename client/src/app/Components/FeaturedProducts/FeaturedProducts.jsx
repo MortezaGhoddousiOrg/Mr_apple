@@ -9,44 +9,44 @@ import { useRouter } from "next/navigation";
 export default function FeaturedProduct() {
   const [featuredItems, setFeaturedItems] = useState([
     {
-      img: "/image-featuredProduct/iphone2025.png",
-      title: "آیفون",
-      path: "iPhone",
+      id: 1,
+      title: "Mobile",
+      image: "/image-featuredProduct/iphone2025.png",
     },
     {
-      img: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-      title: "لوازم جانبی",
-      path: "Accessories",
+      id: 2,
+      title: "Accessories",
+      image: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
     },
     {
-      img: "/image-featuredProduct/ipads.png",
-      title: "آیپد",
-      path: "iPad",
+      id: 3,
+      title: "ipad",
+      image: "/image-featuredProduct/ipads.png",
     },
     {
-      img: "/image-featuredProduct/iphone2025.png",
-      title: "کارکرده",
-      path: "usedProducts",
+      id: 4,
+      title: "usedProducts",
+      image: "/image-featuredProduct/iphone2025.png",
     },
     {
-      img: "/image-featuredProduct/iphone2025.png",
-      title: "آیفون",
-      path: "iPhone",
+      id: 5,
+      title: "Mobile",
+      image: "/image-featuredProduct/iphone2025.png",
     },
     {
-      img: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-      title: "لوازم جانبی",
-      path: "Accessories",
+      id: 6,
+      title: "Accessories",
+      image: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
     },
     {
-      img: "/image-featuredProduct/ipads.png",
-      title: "آیپد",
-      path: "iPad",
+      id: 7,
+      title: "ipad",
+      image: "/image-featuredProduct/ipads.png",
     },
     {
-      img: "/image-featuredProduct/iphone2025.png",
-      title: "کارکرده",
-      path: "usedProducts",
+      id: 8,
+      title: "usedProducts",
+      image: "/image-featuredProduct/iphone2025.png",
     },
   ]);
 
@@ -153,17 +153,17 @@ export default function FeaturedProduct() {
                 : "none",
             }}
           >
-            {extendedItems.map((item, index) => (
+            {extendedItems.map((item, i) => (
               <div
-                key={index}
+                key={`${item.id}-${i}`}
                 className={style.cards}
                 style={{ flex: `0 0 ${100 / visible}%` }}
-                onClick={() => router.push(`/Category/${item.path}`)}
+                onClick={() => router.push(`/Category/${item.title}`)}
               >
                 <div className={style.cardImage}>
                   <Image
                     className={style.image}
-                    src={item.img}
+                    src={item.image}
                     alt={item.title}
                     width={125}
                     height={115}

@@ -4,7 +4,7 @@ import styles from "@/app/ProductBuy/page.module.css";
 import { useState } from "react";
 import { useAuth } from "@/app/Context/Context";
 import { useRouter } from "next/navigation";
-import DetailUserBuy from "@/app/DetailUserBuy/DetailUserBuy";
+import DetailUserBuy from "@/app/ProductBuy/DetailUserBuy/DetailUserBuy";
 
 export default function ProductBuy() {
   const { productbuy, setProductBuy } = useAuth();
@@ -12,8 +12,6 @@ export default function ProductBuy() {
   const [open, setOpen] = useState(false);
 
   const increaseQuantity = (id) => {
-    if (typeof setProductBuy !== "function") return;
-
     setProductBuy((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, qty: (item.qty || 1) + 1 } : item,
@@ -21,9 +19,10 @@ export default function ProductBuy() {
     );
   };
 
-  const decreaseQuantity = (id) => {
-    if (typeof setProductBuy !== "function") return;
+  console.log(productbuy);
+  
 
+  const decreaseQuantity = (id) => {
     setProductBuy((prev) =>
       prev
         .map((item) =>
@@ -35,8 +34,6 @@ export default function ProductBuy() {
   };
 
   const removeItem = (id) => {
-    if (typeof setProductBuy !== "function") return;
-
     setProductBuy((prev) => prev.filter((item) => item.id !== id));
   };
 
@@ -109,7 +106,7 @@ export default function ProductBuy() {
             </div>
           ) : (
             <div className={styles.list}>
-              {productbuy.map((item) => {
+              {productbuy.map((item, index) => {
                 const itemPrice =
                   typeof item.price === "number"
                     ? item.price
@@ -119,25 +116,18 @@ export default function ProductBuy() {
                 const itemTotal = itemPrice * qty;
 
                 return (
-                  <div key={item.id} className={styles.card}>
+                  <div key={index} className={styles.card}>
                     <div className={styles.imageBox}>
                       <img
-                        src={
-                          item.image_url ||
-                          item.image ||
-                          "/placeholder-image.jpg"
-                        }
-                        alt={item.title || "product"}
+                        src={item.image}
+                        alt={item.title}
                         className={styles.productImage}
-                        onError={(e) => {
-                          e.currentTarget.src = "/placeholder-image.jpg";
-                        }}
                       />
                     </div>
 
                     <div className={styles.info}>
                       <h3 className={styles.cardTitle}>
-                        {item.title || "بدون عنوان"}
+                        {item.title}
                       </h3>
                       <div className={styles.meta}>
                         <p className={styles.price}>

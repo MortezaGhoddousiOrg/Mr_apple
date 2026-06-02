@@ -12,39 +12,38 @@
 }
 
 .article {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
   border-radius: 60px;
   background: linear-gradient(135deg, rgb(0, 51, 79) 0%, rgb(0, 45, 64) 100%);
   font-family: "vazir", sans-serif;
   font-size: 16px;
   font-weight: 500;
   overflow: hidden;
-
   backdrop-filter: blur(1.5px);
   border: 1px solid rgba(255, 255, 255, 0.25);
-
   box-shadow:
     0 8px 32px 0 rgba(0, 0, 0, 0.3),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
     inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);
-
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-
   margin: 0 30px;
   padding: 10px 0;
-  height: 100vh;
 }
 
 .badge {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    left: -2%;
-    top: 5%;
-    transform: rotate(-25deg);
-    width: 250px;
-
-    border: 1px solid rgba(255, 255, 255, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: -2%;
+  top: 5%;
+  transform: rotate(-25deg);
+  width: 250px;
+  height: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.155) 0%,
@@ -54,7 +53,6 @@
   font-family: "vazir", sans-serif;
   font-size: 16px;
   font-weight: 500;
-  /* cursor: pointer; */
   backdrop-filter: blur(1.5px);
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
@@ -103,15 +101,9 @@
   height: 430px;
   width: 250px;
   flex-shrink: 0;
-  /* background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(18px);
-  background-color: white;
-  border: 1px solid rgba(255, 255, 255, 0.18); */
   padding: 0 1.5vw;
-  /* cursor: pointer; */
   border-radius: 24px;
   transition: all 0.3s ease-out;
-
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: linear-gradient(
     135deg,
@@ -122,7 +114,6 @@
   font-family: "vazir", sans-serif;
   font-size: 16px;
   font-weight: 500;
-  /* cursor: pointer; */
   backdrop-filter: blur(1.5px);
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
@@ -136,7 +127,6 @@
   border-radius: 24px;
   width: 230px;
   height: 100%;
-
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: linear-gradient(
     135deg,
@@ -148,9 +138,7 @@
   font-size: 16px;
   font-weight: 500;
   backdrop-filter: blur(1.5px);
-
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  /* color: var(--blue); */
 }
 
 .serviceCardLastDiv {
@@ -161,18 +149,11 @@
   font-size: 14px;
 }
 
-/* .serviceCardLastP {
-  font-size: 14px;
-} */
-
 .serviceCardLastButton {
   width: 50%;
   padding: 8px 12px;
-  /* border: none; */
   font-family: "vazir";
   border-radius: 20px;
-  /* border: 1px solid rgba(255, 255, 255, 0.25); */
-
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.155) 0%,
@@ -200,6 +181,7 @@
   height: 180px;
   margin: 15px 0;
   object-fit: contain;
+  cursor: pointer;
 }
 
 .serviceTitle {
@@ -279,8 +261,6 @@
 }
 
 .navBtn {
-  display: flex;
-  justify-content: center;
   position: absolute;
   display: flex;
   justify-content: center;
@@ -289,7 +269,7 @@
   height: 40px;
   font-size: 16px;
   background: #d2d2d2;
-  color: var(--blue);
+  color: black;
   border: none;
   padding: 10px;
   cursor: pointer;
@@ -322,7 +302,24 @@
   margin-right: 3px;
 }
 
-/* @media (min-width: 250px) and (max-width: 400px) {
+@media (min-width: 250px) and (max-width: 400px) {
+  .article {
+    margin: 0 10px;
+    border-radius: 24px;
+    padding: 14px 0;
+    height: auto;
+    min-height: 520px;
+  }
+
+  .badge {
+    width: 220px;
+    top: 2%;
+    left: -20%;
+    font-size: 10px;
+    padding: 6px 12px;
+    transform: rotate(-20deg);
+  }
+
   .iconTitle {
     font-size: 20px;
   }
@@ -391,6 +388,23 @@
 }
 
 @media (min-width: 400px) and (max-width: 600px) {
+  .article {
+    margin: 0 14px;
+    border-radius: 30px;
+    padding: 16px 0;
+    height: auto;
+    min-height: 540px;
+  }
+
+  .badge {
+    width: 240px;
+    top: 3%;
+    left: -12%;
+    font-size: 14px;
+    padding: 7px 14px;
+    transform: rotate(-22deg);
+  }
+
   .iconTitle {
     font-size: 20px;
   }
@@ -458,8 +472,24 @@
   }
 }
 
-
 @media (min-width: 600px) and (max-width: 800px) {
+  .article {
+    margin: 0 18px;
+    border-radius: 38px;
+    padding: 18px 0;
+    height: auto;
+    min-height: 560px;
+  }
+
+  .badge {
+    width: 270px;
+    top: 4%;
+    left: -10%;
+    font-size: 15px;
+    padding: 8px 16px;
+    transform: rotate(-23deg);
+  }
+
   .iconTitle {
     font-size: 22px;
   }
@@ -527,6 +557,23 @@
 }
 
 @media (min-width: 800px) and (max-width: 1000px) {
+  .article {
+    margin: 0 22px;
+    border-radius: 44px;
+    padding: 18px 0;
+    height: auto;
+    min-height: 580px;
+  }
+
+  .badge {
+    width: 300px;
+    top: 4.5%;
+    left: -9%;
+    font-size: 16px;
+    padding: 8px 18px;
+    transform: rotate(-24deg);
+  }
+
   .iconTitle {
     font-size: 22px;
   }
@@ -593,8 +640,24 @@
   }
 }
 
-
 @media (min-width: 1200px) and (max-width: 1400px) {
+  .article {
+    margin: 0 26px;
+    border-radius: 52px;
+    padding: 12px 0;
+    min-height: 700px;
+    /* background: red; */
+  }
+
+  .badge {
+    width: 320px;
+    top: 5%;
+    left: -6%;
+    font-size: 17px;
+    padding: 9px 18px;
+    transform: rotate(-25deg);
+  }
+
   .iconTitle {
     font-size: 24px;
   }
@@ -662,6 +725,23 @@
 }
 
 @media (min-width: 1400px) and (max-width: 1600px) {
+  .article {
+    margin: 0 28px;
+    border-radius: 56px;
+    padding: 12px 0;
+    height: auto;
+    min-height: 760px;
+  }
+
+  .badge {
+    width: 340px;
+    top: 5%;
+    left: -5%;
+    font-size: 18px;
+    padding: 10px 20px;
+    transform: rotate(-25deg);
+  }
+
   .iconTitle {
     font-size: 26px;
   }
@@ -720,8 +800,24 @@
   }
 }
 
-
 @media (min-width: 1600px) and (max-width: 1800px) {
+  .article {
+    margin: 0 30px;
+    border-radius: 60px;
+    padding: 12px 0;
+    height: auto;
+    min-height: 800px;
+  }
+
+  .badge {
+    width: 360px;
+    top: 5%;
+    left: -4.5%;
+    font-size: 19px;
+    padding: 10px 22px;
+    transform: rotate(-25deg);
+  }
+
   .iconTitle {
     font-size: 28px;
   }
@@ -788,8 +884,24 @@
   }
 }
 
-
 @media (min-width: 1800px) {
+  .article {
+    margin: 0 32px;
+    border-radius: 64px;
+    padding: 14px 0;
+    height: auto;
+    min-height: 860px;
+  }
+
+  .badge {
+    width: 380px;
+    top: 5%;
+    left: -4%;
+    font-size: 20px;
+    padding: 11px 24px;
+    transform: rotate(-25deg);
+  }
+
   .iconTitle {
     font-size: 28px;
   }
@@ -853,4 +965,4 @@
   .navBtn.right {
     right: 1%;
   }
-} */
+}

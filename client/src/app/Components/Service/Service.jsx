@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import styles from "@/app/Components/Service/Service.module.css";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/Context";
-import Image from "next/image";
+import Image from "next/image"; 
 
 export default function Service({
   data = [],
@@ -23,8 +23,10 @@ export default function Service({
 
   const { setProductBuy } = useAuth();
 
+  const Active = data.filter((item) => item.status == "active");
+
   const router = useRouter();
- useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 600) {
         setVisibleCards(1);
@@ -41,15 +43,15 @@ export default function Service({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
+
   useEffect(() => {
-    if (index > data.length - visibleCards) {
-      setIndex(Math.max(data.length - visibleCards, 0));
+    if (index > Active.length - visibleCards) {
+      setIndex(Math.max(Active.length - visibleCards, 0));
     }
-  }, [visibleCards, data.length]);
+  }, [visibleCards, Active.length]);
 
   const nextSlide = () => {
-    if (index >= data.length + 1 - visibleCards) return;
+    if (index >= Active.length + 1 - visibleCards) return;
     setIndex((prev) => prev + 1);
   };
 
@@ -81,24 +83,40 @@ export default function Service({
 
   // const [addedItems, setAddedItems] = useState([]);
 
+  // const handleAddToCart = (item) => {
+  //   setProductBuy((prev) => {
+  //     const product = prev.find((p) => p.id === item.id);
+
+  //     if (product) {
+  //       return prev.map((p) =>
+  //         p.id === item.id ? { ...p, pro: p.pro + 1 } : p,
+  //       );
+  //     }
+
+  //     return [...prev, { ...item, pro: 1 }];
+  //   });
+  //   setAddedItems((prev) =>
+  //     prev.includes(item.id) ? prev : [...prev, item.id],
+  //   );
+  // };
+
   const handleAddToCart = (item) => {
-    setProductBuy((prev) => {
-      const product = prev.find((p) => p.id === item.id);
+  setProductBuy((prev) => {
+    const notifProduct = prev.some((p) => p.id === item.id);
 
-      if (product) {
-        return prev.map((p) =>
-          p.id === item.id ? { ...p, pro: p.pro + 1 } : p,
-        );
-      }
+    if (notifProduct) {
+      // toast("شما این محصول را قبلاً به سبد خرید اضافه کرده‌اید.");
+      return prev;
+    }
 
-      return [...prev, { ...item, pro: 1 }];
-    });
-    setAddedItems((prev) =>
-      prev.includes(item.id) ? prev : [...prev, item.id],
-    );
-  };
+    // toast.success("محصول به سبد خرید اضافه شد.");
+    return [...prev, { ...item, qty: 1 }];
+  });
 
-  if (data.length === 0) {
+  setAddedItems((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]));
+};
+
+  if (Active.length === 0) {
     return (
       <div className={styles.box}>
         <h2 className={styles.title}>محصولی پیدا نشد</h2>
@@ -109,6 +127,9 @@ export default function Service({
       </div>
     );
   }
+
+
+  
 
   return (
     <div className={styles.servicesBody}>
@@ -122,7 +143,20 @@ export default function Service({
           onClick={prevSlide}
           disabled={index === 0}
         >
-          ❮
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
         </button>
 
         <div
@@ -137,12 +171,13 @@ export default function Service({
               transition: "transform 0.4s ease-in-out",
             }}
           >
-            {data.map((item) => (
+            {Active.map((item, index) => (
               <div
                 className={styles.serviceCard}
-                key={item.id}
+                key={index}
                 style={{ flex: `0 0 ${100 / visibleCards}%` }}
               >
+
                 <Image
                   className={styles.serviceImage}
                   src={item.image}
@@ -161,7 +196,7 @@ export default function Service({
                 <button
                   className={`${styles.serviceBtn} ${addedItems.includes(item.id) ? styles.serviceBtnGreen : ""}`}
                   onClick={() => handleAddToCart(item)}
-                  disabled={addedItems.includes(item.id)}
+                  // disabled={addedItems.includes(item.id)}
                 >
                   {addedItems.includes(item.id) ? (
                     <>
@@ -188,9 +223,7 @@ export default function Service({
               <div className={styles.serviceCardLast}>
                 <div className={styles.serviceCardLastDiv}>
                   <h2>{title}</h2>
-                  <p>
-                    برای نمایش بیشتر کلیک کنید
-                  </p>
+                  <p>برای نمایش بیشتر کلیک کنید</p>
                 </div>
                 {button && (
                   <button
@@ -208,12 +241,24 @@ export default function Service({
         <button
           className={`${styles.navBtn} ${styles.left}`}
           onClick={nextSlide}
-          disabled={index >= data.length + 1 - visibleCards}
+          disabled={index >= Active.length + 1 - visibleCards}
         >
-          ❯
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5"></path>
+            <path d="m12 19-7-7 7-7"></path>
+          </svg>
         </button>
       </div>
     </div>
   );
 }
-

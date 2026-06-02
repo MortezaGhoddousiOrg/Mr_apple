@@ -4,6 +4,9 @@ import { useAuth } from "@/app/Context/Context";
 export default function Card({ product }) {
   const { setProductBuy, addedItems, setAddedItems } = useAuth();
 
+  const Active = product.filter((item) => item.status == "active");
+  console.log(Active);
+
 
   const handleAddToCart = (item) => {
     setProductBuy((prev) => {
@@ -24,7 +27,7 @@ export default function Card({ product }) {
   return (
     <div className={style.bodyCard}>
       <section className={style.Card}>
-        {product.map((item, index) => (
+        {Active.map((item, index) => (
           <div className={style.serviceCard} key={index}>
             <img
               className={style.serviceImage}

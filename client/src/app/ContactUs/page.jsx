@@ -8,7 +8,7 @@ import axios from "axios";
 
 function AccordionBody({ isActive, children }) {
   const ref = useRef(null);
-   const { setNotif } = useAuth();
+  const { setNotif } = useAuth();
 
   const maxHeight = isActive
     ? ref.current
@@ -37,6 +37,7 @@ function AccordionBody({ isActive, children }) {
 export default function Contactus() {
   const [active, setActive] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const infoSectionRef = useRef(null);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -70,6 +71,13 @@ export default function Contactus() {
   const handleChangeForm = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleScrollToContactInfo = () => {
+    infoSectionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   };
 
   const handleSubmitForm = async (e) => {
@@ -126,10 +134,14 @@ export default function Contactus() {
             </div>
           </div>
           <div className={style.heroButtons}>
-            <a href="tel:05112345678" className={style.primaryBtn}>
+            <button
+              type="button"
+              className={style.primaryBtn}
+              onClick={handleScrollToContactInfo}
+            >
               <i className="bx bx-phone-call"></i>
               تماس با ما
-            </a>
+            </button>
             <button
               className={style.secondaryBtn}
               onClick={() => setOpenModal(true)}
@@ -141,8 +153,9 @@ export default function Contactus() {
         </div>
         <div className={style.heroImageContainer}>
           <Image
-            src="/image-contact/apple-iphone-17-cover.png"
+            src="/image-contact/IMG_SEGMENT_20260531_104249.png"
             alt="Contact us"
+            sizes="190vm"
             width={420}
             height={400}
             className={style.heroImg}
@@ -150,9 +163,8 @@ export default function Contactus() {
         </div>
       </section>
 
-      <section className={style.infoContact}>
+      <section ref={infoSectionRef} className={style.infoContact}>
         <div className={style.contactInfoBox}>
-
           <div className={style.infoItem}>
             <div className={style.iconBox}>
               <svg viewBox="0 0 24 24">
@@ -189,8 +201,6 @@ export default function Contactus() {
             </div>
             <span>هر روز از ساعت ۹ الی ۲۲</span>
           </div>
-
-
         </div>
 
         <iframe
@@ -199,9 +209,7 @@ export default function Contactus() {
           loading="lazy"
           title="Neshan Map"
         ></iframe>
-
       </section>
-
 
       {openModal && (
         <div

@@ -19,6 +19,8 @@ export default function ServiceSpecial({
   const touchEndX = useRef(0);
   const gap = 20;
 
+  const Active = data.filter((item) => item.status == "active");
+
   const { addedItems, setAddedItems } = useAuth();
 
   const { setProductBuy } = useAuth();
@@ -43,13 +45,13 @@ export default function ServiceSpecial({
   }, []);
 
   useEffect(() => {
-    if (index > data.length - visibleCards) {
-      setIndex(Math.max(data.length - visibleCards, 0));
+    if (index > Active.length - visibleCards) {
+      setIndex(Math.max(Active.length - visibleCards, 0));
     }
-  }, [visibleCards, data.length]);
+  }, [visibleCards, Active.length]);
 
   const nextSlide = () => {
-    if (index >= data.length + 1 - visibleCards) return;
+    if (index >= Active.length + 1 - visibleCards) return;
     setIndex((prev) => prev + 1);
   };
 
@@ -98,7 +100,7 @@ export default function ServiceSpecial({
     );
   };
 
-  if (data.length === 0) {
+  if (Active.length === 0) {
     return (
       <div className={styles.box}>
         <h2 className={styles.title}>محصولی پیدا نشد</h2>
@@ -124,7 +126,20 @@ export default function ServiceSpecial({
             onClick={prevSlide}
             disabled={index === 0}
           >
-            ❮
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
           </button>
 
           <div
@@ -139,7 +154,7 @@ export default function ServiceSpecial({
                 transition: "transform 0.4s ease-in-out",
               }}
             >
-              {data.map((item) => (
+              {Active.map((item) => (
                 <div
                   className={styles.serviceCard}
                   key={item.id}
@@ -208,9 +223,22 @@ export default function ServiceSpecial({
           <button
             className={`${styles.navBtn} ${styles.left}`}
             onClick={nextSlide}
-            disabled={index >= data.length + 1 - visibleCards}
+            disabled={index >= Active.length + 1 - visibleCards}
           >
-            ❯
+            <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5"></path>
+            <path d="m12 19-7-7 7-7"></path>
+          </svg>
           </button>
         </div>
       </article>

@@ -55,14 +55,14 @@ export default function Login({ setNotif }) {
         loginTime: new Date().toISOString(),
       };
 
-      localStorage.setItem("user", userData);
+      // localStorage.setItem("user", userData.phone);
       // console.log("User saved to LocalStorage:", phone);
 
       // setNotif({ message: "کد تایید برای شما ارسال شد", type: "success" });
 
-      setLoginData({
-        phone: "",
-      });
+      // setLoginData({
+      //   phone: "",
+      // });
 
       // const userLocal = localStorage.getItem("user");
       // if (userLocal) {
@@ -91,7 +91,7 @@ export default function Login({ setNotif }) {
         </p>
 
         {code ? (
-          <Code />
+          <Code phone={loginData.phone}/>
         ) : (
           <form className={style.loginFirst} onSubmit={handleSubmit} noValidate>
             <div className={style.loginInput}>
