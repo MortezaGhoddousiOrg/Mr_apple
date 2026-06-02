@@ -113,7 +113,7 @@ class AdminLoginView(APIView):
 class MeView(APIView):
     permission_classes = [AllowAny]
 
-    def get(self, request):
+    def get_user_from_token(self, request):
         access_token = request.COOKIES.get("access_token")
         admin_token = request.COOKIES.get("admin_access_token")
 
@@ -125,6 +125,7 @@ class MeView(APIView):
         try:
             decoded = AccessToken(token)
             user_id = decoded["user_id"]
+            return User.objects.get(id=user_id)
         except Exception:
             return None
 
@@ -146,3 +147,50 @@ class MeView(APIView):
             "email": user.email,
             "is_staff": user.is_staff,
         })
+
+    def put(self, request):
+        user = self.get_user_from_token(request)
+
+        if not user:
+            return Response(
+                {"error": "کاربر لاگین نیست"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        user.username = request.data.get(
+            "username",
+            user.username
+        )
+
+        user.firstname = request.data.get(
+            "firstname",
+            user.firstname
+        )
+
+        user.lastname = request.data.get(
+            "lastname",
+            user.lastname
+        )
+
+        user.email = request.data.get(
+            "email",
+            user.email
+        )
+
+        user.save()
+
+        return Response(
+            {
+                "message": "اطلاعات با موفقیت ویرایش شد",
+                "data": {
+                    "id": user.id,
+                    "phone": user.phone,
+                    "username": user.username,
+                    "firstname": user.firstname,
+                    "lastname": user.lastname,
+                    "email": user.email,
+                    "is_staff": user.is_staff,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
