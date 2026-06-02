@@ -126,9 +126,16 @@ class MeView(APIView):
             decoded = AccessToken(token)
             user_id = decoded["user_id"]
         except Exception:
-            return Response({"error": "توکن نامعتبر یا منقضی شده"}, status=401)
+            return None
 
-        user = User.objects.get(id=user_id)
+    def get(self, request):
+        user = self.get_user_from_token(request)
+
+        if not user:
+            return Response(
+                {"error": "کاربر لاگین نیست"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
         return Response({
             "id": user.id,
