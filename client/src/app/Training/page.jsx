@@ -7,7 +7,7 @@ import { useState } from 'react';
 const fakePhones = [
     { id: 'iphone-15-pro', name: 'iPhone 15 Pro', storage: '256GB', display: '6.1" OLED', chip: 'A17 Pro', battery: '3200 mAh', camera: '48MP', ram: '8GB' },
     { id: 'iphone-15', name: 'iPhone 15', storage: '128GB', display: '6.1" OLED', chip: 'A16', battery: '3349 mAh', camera: '48MP', ram: '6GB' },
-    { id: 'iphone-14-pro', name: 'iPhone 14 Pro', storage: '128GB', display: '6.1" OLED', chip: 'A16', battery: '3200 mAh', camera: '48MP', ram: '6GB' },
+    { id: 'iphone-14-pro', name: 'iPhone 14 Pro', storage: '128GB', display: '6.1" OLED', chip: 'A15', battery: '3200 mAh', camera: '48MP', ram: '6GB' },
     { id: 'iphone-13', name: 'iPhone 13', storage: '128GB', display: '6.1" OLED', chip: 'A15', battery: '3227 mAh', camera: '12MP', ram: '4GB' }
 ];
 
@@ -24,7 +24,7 @@ const fakeTutorials = [
 const getValue = (str) => parseInt(str.replace(/[^0-9]/g, '')) || 0;
 
 export default function Training() {
-    const [activeTab, setActiveTab] = useState('آموزش');
+    const [activeTab, setActiveTab] = useState('اخبار');
     const tabs = ['اخبار', 'آموزش', 'مقایسه'];
 
     const [phoneAId, setPhoneAId] = useState('iphone-15-pro');
@@ -66,17 +66,9 @@ export default function Training() {
                 </div>
 
                 <div className={styles.trainingImageWrapper}>
-                    <Image src="/image-infosection/iphonesimg.jpg" alt="Training" width={600} height={600} className={styles.trainingImage} priority />
+                    <Image src="/image-training/hero_startframe__fd0s9s949fu6_medium_2x.jpg" alt="Training" width={1331} sizes="130vm" height={600} className={styles.trainingImage} priority />
                 </div>
             </header>
-
-            <div>
-                
-            </div>
-
-            <section>
-                
-            </section>
 
             <section className={styles.mainLayout}>
                 <aside className={styles.sidebar}>

@@ -1,4 +1,3 @@
-/* --- بخش‌های ثابت (بدون تغییر نسبت به کد خودتان) --- */
 .wrapper {
   background: #f5f6f6;
   padding: 120px 0;
@@ -38,7 +37,6 @@
 .content {
   position: relative;
   z-index: 10;
-  /* افزایش لایه برای جلوگیری از تداخل */
   direction: rtl;
   text-align: center;
   display: flex;
@@ -75,13 +73,11 @@
   color: #ffffff;
 }
 
-/* --- استایل دکمه‌ها و رفع باگ هاور --- */
 .actions {
   display: flex;
   gap: 14px;
   margin-top: 64px;
   z-index: 20;
-  /* بالاترین لایه برای حل باگ هاور */
   position: relative;
 }
 
@@ -125,9 +121,7 @@
   align-items: flex-end;
   justify-content: center;
   z-index: 1;
-  /* لایه زیر دکمه‌ها */
   pointer-events: none;
-  /* مهم: جلوگیری از مسدود کردن کلیک دکمه‌ها */
 }
 
 .image {

@@ -4,41 +4,59 @@ import styles from "@/app/ProductBuy/page.module.css";
 import { useState } from "react";
 import { useAuth } from "@/app/Context/Context";
 import { useRouter } from "next/navigation";
-import DetailUserBuy from "@/app/DetailUserBuy/DetailUserBuy";
+import DetailUserBuy from "@/app/ProductBuy/DetailUserBuy/DetailUserBuy";
 
 export default function ProductBuy() {
-  const { productbuy, setProductBuy } = useAuth();
+  // const { productbuy, setProductBuy, userId } = useAuth();
+  const { productbuy, updateQuantity, removeFromCart } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  const increaseQuantity = (id) => {
-    if (typeof setProductBuy !== "function") return;
-
-    setProductBuy((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, qty: (item.qty || 1) + 1 } : item,
-      ),
-    );
+  const increaseQuantity = async (id, currentQty) => {
+    try {
+      await updateQuantity(id, (currentQty || 1) + 1);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const decreaseQuantity = (id) => {
-    if (typeof setProductBuy !== "function") return;
+  // console.log(productbuy);
 
-    setProductBuy((prev) =>
-      prev
-        .map((item) =>
-          item.id === id
-            ? { ...item, qty: Math.max((item.qty || 1) - 1, 1) }
-            : item,
-        )
-    );
+  const decreaseQuantity = async (id, currentQty) => {
+    try {
+      await updateQuantity(id, Math.max((currentQty || 1) - 1, 1));
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const removeItem = (id) => {
-    if (typeof setProductBuy !== "function") return;
+  //   const removeFromCart = async (productId) => {
+  //   if (userId) {
+  //     try {
+  //       const res = await api.post("/cart/remove", {
+  //         userId,
+  //         productId
+  //       });
+  //       console.log(res);
 
-    setProductBuy((prev) => prev.filter((item) => item.id !== id));
-  };
+  //       setProductBuy((prev) => prev.filter((item) => item.id !== productId));
+  //       // setAddedItems((prev) => prev.filter((id) => id !== productId));
+
+  //       return { success: true };
+  //     } catch (err) {
+  //       console.log(err);
+  //       return;
+  //     }
+  //   } else {
+  //     setProductBuy((prev) => prev.filter((item) => item.id !== productId));
+  //     // setAddedItems((prev) => prev.filter((id) => id !== productId));
+  //     return { success: true };
+  //   }
+  // };
+
+  // const removeItem = (id) => {
+  //   setProductBuy((prev) => prev.filter((item) => item.id !== id));
+  // };
 
   const formatPrice = (price) => {
     const value =
@@ -79,15 +97,20 @@ export default function ProductBuy() {
                 {formatPrice(totalPrice)} تومان
               </span>
             </div>
-            <button className={styles.checkoutBtn} onClick={() => setOpen(true)}>ادامه فرایند خرید</button>
+            <button
+              className={styles.checkoutBtn}
+              onClick={() => setOpen(true)}
+            >
+              ادامه فرایند خرید
+            </button>
             <DetailUserBuy
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onSubmitSuccess={(data) => {
-          console.log("اطلاعات فرم:", data);
-          // اینجا می‌تونی داده رو به مرحله بعدی ذخیره/ارسال کنی
-        }}
-      />
+              isOpen={open}
+              onClose={() => setOpen(false)}
+              onSubmitSuccess={(data) => {
+                // console.log("اطلاعات فرم:", data);
+                // اینجا می‌تونی داده رو به مرحله بعدی ذخیره/ارسال کنی
+              }}
+            />
           </div>
         </div>
 
@@ -122,23 +145,14 @@ export default function ProductBuy() {
                   <div key={item.id} className={styles.card}>
                     <div className={styles.imageBox}>
                       <img
-                        src={
-                          item.image_url ||
-                          item.image ||
-                          "/placeholder-image.jpg"
-                        }
-                        alt={item.title || "product"}
+                        src={item.image}
+                        alt={item.title}
                         className={styles.productImage}
-                        onError={(e) => {
-                          e.currentTarget.src = "/placeholder-image.jpg";
-                        }}
                       />
                     </div>
 
                     <div className={styles.info}>
-                      <h3 className={styles.cardTitle}>
-                        {item.title || "بدون عنوان"}
-                      </h3>
+                      <h3 className={styles.cardTitle}>{item.title}</h3>
                       <div className={styles.meta}>
                         <p className={styles.price}>
                           قیمت واحد: <span>{formatPrice(itemPrice)} تومان</span>
@@ -149,7 +163,7 @@ export default function ProductBuy() {
                     <div className={styles.controls}>
                       <button
                         className={styles.qtyBtn}
-                        onClick={() => decreaseQuantity(item.id)}
+                        onClick={() => decreaseQuantity(item.id, qty)}
                         aria-label="کاهش تعداد"
                       >
                         −
@@ -157,7 +171,7 @@ export default function ProductBuy() {
                       <span className={styles.qtyCount}>{qty}</span>
                       <button
                         className={styles.qtyBtn}
-                        onClick={() => increaseQuantity(item.id)}
+                        onClick={() => increaseQuantity(item.id, qty)}
                         aria-label="افزایش تعداد"
                       >
                         +
@@ -170,7 +184,7 @@ export default function ProductBuy() {
                       </div>
                       <button
                         className={styles.removeBtn}
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeFromCart(item.id)}
                       >
                         حذف
                       </button>

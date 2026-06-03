@@ -145,7 +145,7 @@ export default function Footer() {
 
           <div className={style.trustBadges}>
             <img
-              src="/image-footer/enamad_icon_text_color_blue_1024-768x768.png"
+              src="/image-footer/enamad.png"
               alt="enamad"
               className={style.badgeImage}
             />

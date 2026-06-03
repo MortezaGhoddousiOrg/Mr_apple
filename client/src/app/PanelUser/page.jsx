@@ -1,60 +1,9 @@
-// "use client";
-// import { useState } from "react";
-// import styles from "./page.module.css";
-// // کامپوننت‌هایی که باید بسازید (فایل‌های جداگانه)
-// import OrdersList from "@/app/PanelUser/OrderList/page";
-// import ProfileSettings from "@/app/PanelUser/ProfileSetting/page";
-// // import Addresses from "./components/Addresses";
-
-// export default function PanelUser() {
-//   const [activeTab, setActiveTab] = useState("orders");
-
-//   const menuItems = [
-//     { id: "orders", title: "سفارش‌های من" },
-//     { id: "profile", title: "اطلاعات حساب" },
-//     { id: "addresses", title: "آدرس‌ها" },
-//   ];
-
-//   const renderContent = () => {
-//     switch (activeTab) {
-//       case "orders": return <OrdersList />;
-//       case "profile": return <ProfileSettings />;
-//       case "addresses": return <Addresses />;
-//       default: return <OrdersList />;
-//     }
-//   };
-
-//   return (
-//     <section className={styles.panelContainer}>
-//       <aside className={styles.sidebar}>
-//         <div className={styles.sidebarHeader}>پنل کاربری</div>
-//         <nav className={styles.menu}>
-//           {menuItems.map((item) => (
-//             <button
-//               key={item.id}
-//               onClick={() => setActiveTab(item.id)}
-//               className={`${styles.menuItem} ${activeTab === item.id ? styles.active : ""}`}
-//             >
-//               {item.title}
-//             </button>
-//           ))}
-//         </nav>
-//       </aside>
-
-//       <main className={styles.content}>
-//         {renderContent()}
-//       </main>
-//     </section>
-//   );
-// }
-
 "use client";
 
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
 
-// فرض بر این است که این کامپوننت‌ها را دارید
 import OrdersList from "@/app/PanelUser/OrderList/page";
 import ProfileSettings from "@/app/PanelUser/ProfileSetting/page";
 
@@ -83,7 +32,6 @@ export default function PanelUser() {
   const menuItems = [
     { id: "orders", title: "سفارش‌های من" },
     { id: "profile", title: "اطلاعات حساب" },
-    // { id: "addresses", title: "آدرس‌ها" },
   ];
 
   const renderContent = () => {
