@@ -455,7 +455,7 @@ export default function Category() {
       sell_price: "1500000",
       descriptions:
         "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-        status: "active",
+      status: "active",
     },
     {
       id: 2,
@@ -472,7 +472,7 @@ export default function Category() {
       sell_price: "1500000",
       descriptions:
         "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-        status: "active",
+      status: "active",
     },
     {
       id: 3,
@@ -489,7 +489,7 @@ export default function Category() {
       sell_price: "1500000",
       descriptions:
         "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-        status: "active",
+      status: "active",
     },
     {
       id: 4,
@@ -506,7 +506,7 @@ export default function Category() {
       sell_price: "1500000",
       descriptions:
         "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-        status: "active",
+      status: "active",
     },
     {
       id: 5,
@@ -523,9 +523,8 @@ export default function Category() {
       sell_price: "1500000",
       descriptions:
         "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-        status: "notactive",
+      status: "notactive",
     },
-    
   ]);
 
   // useEffect(() => {
@@ -541,7 +540,6 @@ export default function Category() {
 
   //   axioshome();
   // }, []);
-
 
   // const filter = product.filter(
   //   (item) => item.category.parent.title === Category,
@@ -561,17 +559,15 @@ export default function Category() {
 
   // const filter = product.filter((title) => title.category.parent.title == Category);
 
-   const cardData = product.map((item) => ({
-  id: item.id,
-  image: item.images?.[0]?.url,
-  title: item.name,
-  description: item.descriptions,
-  price: item.sell_price,
-}));
+  const cardData = product.map((item) => ({
+    id: item.id,
+    image: item.images?.[0]?.url,
+    title: item.name,
+    description: item.descriptions,
+    price: item.sell_price,
+  }));
 
-
-
-   const filtered = useMemo(() => {
+  const filtered = useMemo(() => {
     if (!Category) return [];
     const cat = String(Category).trim();
     if (!cat) return [];
@@ -579,7 +575,11 @@ export default function Category() {
   }, [Category, product]);
 
   // اگر Category خالی بود یا در دیتای ما وجود نداشت (یعنی filtered خالی شد)
-  if (!Category || String(Category).trim().length === 0 || filtered.length === 0) {
+  if (
+    !Category ||
+    String(Category).trim().length === 0 ||
+    filtered.length === 0
+  ) {
     return (
       <div className={style.box}>
         <h2 className={style.title}>هیچ دسته بندی برای محصولات وجود نداره</h2>
@@ -591,8 +591,6 @@ export default function Category() {
     );
   }
 
-  
-
   return (
     <div className={style.categoryBody}>
       {filtered.map((item, index) => (
@@ -600,7 +598,7 @@ export default function Category() {
           <header className={style.categoryHeader}>
             <div className={style.categoryBox}>
               <h1 className={style.categoryTitle}>
-                  {item.category.parent.title}
+                {item.category.parent.title}
               </h1>
               <p className={style.categoryDescription}>{item.descriptions}</p>
 
@@ -655,20 +653,19 @@ export default function Category() {
               </div>
             </div>
 
-           
-              <div className={style.categoryImageContainer}>
-                <Image
-                  className={style.categoryImage}
-                  src={item.images?.[0]?.url}
-                  alt="category-image"
-                  width={400}
-                  height={400}
-                />
-              </div>
-            
+            <div className={style.categoryImageContainer}>
+              <Image
+                className={style.categoryImage}
+                src={item.images?.[0]?.url}
+                alt="category-image"
+                width={400}
+                height={400}
+              />
+            </div>
           </header>
           <CategoryTabFeature
-            Tab={categoryChild} data={cardData}
+            Tab={categoryChild}
+            data={cardData}
             // onClick={() => router.push(`${.cate}`)}
           />
         </aside>

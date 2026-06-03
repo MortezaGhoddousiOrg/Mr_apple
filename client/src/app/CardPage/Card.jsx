@@ -5,7 +5,6 @@ export default function Card({ product }) {
   const { setProductBuy, addedItems, setAddedItems } = useAuth();
 
   const Active = product.filter((item) => item.status == "active");
-  console.log(Active);
 
 
   const handleAddToCart = (item) => {

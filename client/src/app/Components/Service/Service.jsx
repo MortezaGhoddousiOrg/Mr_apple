@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import styles from "@/app/Components/Service/Service.module.css";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/Context";
-import Image from "next/image"; 
+import Image from "next/image";
 
 export default function Service({
   data = [],
@@ -19,9 +19,17 @@ export default function Service({
   const touchEndX = useRef(0);
   const gap = 20;
 
-  const { addedItems, setAddedItems } = useAuth();
+  // const {
+  //   addedItems,
+  //   setAddedItems,
+  //   productBuy,
+  //   setProductBuy,
+  //   userId,
+  //   setUserId,
+  // } = useAuth();
 
-  const { setProductBuy } = useAuth();
+  const { addToCart, productbuy } = useAuth();
+
 
   const Active = data.filter((item) => item.status == "active");
 
@@ -100,21 +108,62 @@ export default function Service({
   //   );
   // };
 
-  const handleAddToCart = (item) => {
-  setProductBuy((prev) => {
-    const notifProduct = prev.some((p) => p.id === item.id);
+  // const handleAddToCart = async (item) => {
+  //   const isAlreadyAdded = productBuy.some((p) => p.id === item.id);
+  //   if (isAlreadyAdded) return;
 
-    if (notifProduct) {
-      // toast("شما این محصول را قبلاً به سبد خرید اضافه کرده‌اید.");
-      return prev;
+  //   if (userId) {
+  //     try {
+  //       const res = await api.post("/api/orders/cart/add", {
+  //         userId,
+  //         productId: item.id,
+  //       });
+  //       console.log(res.data);
+  //     } catch (err) {
+  //       console.error(err);
+  //       return;
+  //     }
+  //   }
+  // };
+
+//   const handleAddToCart = async (item) => {
+//   try {
+//     await addToCart(item);
+//   } catch (err) {
+//     // console.error(err);
+//   }
+// };
+
+ const isInCart = (id) => {
+    return productbuy?.some((p) => p.id === id);
+  };
+
+  const handleAddToCart = async (item) => {
+    try {
+      if (isInCart(item.id)) return;
+
+      await addToCart({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        image: item.image,
+        description: item.description,
+      });
+
+        // setNotif({
+        //   message: "محصول با موفقیت به سبد خرید اضافه شد",
+        //   type: "success",
+        // });
+      
+    } catch (err) {
+        // setNotif({
+        //   message: "افزودن محصول به سبد خرید با خطا مواجه شد",
+        //   type: "error",
+        // });
+      
+      // console.error(err);
     }
-
-    // toast.success("محصول به سبد خرید اضافه شد.");
-    return [...prev, { ...item, qty: 1 }];
-  });
-
-  setAddedItems((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]));
-};
+  };
 
   if (Active.length === 0) {
     return (
@@ -127,9 +176,6 @@ export default function Service({
       </div>
     );
   }
-
-
-  
 
   return (
     <div className={styles.servicesBody}>
@@ -171,53 +217,55 @@ export default function Service({
               transition: "transform 0.4s ease-in-out",
             }}
           >
-            {Active.map((item, index) => (
-              <div
-                className={styles.serviceCard}
-                key={index}
-                style={{ flex: `0 0 ${100 / visibleCards}%` }}
-              >
+            {Active.map((item) => {
+              const added = isInCart(item.id);
 
-                <Image
-                  className={styles.serviceImage}
-                  src={item.image}
-                  alt={item.title}
-                  width={100}
-                  height={180}
-                  onClick={() => router.push(`/ProductDetail/${item.id}`)}
-                />
-                <p className={styles.serviceTitle}>{item.title}</p>
-                <h2 className={styles.serviceDescription}>
-                  {item.description}
-                </h2>
-                <p className={styles.servicePrice}>
-                  {parseInt(item.price)?.toLocaleString("fa-IR")} تومان
-                </p>
-                <button
-                  className={`${styles.serviceBtn} ${addedItems.includes(item.id) ? styles.serviceBtnGreen : ""}`}
-                  onClick={() => handleAddToCart(item)}
-                  // disabled={addedItems.includes(item.id)}
+              return (
+                <div
+                  className={styles.serviceCard}
+                  key={item.id}
+                  style={{ flex: `0 0 ${100 / visibleCards}%` }}
                 >
-                  {addedItems.includes(item.id) ? (
-                    <>
-                      به سبد خرید اضافه شد
-                      <svg
-                        className={styles.svg}
-                        viewBox="0 0 24 24"
-                        fill="white"
-                        width="18"
-                        height="18"
-                        style={{ marginLeft: "8px" }}
-                      >
-                        <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
-                      </svg>
-                    </>
-                  ) : (
-                    "افزودن به سبد خرید"
-                  )}
-                </button>
-              </div>
-            ))}
+                  <Image
+                    className={styles.serviceImage}
+                    src={item.image}
+                    alt={item.title}
+                    width={100}
+                    height={180}
+                    onClick={() => router.push(`/ProductDetail/${item.id}`)}
+                  />
+                  <p className={styles.serviceTitle}>{item.title}</p>
+                  <h2 className={styles.serviceDescription}>
+                    {item.description}
+                  </h2>
+                  <p className={styles.servicePrice}>
+                    {parseInt(item.price)?.toLocaleString("fa-IR")} تومان
+                  </p>
+                  <button
+                    className={`${styles.serviceBtn} ${added ? styles.serviceBtnGreen : ""}`}
+                    onClick={() => handleAddToCart(item)}
+                  >
+                    {added ? (
+                      <>
+                        به سبد خرید اضافه شد
+                        <svg
+                          className={styles.svg}
+                          viewBox="0 0 24 24"
+                          fill="white"
+                          width="18"
+                          height="18"
+                          style={{ marginLeft: "8px" }}
+                        >
+                          <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
+                        </svg>
+                      </>
+                    ) : (
+                      "افزودن به سبد خرید"
+                    )}
+                  </button>
+                </div>
+              );
+            })}
 
             <div>
               <div className={styles.serviceCardLast}>

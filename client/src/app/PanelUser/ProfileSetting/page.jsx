@@ -1,62 +1,61 @@
+"use client";
+
 import { useState } from "react";
 import styles from "@/app/PanelUser/ProfileSetting/page.module.css";
+import { useAuth } from "@/app/Context/Context";
 
 export default function ProfileSettings() {
-  const [hasData, setHasData] = useState(false);
+
   const [isEditing, setIsEditing] = useState(false);
 
-  const [userData, setUserData] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    zipCode: "",
-    address: "",
-  });
-
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    zipCode: "",
-    address: "",
-  });
+  const { dataForm, setDataForm, saveOrUpdateUser, initialData } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setDataForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
 
-    setUserData(formData);
+    try {
+      await saveOrUpdateUser(dataForm);
 
-    setHasData(true);
-    setIsEditing(false);
+      setIsEditing(false);
+    } catch (err) {
+      console.error(err);
+      // setNotif
+    }
   };
 
   const handleEdit = () => {
-    setFormData(userData);
     setIsEditing(true);
   };
 
   const handleCancel = () => {
-    setFormData(userData);
+    if (initialData) {
+      setDataForm(initialData);
+    }
     setIsEditing(false);
   };
 
-  return (
+  if (!dataForm) {
+    return <div className={styles.card}>در حال بارگذاری...</div>;
+  }
+
+    return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={styles.title}>اطلاعات حساب</h2>
-        {hasData && !isEditing && (
+        
+        {!isEditing && (
           <button onClick={handleEdit} className={styles.editLinkBtn}>
             ویرایش اطلاعات
           </button>
         )}
       </div>
 
-      {!hasData || isEditing ? (
+      {isEditing ? (
         <form className={styles.form} onSubmit={handleSave}>
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
@@ -65,7 +64,7 @@ export default function ProfileSettings() {
                 className={styles.input}
                 type="text"
                 name="firstName"
-                value={formData.firstName}
+                value={dataForm.firstName || ""}
                 onChange={handleChange}
                 placeholder="نام"
                 required
@@ -78,14 +77,14 @@ export default function ProfileSettings() {
                 className={styles.input}
                 type="text"
                 name="lastName"
-                value={formData.lastName}
+                value={dataForm.lastName || ""}
                 onChange={handleChange}
                 placeholder="نام خانوادگی"
                 required
               />
             </div>
           </div>
-
+          
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
               <label className={styles.label}>تلفن</label>
@@ -93,7 +92,7 @@ export default function ProfileSettings() {
                 className={styles.input}
                 type="tel"
                 name="phone"
-                value={formData.phone}
+                value={dataForm.phone || ""}
                 onChange={handleChange}
                 placeholder="09xxxxxxxxx"
                 required
@@ -105,8 +104,8 @@ export default function ProfileSettings() {
               <input
                 className={styles.input}
                 type="text"
-                name="zipCode"
-                value={formData.zipCode}
+                name="postalCode"
+                value={dataForm.postalCode || ""}
                 onChange={handleChange}
                 placeholder="کد پستی"
                 required
@@ -120,7 +119,7 @@ export default function ProfileSettings() {
               className={`${styles.input} ${styles.textarea}`}
               rows="3"
               name="address"
-              value={formData.address}
+              value={dataForm.address || ""}
               onChange={handleChange}
               placeholder="آدرس..."
               required
@@ -132,41 +131,39 @@ export default function ProfileSettings() {
               ذخیره اطلاعات
             </button>
 
-            {hasData && (
-              <button
-                type="button"
-                onClick={handleCancel}
-                className={styles.cancelBtn}
-              >
-                لغو
-              </button>
-            )}
+            {/* ✅ ninja: دکمه لغو همیشه نمایش داده شود اگر در حال ادیت هستیم */}
+            <button
+              type="button"
+              onClick={handleCancel}
+              className={styles.cancelBtn}
+            >
+              لغو
+            </button>
           </div>
         </form>
       ) : (
-        /* حالت نمایش اطلاعات */
         <div className={styles.infoDisplay}>
           <div className={styles.infoGrid}>
             <div className={styles.infoItem}>
               <span>نام و نام خانوادگی</span>
               <p>
-                {userData.firstName} {userData.lastName}
+                {dataForm.firstName} {dataForm.lastName}
               </p>
             </div>
 
             <div className={styles.infoItem}>
               <span>شماره تماس</span>
-              <p className={styles.ltrText}>{userData.phone}</p>
+              <p className={styles.ltrText}>{dataForm.phone}</p>
             </div>
 
             <div className={styles.infoItem}>
               <span>کد پستی</span>
-              <p className={styles.ltrText}>{userData.zipCode}</p>
+              <p className={styles.ltrText}>{dataForm.postalCode}</p>
             </div>
 
             <div className={styles.infoItemFull}>
               <span>آدرس دقیق</span>
-              <p>{userData.address}</p>
+              <p className={styles.ltrText}>{dataForm.address}</p>
             </div>
           </div>
         </div>

@@ -187,7 +187,7 @@ export default function Productdetail() {
       createdAt: new Date().toISOString(),
     };
 
-    console.log("NEW_COMMENT:", payload);
+    // console.log("NEW_COMMENT:", payload);
 
     setCommentName("");
     setCommentText("");

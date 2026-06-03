@@ -16,7 +16,8 @@ export default function FeaturedProduct() {
     {
       id: 2,
       title: "Accessories",
-      image: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
+      image:
+        "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
     },
     {
       id: 3,
@@ -36,7 +37,8 @@ export default function FeaturedProduct() {
     {
       id: 6,
       title: "Accessories",
-      image: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
+      image:
+        "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
     },
     {
       id: 7,
@@ -63,6 +65,7 @@ export default function FeaturedProduct() {
 
   //   axioshome();
   // }, []);
+
 
   const [visible, setVisible] = useState(6);
   const [index, setIndex] = useState(0);
@@ -136,49 +139,90 @@ export default function FeaturedProduct() {
   }
 
   return (
-    <div className={style.dashboardContainer}>
-      <button className={`${style.navBtn} ${style.prev}`} onClick={prevSlide}>
-        &lt;
-      </button>
-
-      <div className={style.sliderWrapper}>
-        <div className={style.dashboardCards}>
-          <div
-            ref={containerRef}
-            className={style.cardsContainer}
-            style={{
-              transform: translateValue,
-              transition: isTransitioning
-                ? "transform 0.4s ease-in-out"
-                : "none",
-            }}
+    <section
+      className={style.dashboardContainer}
+      aria-label="Featured categories"
+    >
+      <div className={style.sliderShell}>
+        <button
+          className={`${style.navBtn} ${style.prev}`}
+          onClick={prevSlide}
+          aria-label="Previous"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            {extendedItems.map((item, i) => (
-              <div
-                key={`${item.id}-${i}`}
-                className={style.cards}
-                style={{ flex: `0 0 ${100 / visible}%` }}
-                onClick={() => router.push(`/Category/${item.title}`)}
-              >
-                <div className={style.cardImage}>
-                  <Image
-                    className={style.image}
-                    src={item.image}
-                    alt={item.title}
-                    width={125}
-                    height={115}
-                  />
-                </div>
-                <p>{item.title}</p>
-              </div>
-            ))}
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </button>
+
+        <div className={style.sliderWrapper}>
+          <div className={style.dashboardCards}>
+            <div
+              ref={containerRef}
+              className={style.cardsContainer}
+              style={{
+                transform: translateValue,
+                transition: isTransitioning
+                  ? "transform 0.4s ease-in-out"
+                  : "none",
+              }}
+            >
+              {extendedItems.map((item, i) => (
+                <button
+                  type="button"
+                  key={`${item.id}-${i}`}
+                  className={style.cards}
+                  style={{ flex: `0 0 ${100 / visible}%` }}
+                  onClick={() => router.push(`/Category/${item.title}`)}
+                >
+                  <span className={style.cardImage}>
+                    <Image
+                      className={style.image}
+                      src={item.image}
+                      alt={item.title}
+                      width={140}
+                      height={120}
+                      priority={i < visible}
+                    />
+                  </span>
+                  <span className={style.cardTitle}>{item.title}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <button className={`${style.navBtn} ${style.next}`} onClick={nextSlide}>
-        &gt;
-      </button>
-    </div>
+        <button
+          className={`${style.navBtn} ${style.next}`}
+          onClick={nextSlide}
+          aria-label="Next"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5"></path>
+            <path d="m12 19-7-7 7-7"></path>
+          </svg>
+        </button>
+      </div>
+    </section>
   );
 }
