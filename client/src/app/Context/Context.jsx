@@ -146,7 +146,7 @@ export function AuthProvider({ children }) {
   const removeFromCart = async (productId) => {
     try {
       if (userId) {
-        await api.post("/api/orders/cart/remove", {
+        await api.delete("/api/orders/cart/remove", {
           userId,
           productId,
         });
@@ -173,7 +173,7 @@ export function AuthProvider({ children }) {
       const safeQty = Math.max(qty, 1);
 
       if (userId) {
-        await api.post("/api/orders/cart/update-qty", {
+        await api.put("/api/orders/cart/update-qty", {
           userId,
           productId,
           qty: safeQty,
