@@ -86,9 +86,8 @@ export default function Productdetail() {
   const [commentText, setCommentText] = useState("");
   const [commentRate, setCommentRate] = useState(5);
 
-  const { addedItems, setAddedItems, setProductBuy } = useAuth();
+  const { addToCart, productbuy } = useAuth();
 
-  // اگر خواستی از بک‌اند بگیری این بخش رو فعال کن
   // useEffect(() => {
   //   if (!id) return;
   //   let alive = true;
@@ -117,7 +116,9 @@ export default function Productdetail() {
 
   const galleryImages = useMemo(() => {
     const imgs = Array.isArray(product?.images) ? product.images : [];
-    const validFiles = imgs.filter((item) => item?.file).map((item) => item.file);
+    const validFiles = imgs
+      .filter((item) => item?.file)
+      .map((item) => item.file);
 
     const mainImage = imgs.find((item) => item?.type === true)?.file;
     if (mainImage) {
@@ -129,7 +130,7 @@ export default function Productdetail() {
 
   const discountedPrice = useMemo(
     () => calcDiscountedPrice(product?.sell_price, product?.discount),
-    [product?.sell_price, product?.discount]
+    [product?.sell_price, product?.discount],
   );
 
   const hasDiscount = useMemo(() => {
@@ -139,41 +140,30 @@ export default function Productdetail() {
 
   const discountPercent = useMemo(
     () => calcDiscountPercent(product?.sell_price, product?.discount),
-    [product?.sell_price, product?.discount]
+    [product?.sell_price, product?.discount],
   );
 
   const stockCount = Number(product?.quantity ?? 0);
   const inStock = stockCount > 0;
 
-  const isAdded = Boolean(product?.id && addedItems?.includes(product.id));
+  const isAdded = productbuy?.some((p) => p.id === product?.id);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product?.id) return;
     if (!inStock) return;
     if (isAdded) return;
 
-    const item = {
-      id: product.id,
-      title: product.name,
-      description: product.descriptions,
-      price: discountedPrice ?? product?.sell_price,
-      image: galleryImages?.[0] || (product?.images?.[0]?.file ?? ""),
-      quantity: product?.quantity,
-      discount: product?.discount,
-      sell_price: product?.sell_price,
-    };
-
-    setProductBuy((prev) => {
-      const exists = prev.find((p) => p.id === item.id);
-      if (exists) {
-        return prev.map((p) =>
-          p.id === item.id ? { ...p, pro: (p.pro ?? 1) + 1 } : p
-        );
-      }
-      return [...prev, { ...item, pro: 1 }];
-    });
-
-    setAddedItems((prev) => (prev.includes(item.id) ? prev : [...prev, item.id]));
+    try {
+      await addToCart({
+        id: product.id,
+        title: product.name,
+        price: discountedPrice ?? product?.sell_price,
+        image: galleryImages?.[0] || product?.images?.[0]?.file || "",
+        description: product.descriptions,
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSubmitComment = (e) => {
@@ -197,7 +187,9 @@ export default function Productdetail() {
   return (
     <div className={styles.pageShell}>
       <Head>
-        {galleryImages?.[0] && <link rel="preload" as="image" href={galleryImages[0]} />}
+        {galleryImages?.[0] && (
+          <link rel="preload" as="image" href={galleryImages[0]} />
+        )}
       </Head>
 
       <section className={styles.heroSection}>
@@ -244,7 +236,8 @@ export default function Productdetail() {
                 <div className={styles.stockLine}>
                   <span className={styles.dot} data-ok={inStock ? "1" : "0"} />
                   <span>
-                    {inStock ? "" : "ناموجود"} • موجودی: {toPersianDigits(stockCount)}
+                    {inStock ? "" : "ناموجود"} • موجودی:{" "}
+                    {toPersianDigits(stockCount)}
                   </span>
                 </div>
 
@@ -260,7 +253,7 @@ export default function Productdetail() {
                   className={`${styles.primaryBtn} ${isAdded ? styles.primaryBtnGreen : ""}`}
                   type="button"
                   onClick={handleAddToCart}
-                  disabled={!inStock || isAdded}
+                  disabled={!inStock}
                 >
                   {!inStock ? (
                     "ناموجود"
@@ -286,7 +279,10 @@ export default function Productdetail() {
 
           <div className={styles.imageSide}>
             <div className={styles.imageWrapper}>
-              <Imagedetail images={galleryImages} discountPercent={discountPercent} />
+              <Imagedetail
+                images={galleryImages}
+                discountPercent={discountPercent}
+              />
             </div>
           </div>
         </div>
@@ -311,16 +307,20 @@ export default function Productdetail() {
       <section className={`${styles.sectionBlock} ${styles.featureSection}`}>
         <div className={styles.sectionHeadRow}>
           <h2 className={styles.sectionTitle}>ویژگی‌ها</h2>
-          <p className={styles.sectionSubtitle}>اطلاعات ثبت‌شده برای این محصول</p>
+          <p className={styles.sectionSubtitle}>
+            اطلاعات ثبت‌شده برای این محصول
+          </p>
         </div>
 
         <div className={styles.featureList}>
-          {(Array.isArray(product?.feature) ? product.feature : []).map((item, index) => (
-            <div key={`${item?.key}-${index}`} className={styles.featureRow}>
-              <span className={styles.featureKey}>{item?.key}</span>
-              <span className={styles.featureVal}>{item?.value}</span>
-            </div>
-          ))}
+          {(Array.isArray(product?.feature) ? product.feature : []).map(
+            (item, index) => (
+              <div key={`${item?.key}-${index}`} className={styles.featureRow}>
+                <span className={styles.featureKey}>{item?.key}</span>
+                <span className={styles.featureVal}>{item?.value}</span>
+              </div>
+            ),
+          )}
         </div>
       </section>
 
@@ -344,7 +344,11 @@ export default function Productdetail() {
             <div className={styles.field}>
               <label className={styles.label}>امتیاز</label>
 
-              <div className={styles.stars} role="radiogroup" aria-label="امتیاز">
+              <div
+                className={styles.stars}
+                role="radiogroup"
+                aria-label="امتیاز"
+              >
                 {[5, 4, 3, 2, 1].map((n) => {
                   const active = n <= Number(commentRate);
                   return (
@@ -384,20 +388,20 @@ export default function Productdetail() {
       </section>
 
       {/* <section className={styles.sectionBlock}>
-        <div className={styles.sectionHeadRow}>
-          <h2 className={styles.sectionTitle}>محتویات جعبه</h2>
-          <p className={styles.sectionSubtitle}>نمایشی (فیک) برای UI</p>
-        </div>
+          <div className={styles.sectionHeadRow}>
+            <h2 className={styles.sectionTitle}>محتویات جعبه</h2>
+            <p className={styles.sectionSubtitle}>نمایشی (فیک) برای UI</p>
+          </div>
 
-        <div className={styles.boxGrid}>
-          {fakePdpContent.inTheBox.map((x) => (
-            <div key={x} className={styles.boxItem}>
-              <span className={styles.boxBullet} />
-              <span>{x}</span>
-            </div>
-          ))}
-        </div>
-      </section> */}
+          <div className={styles.boxGrid}>
+            {fakePdpContent.inTheBox.map((x) => (
+              <div key={x} className={styles.boxItem}>
+                <span className={styles.boxBullet} />
+                <span>{x}</span>
+              </div>
+            ))}
+          </div>
+        </section> */}
     </div>
   );
 }

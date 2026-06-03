@@ -11,7 +11,7 @@ export function AuthProvider({ children }) {
 
   const [productbuy, setProductBuy] = useState([]);
 
-  const [addedItems, setAddedItems] = useState([]);
+  // const [addedItems, setAddedItems] = useState([]);
 
   const [notif, setNotif] = useState({
     message: "",
@@ -27,6 +27,14 @@ export function AuthProvider({ children }) {
     postalCode: "dfgdgdg",
     address: "dgdgdfgdg",
   });
+
+  const emptyForm = {
+    firstName: "",
+    lastName: "",
+    phone: "",
+    postalCode: "",
+    address: "",
+  };
   const [initialData, setInitialData] = useState({});
 
   const saveOrUpdateUser = async (updatedData) => {
@@ -76,6 +84,7 @@ export function AuthProvider({ children }) {
     if (userData?.userId) {
       setUserId(userData.userId);
       localStorage.setItem("userId", userData.userId);
+      setIsLoggedIn(true);
     }
 
     return userData;
@@ -86,7 +95,9 @@ export function AuthProvider({ children }) {
 
     const dataUser = async () => {
       try {
-        const res = await api.get("/auth/me/", { userId });
+        const res = await api.get("/auth/me/", {
+          params: { userId },
+        });
         setDataForm(res.data);
         setInitialData(res.data);
       } catch (err) {
@@ -96,6 +107,17 @@ export function AuthProvider({ children }) {
 
     dataUser();
   }, [userId]);
+
+  // برای ست کردن آیکن داخل هدر لاگین 
+  useEffect(() => {
+  const savedUserId = localStorage.getItem("user");
+
+  if (savedUserId) {
+    setUserId(savedUserId);
+    setIsLoggedIn(true);
+  }
+}, []);
+
 
   // خواندن سبد خرید برای مهمان و بعد از لاگین ست کردن با بک اند
   const loadCart = async () => {
@@ -147,8 +169,10 @@ export function AuthProvider({ children }) {
     try {
       if (userId) {
         await api.delete("/api/orders/cart/remove", {
-          userId,
-          productId,
+          data: {
+            userId,
+            productId,
+          },
         });
 
         await loadCart();
@@ -238,7 +262,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("userId");
     localStorage.removeItem("tempPhone");
 
-    setIsLoggedIn(false);
+    // setIsLoggedIn(false);
     setUserId(null);
     setDataForm(emptyForm);
     setInitialData(emptyForm);
@@ -260,10 +284,10 @@ export function AuthProvider({ children }) {
       logout,
 
       productbuy,
-      setProductBuy,
+      // setProductBuy,
 
-      addedItems,
-      setAddedItems,
+      // addedItems,
+      // setAddedItems,
 
       userId,
       setUserId,
@@ -274,11 +298,15 @@ export function AuthProvider({ children }) {
       sendCode,
       saveOrUpdateUser,
       verifyCode,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      loadCart,
 
       notif,
       setNotif,
     }),
-    [isLoggedIn, productbuy, addedItems, userId, dataForm, notif],
+    [isLoggedIn, productbuy, userId, dataForm, notif],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

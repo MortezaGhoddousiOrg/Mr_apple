@@ -11,36 +11,35 @@ export default function ServiceSpecial({
   title,
   button,
   onMoreClick,
-  setNotif,
 }) {
   const [index, setIndex] = useState(0);
   const [visibleCards, setVisibleCards] = useState(4);
+
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const gap = 20;
 
-  const Active = data.filter((item) => item.status == "active");
-
-  const { addedItems, setAddedItems } = useAuth();
-
-  const { setProductBuy } = useAuth();
-
   const router = useRouter();
+
+  const { productbuy, addToCart } = useAuth();
+
+  const Active = data.filter((item) => item.status === "active");
+
+  const isInCart = (id) => {
+    return productbuy?.some((p) => p.id === id);
+  };
+
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 600) {
-        setVisibleCards(1);
-      } else if (window.innerWidth < 800) {
-        setVisibleCards(2);
-      } else if (window.innerWidth < 1024) {
-        setVisibleCards(3);
-      } else {
-        setVisibleCards(4);
-      }
+      if (window.innerWidth < 600) setVisibleCards(1);
+      else if (window.innerWidth < 800) setVisibleCards(2);
+      else if (window.innerWidth < 1024) setVisibleCards(3);
+      else setVisibleCards(4);
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
+
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -66,47 +65,19 @@ export default function ServiceSpecial({
 
   const handleTouchEnd = (e) => {
     touchEndX.current = e.changedTouches[0].screenX;
-    handleTouchtrue();
-  };
 
-  const handleTouchtrue = () => {
-    if (touchStartX.current - touchEndX.current > 150) {
-      prevSlide();
-    }
-
-    if (touchEndX.current - touchStartX.current > 150) {
-      nextSlide();
-    }
+    if (touchStartX.current - touchEndX.current > 150) prevSlide();
+    if (touchEndX.current - touchStartX.current > 150) nextSlide();
   };
 
   const translateValue = `translateX(${index * (100 / visibleCards)}%) translateX(${index * gap}px)`;
-
-  // const [addedItems, setAddedItems] = useState([]);
-
-  const handleAddToCart = (item) => {
-    setProductBuy((prev) => {
-      const product = prev.find((p) => p.id === item.id);
-
-      if (product) {
-        return prev.map((p) =>
-          p.id === item.id ? { ...p, pro: p.pro + 1 } : p,
-        );
-      }
-
-      return [...prev, { ...item, pro: 1 }];
-    });
-    setAddedItems((prev) =>
-      prev.includes(item.id) ? prev : [...prev, item.id],
-    );
-  };
 
   if (Active.length === 0) {
     return (
       <div className={styles.box}>
         <h2 className={styles.title}>محصولی پیدا نشد</h2>
         <p className={styles.description}>
-          متأسفانه هیچ محصولی برای نمایش وجود ندارد. لطفاً کمی بعد دوباره تلاش
-          کنید یا فیلترهای جستجو را تغییر دهید.
+          متأسفانه هیچ محصولی برای نمایش وجود ندارد.
         </p>
       </div>
     );
@@ -116,6 +87,7 @@ export default function ServiceSpecial({
     <div className={styles.servicesBody}>
       <article className={styles.article}>
         <div className={styles.badge}>تخفیف ویژه</div>
+
         <div className={styles.servicesHeader}>
           <h2 className={styles.iconTitle}>{title}</h2>
         </div>
@@ -154,52 +126,48 @@ export default function ServiceSpecial({
                 transition: "transform 0.4s ease-in-out",
               }}
             >
-              {Active.map((item) => (
-                <div
-                  className={styles.serviceCard}
-                  key={item.id}
-                  style={{ flex: `0 0 ${100 / visibleCards}%` }}
-                >
-                  <Image
-                    className={styles.serviceImage}
-                    src={item.image}
-                    alt={item.title}
-                    width={100}
-                    height={180}
-                    onClick={() => router.push(`/ProductDetail/${item.id}`)}
-                  />
-                  <p className={styles.serviceTitle}>{item.title}</p>
-                  <h2 className={styles.serviceDescription}>
-                    {item.description}
-                  </h2>
-                  <p className={styles.servicePrice}>
-                    {parseInt(item.price)?.toLocaleString("fa-IR")} تومان
-                  </p>
-                  <button
-                    className={`${styles.serviceBtn} ${addedItems.includes(item.id) ? styles.serviceBtnGreen : ""}`}
-                    onClick={() => handleAddToCart(item)}
-                    disabled={addedItems.includes(item.id)}
+              {Active.map((item) => {
+                const added = isInCart(item.id);
+
+                return (
+                  <div
+                    className={styles.serviceCard}
+                    key={item.id}
+                    style={{ flex: `0 0 ${100 / visibleCards}%` }}
                   >
-                    {addedItems.includes(item.id) ? (
-                      <>
-                        به سبد خرید اضافه شد
-                        <svg
-                          className={styles.svg}
-                          viewBox="0 0 24 24"
-                          fill="white"
-                          width="18"
-                          height="18"
-                          style={{ marginLeft: "8px" }}
-                        >
-                          <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
-                        </svg>
-                      </>
-                    ) : (
-                      "افزودن به سبد خرید"
-                    )}
-                  </button>
-                </div>
-              ))}
+                    <Image
+                      className={styles.serviceImage}
+                      src={item.image}
+                      alt={item.title}
+                      width={100}
+                      height={180}
+                      onClick={() =>
+                        router.push(`/ProductDetail/${item.id}`)
+                      }
+                    />
+
+                    <p className={styles.serviceTitle}>{item.title}</p>
+
+                    <h2 className={styles.serviceDescription}>
+                      {item.description}
+                    </h2>
+
+                    <p className={styles.servicePrice}>
+                      {parseInt(item.price)?.toLocaleString("fa-IR")} تومان
+                    </p>
+
+                    <button
+                      className={`${styles.serviceBtn} ${
+                        added ? styles.serviceBtnGreen : ""
+                      }`}
+                      onClick={() => addToCart(item)}
+                      disabled={added}
+                    >
+                      {added ? "به سبد خرید اضافه شد" : "افزودن به سبد خرید"}
+                    </button>
+                  </div>
+                );
+              })}
 
               <div>
                 <div className={styles.serviceCardLast}>
@@ -207,6 +175,7 @@ export default function ServiceSpecial({
                     <h2>{title}</h2>
                     <p>برای نمایش بیشتر کلیک کنید</p>
                   </div>
+
                   {button && (
                     <button
                       className={styles.serviceCardLastButton}
@@ -223,7 +192,7 @@ export default function ServiceSpecial({
           <button
             className={`${styles.navBtn} ${styles.left}`}
             onClick={nextSlide}
-            disabled={index >= Active.length + 1 - visibleCards}
+            // disabled={index >= Active.length + 1 - visibleCards}
           >
             <svg
             xmlns="http://www.w3.org/2000/svg"

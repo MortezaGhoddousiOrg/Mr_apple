@@ -65,9 +65,6 @@ export default function CheckoutFormPopup({
   } catch (err) {
     alert("خطا در ثبت اطلاعات");
   }
-
-    onSubmitSuccess?.(dataForm);
-    onClose?.();
   };
 
 
