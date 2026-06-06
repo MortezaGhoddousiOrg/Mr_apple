@@ -8,7 +8,7 @@ export default function Footer() {
       <div className={style.footerTop}>
         {/* Brand Section */}
         <div className={style.brandSection}>
-          <h2 className={style.brand}>MR•APPLE</h2>
+          <h2 className={style.brand}>MR APPLE</h2>
 
           <p className={style.brandText}>
             فروشگاه تخصصی محصولات اپل، عرضه جدیدترین دستگاه‌ها

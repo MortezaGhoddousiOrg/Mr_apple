@@ -1,4 +1,7 @@
+// "use client"
+
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 function Dashboard() {
     const [stats, setStats] = useState({
@@ -6,6 +9,18 @@ function Dashboard() {
         weekly: { sales: 0, users: 0, orders: 0 },
         monthly: { sales: 0, users: 0, orders: 0 },
     });
+
+    const router = useRouter();
+    
+    useEffect(() => {
+        const local = localStorage.getItem("admin");
+        if (local) {
+            router.push("/dashboard");
+        } else {
+            router.push("/");
+        }
+    }, []);
+
 
     // Simulate data loading
     useEffect(() => {
@@ -270,7 +285,7 @@ function Dashboard() {
                         </span>
                     </button>
                     <button className="bg-white hover:bg-blue-600 text-gray-700 hover:text-white px-4 py-3 rounded-xl shadow-sm transition-all duration-200 flex flex-col items-center gap-2 group">
-                        <span className="text-2xl">📊</span>
+                        <span className="text-2xl">📊   </span>
                         <span className="text-sm font-medium">گزارشات</span>
                     </button>
                 </div>

@@ -84,6 +84,7 @@ export function AuthProvider({ children }) {
     if (userData?.userId) {
       setUserId(userData.userId);
       localStorage.setItem("userId", userData.userId);
+      setIsLoggedIn(true);
     }
 
     return userData;
@@ -106,6 +107,17 @@ export function AuthProvider({ children }) {
 
     dataUser();
   }, [userId]);
+
+  // برای ست کردن آیکن داخل هدر لاگین 
+  useEffect(() => {
+  const savedUserId = localStorage.getItem("user");
+
+  if (savedUserId) {
+    setUserId(savedUserId);
+    setIsLoggedIn(true);
+  }
+}, []);
+
 
   // خواندن سبد خرید برای مهمان و بعد از لاگین ست کردن با بک اند
   const loadCart = async () => {
@@ -250,7 +262,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("userId");
     localStorage.removeItem("tempPhone");
 
-    setIsLoggedIn(false);
+    // setIsLoggedIn(false);
     setUserId(null);
     setDataForm(emptyForm);
     setInitialData(emptyForm);

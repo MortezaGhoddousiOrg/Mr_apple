@@ -86,7 +86,7 @@ export default function Productdetail() {
   const [commentText, setCommentText] = useState("");
   const [commentRate, setCommentRate] = useState(5);
 
-  const { addedItems, setAddedItems, setProductBuy } = useAuth();
+  const { addToCart, productbuy } = useAuth();
 
   // useEffect(() => {
   //   if (!id) return;
@@ -146,37 +146,24 @@ export default function Productdetail() {
   const stockCount = Number(product?.quantity ?? 0);
   const inStock = stockCount > 0;
 
-  const isAdded = Boolean(product?.id && addedItems?.includes(product.id));
+  const isAdded = productbuy?.some((p) => p.id === product?.id);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!product?.id) return;
     if (!inStock) return;
     if (isAdded) return;
 
-    const item = {
-      id: product.id,
-      title: product.name,
-      description: product.descriptions,
-      price: discountedPrice ?? product?.sell_price,
-      image: galleryImages?.[0] || (product?.images?.[0]?.file ?? ""),
-      quantity: product?.quantity,
-      discount: product?.discount,
-      sell_price: product?.sell_price,
-    };
-
-    setProductBuy((prev) => {
-      const exists = prev.find((p) => p.id === item.id);
-      if (exists) {
-        return prev.map((p) =>
-          p.id === item.id ? { ...p, pro: (p.pro ?? 1) + 1 } : p,
-        );
-      }
-      return [...prev, { ...item, pro: 1 }];
-    });
-
-    setAddedItems((prev) =>
-      prev.includes(item.id) ? prev : [...prev, item.id],
-    );
+    try {
+      await addToCart({
+        id: product.id,
+        title: product.name,
+        price: discountedPrice ?? product?.sell_price,
+        image: galleryImages?.[0] || product?.images?.[0]?.file || "",
+        description: product.descriptions,
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleSubmitComment = (e) => {
@@ -401,20 +388,20 @@ export default function Productdetail() {
       </section>
 
       {/* <section className={styles.sectionBlock}>
-        <div className={styles.sectionHeadRow}>
-          <h2 className={styles.sectionTitle}>محتویات جعبه</h2>
-          <p className={styles.sectionSubtitle}>نمایشی (فیک) برای UI</p>
-        </div>
+          <div className={styles.sectionHeadRow}>
+            <h2 className={styles.sectionTitle}>محتویات جعبه</h2>
+            <p className={styles.sectionSubtitle}>نمایشی (فیک) برای UI</p>
+          </div>
 
-        <div className={styles.boxGrid}>
-          {fakePdpContent.inTheBox.map((x) => (
-            <div key={x} className={styles.boxItem}>
-              <span className={styles.boxBullet} />
-              <span>{x}</span>
-            </div>
-          ))}
-        </div>
-      </section> */}
+          <div className={styles.boxGrid}>
+            {fakePdpContent.inTheBox.map((x) => (
+              <div key={x} className={styles.boxItem}>
+                <span className={styles.boxBullet} />
+                <span>{x}</span>
+              </div>
+            ))}
+          </div>
+        </section> */}
     </div>
   );
 }
