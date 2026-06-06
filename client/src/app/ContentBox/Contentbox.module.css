@@ -15,22 +15,25 @@
 }
 
 .toggleButton::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 5%;
   width: 90%;
   height: 45%;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
   border-radius: 999px 999px 0 0;
   transition: all 0.4s ease;
-  
 }
 
 .toggleButton:hover {
   transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.45);
-  box-shadow: 
+  box-shadow:
     0 12px 40px 0 rgba(0, 0, 0, 0.45),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.6),
     inset 0 -1px 10px 0 rgba(255, 255, 255, 0.1);
@@ -38,45 +41,33 @@
 
 .toggleButton:active {
   transform: translateY(1px);
-  box-shadow: 
+  box-shadow:
     0 4px 15px 0 rgba(0, 0, 0, 0.25),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
 }
-
-
-
-/* .glassButton:hover {
-  background: rgba(255, 255, 255, 0.35);
-  transform: scale(1.05);
-  box-shadow: 
-    inset 0 1px 1px rgba(255, 255, 255, 0.4),
-    0 12px 24px rgba(0, 0, 0, 0.15);
-} */
-
-
-
-
 
 .contactBoxContainer {
   position: fixed;
   bottom: 105px;
   right: 30px;
   width: 300px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(15px);
   border-radius: 24px;
   padding: 24px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  z-index: 9998;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.701) 0%,
+    rgba(0, 10, 14, 0.484) 100%
+  );
+  backdrop-filter: blur(20px);
+  z-index: 999;
   font-family: "vazir";
 }
 
 .title {
-  margin: 0 0 16px 0;
+  margin-bottom: 16px;
   font-size: 1.1rem;
-  color: #1c1c1e;
   text-align: center;
+  color: white;
 }
 
 .contactList {
@@ -91,18 +82,34 @@
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #f8f9fa;
   border-radius: 16px;
   text-decoration: none;
-  color: #333;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.32) 0%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+  color: #ffffff;
+  font-family: "vazir", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(1.5px);
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .contactItem:hover {
-  background: #eff6ff;
-  border-color: #dbeafe;
-  color: #007aff;
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 12px 40px 0 rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 10px 0 rgba(255, 255, 255, 0.1);
 }
 
 .closeButton {
@@ -119,4 +126,116 @@
   align-items: center;
   justify-content: center;
   color: #8e8e93;
+}
+
+
+@media (max-width: 768px) {
+  .toggleButton {
+    width: 56px;
+    height: 56px;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .contactBoxContainer {
+    width: 280px;
+    bottom: 90px;
+    right: 20px;
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .title {
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
+  .contactItem {
+    padding: 11px;
+    font-size: 15px;
+    gap: 10px;
+  }
+
+  .closeButton {
+    top: 12px;
+    left: 12px;
+    width: 26px;
+    height: 26px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .toggleButton {
+    width: 52px;
+    height: 52px;
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .contactBoxContainer {
+    right: 16px;
+    left: 16px;
+    bottom: 78px;
+    width: auto;
+    max-width: unset;
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .title {
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+
+  .contactList {
+    gap: 10px;
+  }
+
+  .contactItem {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 14px;
+  }
+
+  .contactItem svg {
+    min-width: 18px;
+    min-height: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .closeButton {
+    width: 24px;
+    height: 24px;
+    top: 10px;
+    left: 10px;
+  }
+}
+
+
+@media (max-width: 360px) {
+  .toggleButton {
+    width: 48px;
+    height: 48px;
+    bottom: 14px;
+    right: 14px;
+  }
+
+  .contactBoxContainer {
+    right: 12px;
+    left: 12px;
+    bottom: 70px;
+    padding: 16px;
+  }
+
+  .title {
+    font-size: 0.9rem;
+  }
+
+  .contactItem {
+    font-size: 13px;
+    padding: 9px;
+    gap: 8px;
+  }
 }

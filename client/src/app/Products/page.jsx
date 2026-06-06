@@ -6,254 +6,362 @@ import Service from "../Components/Service/Service";
 import { useRouter } from "next/navigation";
 
 import Image from "next/image";
+// import { image } from "framer-motion/client";
+
 // import { useRouter } from "next/navigation";
 // import Card from "../CardProduct/Card";
 // import axios from "axios";
 
 export default function Products({ setNotif }) {
+  // const [product, setProduct] = useState([
+  //   {
+  //     id: 1,
+  //     title: "آیفون",
+  //     path: "iPhone",
+  //     item: [
+  //       {
+  //         id: 1,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 2,
+  //         image: "/image-category/apple-iphone-15-pro-first-image.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 3,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 4,
+  //         image: "/image-category/apple-iphone-15-pro-first-image.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 5,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 6,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //     ],
+  //   },
+
+  //   {
+  //     id: 2,
+  //     title: "لوازم جانبی ",
+  //     path: "Accessories",
+  //     item: [
+  //       {
+  //         id: 7,
+  //         image: "/image-category/anyland-high-quality-clear-case-iphone-17-magsafe-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 8,
+  //         image: "/image-category/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 9,
+  //         image: "/image-category/whoop_peek11.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 10,
+  //         image: "/image-category/apple-usb-c-to-lightning-cable-1m-3.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 11,
+  //         image: "/image-category/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 12,
+  //         image: "/image-category/anyland-high-quality-clear-case-iphone-17-magsafe-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //     ],
+  //   },
+
+  //   {
+  //     id: 3,
+  //     title: "کارکرده ",
+  //     path: "usedProducts",
+  //     item: [
+  //       {
+  //         id: 13,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 14,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 15,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 16,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 17,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 18,
+  //         image: "/image-services/apple-iphone-17-pro-max-cover.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //     ],
+  //   },
+
+  //   {
+  //     id: 4,
+  //     title: "آیپد",
+  //     path: "iPad",
+  //     item: [
+  //       {
+  //         id: 19,
+  //         image: "/image-category/apple-ipad-11-inch-11th-7.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 20,
+  //         image: "/image-category/apple-ipad-air-m3-11-inch-8.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 21,
+  //         image: "/image-category/apple-ipad-11-inch-11th-7.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 22,
+  //         image: "/image-category/apple-ipad-air-m3-11-inch-8.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 23,
+  //         image: "/image-category/apple-ipad-air-m3-11-inch-8.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //       {
+  //         id: 24,
+  //         image: "/image-category/apple-ipad-11-inch-11th-7.png",
+  //         title: "آیفون 17 پرو مکس",
+  //         description:
+  //           "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+  //         price: 1000000000,
+  //       },
+  //     ],
+  //   },
+  // ]);
+
   const [product, setProduct] = useState([
-    {
-      id: 1,
-      title: "آیفون | iPhone",
-      path: "iPhone",
-      item: [
-        {
-          id: 1,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 2,
-          image: "/image-category/apple-iphone-15-pro-first-image.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 3,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 4,
-          image: "/image-category/apple-iphone-15-pro-first-image.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 5,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 6,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-      ],
-    },
 
-    {
+
+  {
+    id: 1,
+    images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    category: {
       id: 2,
-      title: "لوازم جانبی | Accessories",
-      path: "Accessories",
-      item: [
-        {
-          id: 7,
-          image: "/image-category/anyland-high-quality-clear-case-iphone-17-magsafe-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 8,
-          image: "/image-category/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 9,
-          image: "/image-category/whoop_peek11.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 10,
-          image: "/image-category/apple-usb-c-to-lightning-cable-1m-3.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 11,
-          image: "/image-category/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 12,
-          image: "/image-category/anyland-high-quality-clear-case-iphone-17-magsafe-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-      ],
+      parent: {id: 1, title: "Mobile", image: null}
     },
-
-    {
-      id: 3,
-      title: "کارکرده | Used",
-      path: "usedProducts",
-      item: [
-        {
-          id: 13,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 14,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 15,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 16,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 17,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 18,
-          image: "/image-services/apple-iphone-17-pro-max-cover.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-      ],
+    category_child_id: 2,
+    category_parent_id: 1,
+    product_code: "IP14",
+    name: "iPhone 14",
+    buy_price: "1000000",
+    sell_price: "1500000",
+    descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    status: "active",
+  },
+  {
+    id: 2,
+    images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    category: {
+      id: 2,
+      parent: {id: 1, title: "Mobile", image: null}
     },
-
-    {
-      id: 4,
-      title: "آیپد | iPad",
-      path: "iPad",
-      item: [
-        {
-          id: 19,
-          image: "/image-category/apple-ipad-11-inch-11th-7.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 20,
-          image: "/image-category/apple-ipad-air-m3-11-inch-8.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 21,
-          image: "/image-category/apple-ipad-11-inch-11th-7.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 22,
-          image: "/image-category/apple-ipad-air-m3-11-inch-8.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 23,
-          image: "/image-category/apple-ipad-air-m3-11-inch-8.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-        {
-          id: 24,
-          image: "/image-category/apple-ipad-11-inch-11th-7.png",
-          title: "آیفون 17 پرو مکس",
-          description:
-            "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-          price: 1000000000,
-        },
-      ],
+    category_child_id: 2,
+    category_parent_id: 1,
+    product_code: "IP14",
+    name: "iPhone 14",
+    buy_price: "1000000",
+    sell_price: "1500000",
+    descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    status: "active",
+  },
+  {
+    id: 3,
+    images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    category: {
+      id: 2,
+      parent: {id: 1, title: "Mobile", image: null}
     },
-  ]);
+    category_child_id: 2,
+    category_parent_id: 1,
+    product_code: "IP14",
+    name: "iPhone 14",
+    buy_price: "1000000",
+    sell_price: "1500000",
+    descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    status: "active",
+  },
+  {
+    id: 4,
+    images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    category: {
+      id: 2,
+      parent: {id: 1, title: "Mobile", image: null}
+    },
+    category_child_id: 2,
+    category_parent_id: 1,
+    product_code: "IP14",
+    name: "iPhone 14",
+    buy_price: "1000000",
+    sell_price: "1500000",
+    descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    status: "active",
+  },
+  {
+    id: 5,
+    images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    category: {
+      id: 2,
+      parent: {id: 1, title: "Mobile", image: null}
+    },
+    category_child_id: 2,
+    category_parent_id: 1,
+    product_code: "IP14",
+    name: "iPhone 14",
+    buy_price: "1000000",
+    sell_price: "1500000",
+    descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    status: "active",
+  },
+]);
 
 
- useEffect(() => {
-    const axioshome = async () => {
-      try {
-        const response = await api.get("/api/product/");
-        console.log(response.data);
-        setProduct(response.data);
-      } catch (err) {
-        console.log(err);
-      }
-    };
+//  useEffect(() => {
+//     const axioshome = async () => {
+//       try {
+//         const response = await api.get("/api/product/");
+//         console.log(response.data);
+//         setProduct(response.data);
+//       } catch (err) {
+//         console.log(err);
+//       }
+//     };
 
-    axioshome();
-  }, []);
+//     axioshome();
+//   }, []);
 
 
   const router = useRouter();
+
+  const serviceData = product.map((item) => ({
+  id: item.id,
+  image: item.images?.[0]?.url,
+  title: item.name,
+  description: item.descriptions,
+  price: item.sell_price,
+  status: item.status,
+}));
+
+if (product.length === 0 ) {
+    return (
+          <div className={style.box}>
+            <h2 className={style.title}>هیچ دسته بندی برای محصولات وجود نداره</h2>
+            <p className={style.description}>
+              متأسفانه هیچ محصولی برای نمایش وجود ندارد. لطفاً کمی بعد دوباره تلاش
+              کنید یا فیلترهای جستجو را تغییر دهید.
+            </p>
+          </div>
+        );
+}
 
   return (
     <div className={style.productBody}>
@@ -304,10 +412,10 @@ export default function Products({ setNotif }) {
         {product.map((item) => (
           <Service
             key={item.id}
-            data={item.item}
-            title={item.title}
+            data={serviceData}
+            title={item.category.parent.title}
             button="بیشتر"
-            onMoreClick={() => router.push(`/Category/${item.path}`)}
+            onMoreClick={() => router.push(`/Category/${item.category.parent.title}`)}
             setNotif={setNotif}
           />
         ))}

@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useRef } from "react";
-import style from "@/app/Code/Code.module.css";
+import style from "@/app/Login/Code/Code.module.css";
 import { useAuth } from "@/app/Context/Context";
 import { useRouter } from "next/navigation";
 
 export default function Code({ phone }) {
   console.log(phone);
-  const { setIsLoggedIn } = useAuth();
+  const { setIsLoggedIn, verifyCode } = useAuth();
   
 
   const [otp, setOtp] = React.useState(["", "", "", "", "", ""]);
@@ -36,25 +36,17 @@ export default function Code({ phone }) {
     }
   };
 
-  const handleSubmit = () => {
-    // console.log("OTP Code Submitted:", code);
-
-    // const savedPhone = localStorage.getItem("tempPhone");
-
-    // const userData = {
-    //   phone: savedPhone,
-    //   isLoggedIn: true,
-    //   loginTime: new Date().toISOString(),
-    // };
-
-    // localStorage.setItem("user", JSON.stringify(userData));
-    // localStorage.removeItem("tempPhone");
-
-    localStorage.setItem("user", JSON.stringify(phone));
+   const handleSubmit = async (code) => {
+    try {
+      // const result = await verifyCode(phone, code);
+      // console.log(result);
+      
       setIsLoggedIn(true);
 
-
-    router.push("/");
+      router.push("/");
+    } catch (error) {
+      console.error("OTP verification failed:", error);
+    }
   };
 
   return (

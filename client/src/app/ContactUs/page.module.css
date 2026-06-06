@@ -36,7 +36,6 @@
   color: transparent; 
 }
 
-
 .descriptionContact {
   font-size: 17px;
   line-height: 2.1;
@@ -56,7 +55,6 @@
   display: flex;
   align-items: center;
   gap: 10px;
-
   font-size: 15px;
   color: white;
 }
@@ -64,10 +62,8 @@
 .heroFeatureItem svg {
   width: 18px;
   height: 18px;
-
   stroke: white;
   stroke-width: 2;
-
   fill: none;
 }
 
@@ -117,8 +113,6 @@
   box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
 }
 
-
-
 .heroImageContainer {
   width: 50%;
   display: flex;
@@ -126,11 +120,12 @@
 }
 
 .heroImg {
-  width: 420px;
+  transform: scale(2);
   object-fit: contain;
   filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .6));
+  position: absolute;
+  bottom: 142px;
 }
-
 
 .infoContact {
   display: grid;
@@ -196,7 +191,6 @@
   height: 22px;
   fill: white;
 }
-
 
 .questionSection {
   width: 100%;
@@ -359,9 +353,6 @@
   font-size: 14px;
   outline: none;
   transition: all 0.3s ease;
-  /* background: white; */
-
-  /* متن داخل فیلد */
   color: #000;
 }
 
@@ -396,7 +387,6 @@
   pointer-events: none;
   transition: all 0.3s ease;
   transform-origin: right top;
-  /* background: white; */
 }
 
 /* input و textarea */
@@ -443,22 +433,18 @@
   box-shadow: 0 15px 30px rgba(15, 115, 179, 0.3);
 }
 
-
 /* ================= RESPONSIVE STYLES ================= */
 @media (max-width: 900px) {
   .infoContact {
     grid-template-columns: 1fr;
-    /* Stack contact info and map */
   }
 
   .contactInfoBox {
     order: 2;
-    /* Map above info */
   }
 
   .mapContact {
     height: 350px;
-    /* Adjust map height */
     order: 1;
   }
 }
@@ -507,5 +493,3 @@
 .bx-message-rounded::before {
   content: "\eb69";
 }
-
-/* Add more bx icons if used */
