@@ -10,7 +10,9 @@ from .models import OTP
 from .serializers import AdminLoginSerializer, SendCodeSerializer, VerifyCodeSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from .serializers import UserProfileSerializer
 
 
 
@@ -63,7 +65,20 @@ class VerifyCodeView(APIView):
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
-        response = Response({"message": "ورود موفق" , "access_token": access_token})
+        response = Response({
+            "message": "ورود موفق",
+            "access_token": access_token,
+            "is_new_user": created,
+            "profile_completed": user.profile_completed,
+            "user": {
+                "id": user.id,
+                "phone": user.phone,
+                "username": user.username,
+                "firstname": user.firstname,
+                "lastname": user.lastname,
+                "email": user.email,
+            }
+        })
 
         response.set_cookie(
             key="access_token",
@@ -113,6 +128,7 @@ class AdminLoginView(APIView):
 class MeView(APIView):
     permission_classes = [AllowAny]
 
+    # /auth/me
     def get_user_from_token(self, request):
         access_token = request.COOKIES.get("access_token")
         admin_token = request.COOKIES.get("admin_access_token")
@@ -120,12 +136,17 @@ class MeView(APIView):
         token = access_token or admin_token
 
         if not token:
-            return Response({"error": "کاربر لاگین نیست"}, status=401)
+            return None
 
         try:
             decoded = AccessToken(token)
             user_id = decoded["user_id"]
+
             return User.objects.get(id=user_id)
+
+        except User.DoesNotExist:
+            return None
+
         except Exception:
             return None
 
