@@ -1,0 +1,44 @@
+.toastBody {
+  position: relative;
+}
+
+.toastContainer {
+  position: fixed;
+  bottom: 5%;
+  right: 3%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 99;
+}
+
+.toast {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 10px;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.5s ease;
+}
+
+.toastRemoving {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: all 0.2s ease;
+}
+
+.toastError {
+  background-color: #e74c3c;
+}
+
+.toastError i,
+.toastSuccess i {
+  font-size: 26px;
+}
+
+.toastSuccess {
+  background-color: #2ecc71;
+}

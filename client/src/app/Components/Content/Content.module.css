@@ -1,0 +1,78 @@
+.contentSection {
+  width: 100%;
+  height: 100vh;
+  background: #000;
+  position: relative;
+  /* overflow: hidden; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* font-family: "iphone !important"; */
+}
+
+.heroContent {
+  height: 83%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 24px;
+}
+
+.contentTitle {
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  font-size: 58px;
+  line-height: 1.05;
+  margin: 120px 0 14px 0;
+  color: #dadada;
+  color: #817b6d;
+}
+
+.VideoContainer {
+  width: 75%;
+  max-width: 920px;
+}
+
+.Video {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+
+
+
+@media (min-width: 768px) {
+  .heroVideoContainer {
+    width: 83%;
+    max-width: 1100px;
+  }
+
+  .heroTitle {
+    font-size: 58px;
+  }
+}
+
+@media (max-width: 759px) {
+  .heroContent {
+    padding-top: 48px;
+  }
+
+  .heroTitle {
+    font-size: 40px;
+    margin-bottom: 18px;
+  }
+
+  .heroVideoContainer {
+    width: 90%;
+    max-width: 100%;
+  }
+
+  .heroPriceInfo {
+    font-size: 18px;
+  }
+}

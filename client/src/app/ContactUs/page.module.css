@@ -1,0 +1,511 @@
+.bodyContact {
+  background-color: var(--white);
+  font-family: "vazir";
+  color: var(--text);
+  line-height: 1.6;
+  position: relative;
+}
+
+.headerContact {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 60px;
+  padding: 120px 7vw 80px;
+  background: black;
+  color: white;
+}
+
+.heroContent {
+  width: 50%;
+}
+
+.titleContact {
+  font-size: 58px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  letter-spacing: -2px;
+  background: linear-gradient(to right, #fff, #cfd8ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; 
+}
+
+
+.descriptionContact {
+  font-size: 17px;
+  line-height: 2.1;
+  color: rgba(255, 255, 255, 0.75);
+  max-width: 620px;
+  margin-bottom: 30px;
+}
+
+.heroFeatures {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.heroFeatureItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 15px;
+  color: white;
+}
+
+.heroFeatureItem svg {
+  width: 18px;
+  height: 18px;
+
+  stroke: white;
+  stroke-width: 2;
+
+  fill: none;
+}
+
+.heroButtons {
+  display: flex;
+  gap: 16px;
+  margin-top: 36px;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 64px;
+  padding: 0 28px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+}
+
+.primaryBtn {
+  background: white;
+  color: black;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+.primaryBtn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.25);
+}
+
+.secondaryBtn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: white;
+}
+
+.secondaryBtn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+}
+
+
+
+.heroImageContainer {
+  width: 50%;
+  display: flex;
+  justify-content: center;
+}
+
+.heroImg {
+  width: 420px;
+  object-fit: contain;
+  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .6));
+}
+
+
+.infoContact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  padding: 80px 6vw;
+  margin-bottom: 100px;
+}
+
+.contactInfoBox {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 25px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.infoItem i {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0f73b3, #3aa0e0);
+  color: white;
+  font-size: 20px;
+  box-shadow: 0 8px 15px rgba(15, 115, 179, 0.2);
+}
+
+.mapContact {
+  width: 100%;
+  height: 450px;
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+}
+
+.iconBox {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0f73b3, #3aa0e0);
+  box-shadow: 0 8px 15px rgba(15, 115, 179, 0.2);
+}
+
+.iconBox svg {
+  width: 22px;
+  height: 22px;
+  fill: white;
+}
+
+
+.questionSection {
+  width: 100%;
+  padding: 80px 5%;
+  background-color: #f9fbfd;
+}
+
+.questionSection h2 {
+  font-size: 2rem;
+  margin-bottom: 50px;
+  font-weight: 800;
+  text-align: center;
+  color: #1a202c;
+}
+
+.question {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 90%;
+  max-width: 950px;
+  margin: 0 auto;
+}
+
+.questionItem {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+
+.questionHeader {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 30px;
+  color: #4a5568;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.activeTitle {
+  color: #0f73b3;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0; 
+  min-width: 24px; 
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #0f73b3;
+}
+
+.iconOpen {
+  transform: rotate(45deg);
+}
+
+.iconClosed {
+  transform: rotate(0deg);
+}
+
+.answerContent {
+  padding: 0 30px 24px 30px;
+  line-height: 1.8;
+  color: #718096;
+  font-size: 0.95rem;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(10, 10, 10, 0.75);
+  backdrop-filter: blur(20px);
+  z-index: 999;
+  animation: fadeOverlay 0.3s ease-out forwards;
+}
+
+@keyframes fadeOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.contactModal {
+  width: 92%;
+  max-width: 430px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
+  padding: 34px 30px;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+  animation: modalOpen 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+@keyframes modalOpen {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalTitle {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 22px;
+  font-weight: 800;
+  color: black;
+}
+
+.closeModal {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #777;
+  transition: color 0.3s ease;
+}
+
+.closeModal:hover {
+  color: #0f73b3;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.inputGroup {
+  position: relative;
+}
+
+/* فیلدها */
+.inputGroup input,
+.inputGroup textarea,
+.inputGroup select {
+  width: 100%;
+  padding: 16px 14px;
+  border-radius: 12px;
+  border: 2px solid #ddd;
+  font-family: "vazir";
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+  /* background: white; */
+
+  /* متن داخل فیلد */
+  color: #000;
+}
+
+/* حذف استایل پیش فرض select */
+.inputGroup select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+
+.inputGroup textarea {
+  height: 110px;
+  resize: none;
+}
+
+.inputGroup input:focus,
+.inputGroup textarea:focus,
+.inputGroup select:focus {
+  border-color: #0f73b3;
+  box-shadow: 0 0 0 4px rgba(15, 115, 179, 0.15);
+}
+
+/* لیبل ها */
+.inputGroup label {
+  position: absolute;
+  right: 12px;
+  top: 16px;
+  font-size: 14px;
+  color: var(--blue);
+  padding: 0 6px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  transform-origin: right top;
+  /* background: white; */
+}
+
+/* input و textarea */
+.inputGroup input:focus + label,
+.inputGroup textarea:focus + label,
+.inputGroup input:not(:placeholder-shown) + label,
+.inputGroup textarea:not(:placeholder-shown) + label {
+  top: -9px;
+  font-size: 13px;
+  color: #0f73b3;
+  transform: translateY(-50%) scale(0.9);
+}
+
+/* select */
+.inputGroup select:focus + label,
+.inputGroup select:valid + label {
+  top: -9px;
+  font-size: 13px;
+  color: #0f73b3;
+  transform: translateY(-50%) scale(0.9);
+}
+
+/* رنگ گزینه ها */
+.inputGroup select option {
+  color: #000;
+}
+
+.modalForm button {
+  margin-top: 6px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  padding: 13px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(15, 115, 179, 0.2);
+}
+
+.modalForm button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(15, 115, 179, 0.3);
+}
+
+
+/* ================= RESPONSIVE STYLES ================= */
+@media (max-width: 900px) {
+  .infoContact {
+    grid-template-columns: 1fr;
+    /* Stack contact info and map */
+  }
+
+  .contactInfoBox {
+    order: 2;
+    /* Map above info */
+  }
+
+  .mapContact {
+    height: 350px;
+    /* Adjust map height */
+    order: 1;
+  }
+}
+
+@media (max-width: 950px) {
+  .headerContact {
+    flex-direction: column;
+    text-align: center;
+    padding: 120px 20px 60px;
+  }
+
+  .heroContent {
+    width: 100%;
+  }
+
+  .heroButtons {
+    justify-content: center;
+  }
+
+  .heroFeatures {
+    justify-content: center;
+  }
+}
+
+/* Custom styles for Bx Icons */
+.bx-phone::before {
+  content: "\ea48";
+}
+
+.bx-envelope::before {
+  content: "\ea42";
+}
+
+.bx-map::before {
+  content: "\ea3f";
+}
+
+.bx-time::before {
+  content: "\ea5e";
+}
+
+.bx-phone-call::before {
+  content: "\ea4b";
+}
+
+.bx-message-rounded::before {
+  content: "\eb69";
+}
+
+/* Add more bx icons if used */
