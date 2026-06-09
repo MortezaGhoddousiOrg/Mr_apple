@@ -149,8 +149,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
 ]
 
-CORS_ALLOW_HEADERS = ['*']
-CORS_ALLOW_METHODS = ['*']
+# CORS_ALLOW_HEADERS = ['*']
+# CORS_ALLOW_METHODS = ['*']
 
 CORS_ALLOW_CREDENTIALS = True
 
