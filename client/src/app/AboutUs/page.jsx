@@ -81,9 +81,10 @@ export default function Aboutus() {
 
         <div className={style.heroImageWrapper}>
           <Image
-            src="/image-about/IMG_SEGMENT_20260521_145912.png"
+            src="/image-about/hero_iphone_17_pro__bknyzxfk2agi_small_2x.jpg"
+            sizes="101vm"
             alt="About us"
-            width={420}
+            width={600}
             height={400}
             className={style.heroImage}
           />

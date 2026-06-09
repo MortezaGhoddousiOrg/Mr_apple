@@ -19,12 +19,22 @@ export default function Service({
   const touchEndX = useRef(0);
   const gap = 20;
 
-  const { addedItems, setAddedItems } = useAuth();
+  // const {
+  //   addedItems,
+  //   setAddedItems,
+  //   productBuy,
+  //   setProductBuy,
+  //   userId,
+  //   setUserId,
+  // } = useAuth();
 
-  const { setProductBuy } = useAuth();
+  const { addToCart, productbuy } = useAuth();
+
+
+  const Active = data.filter((item) => item.status == "active");
 
   const router = useRouter();
- useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 600) {
         setVisibleCards(1);
@@ -41,15 +51,15 @@ export default function Service({
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
+
   useEffect(() => {
-    if (index > data.length - visibleCards) {
-      setIndex(Math.max(data.length - visibleCards, 0));
+    if (index > Active.length - visibleCards) {
+      setIndex(Math.max(Active.length - visibleCards, 0));
     }
-  }, [visibleCards, data.length]);
+  }, [visibleCards, Active.length]);
 
   const nextSlide = () => {
-    if (index >= data.length + 1 - visibleCards) return;
+    if (index >= Active.length + 1 - visibleCards) return;
     setIndex((prev) => prev + 1);
   };
 
@@ -81,24 +91,81 @@ export default function Service({
 
   // const [addedItems, setAddedItems] = useState([]);
 
-  const handleAddToCart = (item) => {
-    setProductBuy((prev) => {
-      const product = prev.find((p) => p.id === item.id);
+  // const handleAddToCart = (item) => {
+  //   setProductBuy((prev) => {
+  //     const product = prev.find((p) => p.id === item.id);
 
-      if (product) {
-        return prev.map((p) =>
-          p.id === item.id ? { ...p, pro: p.pro + 1 } : p,
-        );
-      }
+  //     if (product) {
+  //       return prev.map((p) =>
+  //         p.id === item.id ? { ...p, pro: p.pro + 1 } : p,
+  //       );
+  //     }
 
-      return [...prev, { ...item, pro: 1 }];
-    });
-    setAddedItems((prev) =>
-      prev.includes(item.id) ? prev : [...prev, item.id],
-    );
+  //     return [...prev, { ...item, pro: 1 }];
+  //   });
+  //   setAddedItems((prev) =>
+  //     prev.includes(item.id) ? prev : [...prev, item.id],
+  //   );
+  // };
+
+  // const handleAddToCart = async (item) => {
+  //   const isAlreadyAdded = productBuy.some((p) => p.id === item.id);
+  //   if (isAlreadyAdded) return;
+
+  //   if (userId) {
+  //     try {
+  //       const res = await api.post("/api/orders/cart/add", {
+  //         userId,
+  //         productId: item.id,
+  //       });
+  //       console.log(res.data);
+  //     } catch (err) {
+  //       console.error(err);
+  //       return;
+  //     }
+  //   }
+  // };
+
+//   const handleAddToCart = async (item) => {
+//   try {
+//     await addToCart(item);
+//   } catch (err) {
+//     // console.error(err);
+//   }
+// };
+
+ const isInCart = (id) => {
+    return productbuy?.some((p) => p.id === id);
   };
 
-  if (data.length === 0) {
+  const handleAddToCart = async (item) => {
+    try {
+      if (isInCart(item.id)) return;
+
+      await addToCart({
+        id: item.id,
+        title: item.title,
+        price: item.price,
+        image: item.image,
+        description: item.description,
+      });
+
+        // setNotif({
+        //   message: "محصول با موفقیت به سبد خرید اضافه شد",
+        //   type: "success",
+        // });
+      
+    } catch (err) {
+        // setNotif({
+        //   message: "افزودن محصول به سبد خرید با خطا مواجه شد",
+        //   type: "error",
+        // });
+      
+      // console.error(err);
+    }
+  };
+
+  if (Active.length === 0) {
     return (
       <div className={styles.box}>
         <h2 className={styles.title}>محصولی پیدا نشد</h2>
@@ -122,7 +189,20 @@ export default function Service({
           onClick={prevSlide}
           disabled={index === 0}
         >
-          ❮
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
         </button>
 
         <div
@@ -137,60 +217,61 @@ export default function Service({
               transition: "transform 0.4s ease-in-out",
             }}
           >
-            {data.map((item) => (
-              <div
-                className={styles.serviceCard}
-                key={item.id}
-                style={{ flex: `0 0 ${100 / visibleCards}%` }}
-              >
-                <Image
-                  className={styles.serviceImage}
-                  src={item.image}
-                  alt={item.title}
-                  width={100}
-                  height={180}
-                  onClick={() => router.push(`/ProductDetail/${item.id}`)}
-                />
-                <p className={styles.serviceTitle}>{item.title}</p>
-                <h2 className={styles.serviceDescription}>
-                  {item.description}
-                </h2>
-                <p className={styles.servicePrice}>
-                  {parseInt(item.price)?.toLocaleString("fa-IR")} تومان
-                </p>
-                <button
-                  className={`${styles.serviceBtn} ${addedItems.includes(item.id) ? styles.serviceBtnGreen : ""}`}
-                  onClick={() => handleAddToCart(item)}
-                  disabled={addedItems.includes(item.id)}
+            {Active.map((item) => {
+              const added = isInCart(item.id);
+
+              return (
+                <div
+                  className={styles.serviceCard}
+                  key={item.id}
+                  style={{ flex: `0 0 ${100 / visibleCards}%` }}
                 >
-                  {addedItems.includes(item.id) ? (
-                    <>
-                      به سبد خرید اضافه شد
-                      <svg
-                        className={styles.svg}
-                        viewBox="0 0 24 24"
-                        fill="white"
-                        width="18"
-                        height="18"
-                        style={{ marginLeft: "8px" }}
-                      >
-                        <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
-                      </svg>
-                    </>
-                  ) : (
-                    "افزودن به سبد خرید"
-                  )}
-                </button>
-              </div>
-            ))}
+                  <Image
+                    className={styles.serviceImage}
+                    src={item.image}
+                    alt={item.title}
+                    width={100}
+                    height={180}
+                    onClick={() => router.push(`/ProductDetail/${item.id}`)}
+                  />
+                  <p className={styles.serviceTitle}>{item.title}</p>
+                  <h2 className={styles.serviceDescription}>
+                    {item.description}
+                  </h2>
+                  <p className={styles.servicePrice}>
+                    {parseInt(item.price)?.toLocaleString("fa-IR")} تومان
+                  </p>
+                  <button
+                    className={`${styles.serviceBtn} ${added ? styles.serviceBtnGreen : ""}`}
+                    onClick={() => handleAddToCart(item)}
+                  >
+                    {added ? (
+                      <>
+                        به سبد خرید اضافه شد
+                        <svg
+                          className={styles.svg}
+                          viewBox="0 0 24 24"
+                          fill="white"
+                          width="18"
+                          height="18"
+                          style={{ marginLeft: "8px" }}
+                        >
+                          <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
+                        </svg>
+                      </>
+                    ) : (
+                      "افزودن به سبد خرید"
+                    )}
+                  </button>
+                </div>
+              );
+            })}
 
             <div>
               <div className={styles.serviceCardLast}>
                 <div className={styles.serviceCardLastDiv}>
                   <h2>{title}</h2>
-                  <p>
-                    برای نمایش بیشتر کلیک کنید
-                  </p>
+                  <p>برای نمایش بیشتر کلیک کنید</p>
                 </div>
                 {button && (
                   <button
@@ -208,12 +289,24 @@ export default function Service({
         <button
           className={`${styles.navBtn} ${styles.left}`}
           onClick={nextSlide}
-          disabled={index >= data.length + 1 - visibleCards}
+          disabled={index >= Active.length + 1 - visibleCards}
         >
-          ❯
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5"></path>
+            <path d="m12 19-7-7 7-7"></path>
+          </svg>
         </button>
       </div>
     </div>
   );
 }
-

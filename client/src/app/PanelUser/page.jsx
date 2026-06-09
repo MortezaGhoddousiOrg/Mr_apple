@@ -1,89 +1,40 @@
-// "use client";
-// import { useState } from "react";
-// import styles from "./page.module.css";
-// // کامپوننت‌هایی که باید بسازید (فایل‌های جداگانه)
-// import OrdersList from "@/app/PanelUser/OrderList/page";
-// import ProfileSettings from "@/app/PanelUser/ProfileSetting/page";
-// // import Addresses from "./components/Addresses";
-
-// export default function PanelUser() {
-//   const [activeTab, setActiveTab] = useState("orders");
-
-//   const menuItems = [
-//     { id: "orders", title: "سفارش‌های من" },
-//     { id: "profile", title: "اطلاعات حساب" },
-//     { id: "addresses", title: "آدرس‌ها" },
-//   ];
-
-//   const renderContent = () => {
-//     switch (activeTab) {
-//       case "orders": return <OrdersList />;
-//       case "profile": return <ProfileSettings />;
-//       case "addresses": return <Addresses />;
-//       default: return <OrdersList />;
-//     }
-//   };
-
-//   return (
-//     <section className={styles.panelContainer}>
-//       <aside className={styles.sidebar}>
-//         <div className={styles.sidebarHeader}>پنل کاربری</div>
-//         <nav className={styles.menu}>
-//           {menuItems.map((item) => (
-//             <button
-//               key={item.id}
-//               onClick={() => setActiveTab(item.id)}
-//               className={`${styles.menuItem} ${activeTab === item.id ? styles.active : ""}`}
-//             >
-//               {item.title}
-//             </button>
-//           ))}
-//         </nav>
-//       </aside>
-
-//       <main className={styles.content}>
-//         {renderContent()}
-//       </main>
-//     </section>
-//   );
-// }
-
 "use client";
 
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../Context/Context";
 
-// فرض بر این است که این کامپوننت‌ها را دارید
 import OrdersList from "@/app/PanelUser/OrderList/page";
 import ProfileSettings from "@/app/PanelUser/ProfileSetting/page";
+import Logout from "@/app/PanelUser/Logout/page";
 
 export default function PanelUser() {
   const [activeTab, setActiveTab] = useState("orders");
   const router = useRouter();
-  const [panelUser, setPanelUser] = useState();
+  // const [panelUser, setPanelUser] = useState();
+  const { isLoggedIn, authLoading, dataForm } = useAuth();
 
   useEffect(() => {
-    const local = localStorage.getItem("user");
-    if (local) {
-      setPanelUser(true);
-      // router.push("/");
-      
-    } else {
-      setPanelUser(false);
-      router.push("/Login");
+    if (authLoading) return;
+
+    if (!isLoggedIn) {
+      router.replace("/Login");
     }
+  }, [isLoggedIn, authLoading, router]);
 
-  }, []);
+  if (authLoading) {
+    return <div>در حال بارگذاری...</div>;
+  }
 
-  // useEffect(() => {
-   
-  // }, [panelUser]);
+  if (!isLoggedIn) {
+    return null;
+  }
 
   const menuItems = [
     { id: "orders", title: "سفارش‌های من" },
     { id: "profile", title: "اطلاعات حساب" },
-    // { id: "addresses", title: "آدرس‌ها" },
+    { id: "logout", title: "خروج" },
   ];
 
   const renderContent = () => {
@@ -92,7 +43,8 @@ export default function PanelUser() {
         return <OrdersList />;
       case "profile":
         return <ProfileSettings />;
-      // default: return <OrdersList />;
+      case "logout":
+        return <Logout />;
     }
   };
 
@@ -103,7 +55,9 @@ export default function PanelUser() {
         <aside className={styles.sidebar}>
           <div className={styles.containerProfile}>
             <img src="/image-about/images (3).jfif" alt="profile" />
-            <p>username</p>
+            <p>
+              {dataForm.firstname} {dataForm.lastname}
+            </p>
           </div>
           <div className={styles.sidebarHeader}>
             <h1 className={styles.sidebarTitle}>پنل کاربری</h1>

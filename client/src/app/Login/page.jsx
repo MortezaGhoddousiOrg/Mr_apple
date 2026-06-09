@@ -4,24 +4,26 @@ import React, { useState, useEffect } from "react";
 import style from "@/app/Login/page.module.css";
 
 import { useRouter } from "next/navigation";
-import Code from "@/app/Code/Code";
+import Code from "@/app/Login/Code/Code";
+import { useAuth } from "@/app/Context/Context";
 
 export default function Login({ setNotif }) {
   const [passshow, setPsssShow] = useState(false);
   const router = useRouter();
   const [code, setCode] = useState(false);
 
-  const [login, setLogin] = useState();
-  
-    useEffect(() => {
-      const local = localStorage.getItem("user");
-      if (local) {
-        setLogin(true);
-        router.push("/PanelUser")
-      } else {
-        setLogin(false);
-      }
-    }, []);
+  // const [login, setLogin] = useState();
+
+
+  const { sendCode, isLoggedIn, authLoading } = useAuth();
+
+ useEffect(() => {
+  if (authLoading) return;
+
+  if (isLoggedIn) {
+    router.replace("/PanelUser");
+  }
+}, [isLoggedIn, authLoading, router]);
 
   const toggleshowpass = () => {
     setPsssShow((prev) => !prev);
@@ -45,39 +47,25 @@ export default function Login({ setNotif }) {
     const phoneRegex = /^09\d{9}$/;
 
     if (!phoneRegex.test(loginData.phone)) {
-      return setNotif({ message: "شماره موبایل معتبر نیست", type: "error" });
+      // return setNotif({ message: "شماره موبایل معتبر نیست", type: "error" });
     }
 
     try {
       const phone = loginData.phone;
-      const userData = {
-        phone: phone,
-        loginTime: new Date().toISOString(),
-      };
 
-      localStorage.setItem("user", userData);
-      // console.log("User saved to LocalStorage:", phone);
-
+      const res = await sendCode(phone);
+      console.log(res);
+      
       // setNotif({ message: "کد تایید برای شما ارسال شد", type: "success" });
-
-      setLoginData({
-        phone: "",
-      });
-
-      // const userLocal = localStorage.getItem("user");
-      // if (userLocal) {
-      //   setIsLoggedIn(true);
-      // } else {
-      //   setIsLoggedIn(false);
-      // }
-
       setCode(true);
+      // localStorage.setItem("user", phone);
+
     } catch (err) {
-      console.error("Login error:", err);
-      setNotif({
-        message: "خطا در ارسال، لطفا دوباره امتحان کنید",
-        type: "error",
-      });
+      console.error(err);
+      // setNotif({
+      //   message: "خطا در ارسال، لطفا دوباره امتحان کنید",
+      //   type: "error",
+      // });
     }
   };
 
@@ -91,7 +79,7 @@ export default function Login({ setNotif }) {
         </p>
 
         {code ? (
-          <Code />
+          <Code phone={loginData.phone} />
         ) : (
           <form className={style.loginFirst} onSubmit={handleSubmit} noValidate>
             <div className={style.loginInput}>

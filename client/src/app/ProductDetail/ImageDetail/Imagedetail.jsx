@@ -1,128 +1,166 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react";
-import style from "@/app/ProductDetail/ImageDetail/Imagedetail.module.css";
+import { useEffect, useMemo, useState } from "react";
+import styles from "./Imagedetail.module.css";
 
+export default function Imagedetail({
+  images = [],
+  discountPercent = 0,
+}) {
+  const gallery = useMemo(
+    () => (Array.isArray(images) ? images.filter(Boolean) : []),
+    [images],
+  );
 
-export default function Imagedetail({ images = [] }) {
-  const validImages = Array.isArray(images) ? images.filter(Boolean) : [];
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
-  useEffect(() => {
-    setCurrentImageIndex((prev) =>
-      validImages.length ? Math.min(prev, validImages.length - 1) : 0
-    );
-  }, [validImages.length]);
-
-  const openFullScreen = (index = 0) => {
-    if (!validImages.length) return;
-    setCurrentImageIndex(index);
-    setIsFullScreen(true);
-  };
-
-  const closeFullScreen = () => setIsFullScreen(false);
-
-  const goToPreviousImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? validImages.length - 1 : prev - 1
-    );
-  };
-
-  const goToNextImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === validImages.length - 1 ? 0 : prev + 1
-    );
-  };
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (!isFullScreen) return;
+    setSelectedIndex(0);
+  }, [gallery.length]);
 
-    const onKeyDown = (e) => {
-      if (e.key === "ArrowLeft") goToPreviousImage();
-      if (e.key === "ArrowRight") goToNextImage();
-      if (e.key === "Escape") closeFullScreen();
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+      } else if (e.key === "ArrowRight") {
+        setSelectedIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1));
+      } else if (e.key === "ArrowLeft") {
+        setSelectedIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1));
+      }
     };
 
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [isFullScreen, validImages.length]);
+    window.addEventListener("keydown", handleKeyDown);
 
-  if (!validImages.length) return <div>عکسی برای نمایش وجود ندارد.</div>;
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, gallery.length]);
 
-  const currentImage = validImages[currentImageIndex];
+  if (!gallery.length) {
+    return (
+      <div className={styles.emptyBox}>
+        <span>تصویری برای نمایش وجود ندارد</span>
+      </div>
+    );
+  }
+
+  const currentImage = gallery[selectedIndex];
+
+  const goNext = (e) => {
+    if (e) e.stopPropagation();
+    setSelectedIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1));
+  };
+
+  const goPrev = (e) => {
+    if (e) e.stopPropagation();
+    setSelectedIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1));
+  };
+
+  const openLightbox = () => setIsOpen(true);
+  const closeLightbox = () => setIsOpen(false);
 
   return (
-    <div className={style.productGalleryContainer}>
-      <img
-        src={currentImage}
-        alt={`Product image ${currentImageIndex + 1}`}
-        className={style.mainImageDisplay}
-        onClick={() => openFullScreen(currentImageIndex)}
-        draggable={false}
-      />
+    <>
+      <div className={styles.galleryShell}>
+        <div className={styles.mainCard}>
+          {discountPercent > 0 && (
+            <div className={styles.discountBadge}>{discountPercent}٪</div>
+          )}
 
-      <div className={style.thumbnailContainer}>
-        {validImages.map((img, index) => (
           <img
-            key={`${img}-${index}`}
-            src={img}
-            alt={`Thumbnail ${index + 1}`}
-            className={`${style.thumbnail} ${index === currentImageIndex ? style.active : ""}`}
-            onClick={() => setCurrentImageIndex(index)}
+            src={currentImage}
+            alt="product"
+            className={styles.mainImage}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             draggable={false}
+            onClick={openLightbox}
           />
-        ))}
+        </div>
+
+        {gallery.length > 1 && (
+          <div className={styles.thumbRow}>
+            {gallery.map((img, index) => (
+              <button
+                key={`${img}-${index}`}
+                type="button"
+                className={`${styles.thumbBtn} ${
+                  selectedIndex === index ? styles.thumbBtnActive : ""
+                }`}
+                onClick={() => setSelectedIndex(index)}
+                aria-label={`تصویر ${index + 1}`}
+              >
+                <img
+                  src={img}
+                  alt={`thumbnail-${index + 1}`}
+                  className={styles.thumbImage}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  draggable={false}
+                />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {isFullScreen && (
-        <div
-          className={style.fullscreenOverlay}
-          onClick={closeFullScreen}
-        >
+      {isOpen && (
+        <div className={styles.lightbox} onClick={closeLightbox}>
           <button
-            className={style.closeFullscreenButton}
-            onClick={(e) => {
-              e.stopPropagation();
-              closeFullScreen();
-            }}
+            type="button"
+            className={`${styles.lightboxBtn} ${styles.closeBtn}`}
+            onClick={closeLightbox}
+            aria-label="بستن"
           >
             ×
           </button>
 
-          <div className={style.fullscreenControls}>
-            <button
-              className={style.prevBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                goToPreviousImage();
-              }}
-              aria-label="Previous image"
-            >
-              ‹
-            </button>
+          {gallery.length > 1 && (
+            <>
+              <button
+                type="button"
+                className={`${styles.lightboxBtn} ${styles.prevBtn}`}
+                onClick={goPrev}
+                aria-label="تصویر قبلی"
+              >
+                ‹
+              </button>
 
+              <button
+                type="button"
+                className={`${styles.lightboxBtn} ${styles.nextBtn}`}
+                onClick={goNext}
+                aria-label="تصویر بعدی"
+              >
+                ›
+              </button>
+            </>
+          )}
+
+          <div
+            className={styles.lightboxContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
               src={currentImage}
-              alt={`Fullscreen image ${currentImageIndex + 1}`}
-              className={style.fullscreenImage}
-              onClick={(e) => e.stopPropagation()}
+              alt="fullscreen-product"
+              className={styles.lightboxImage}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
               draggable={false}
             />
-
-            <button
-              className={style.nextBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                goToNextImage();
-              }}
-              aria-label="Next image"
-            >
-              ›
-            </button>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

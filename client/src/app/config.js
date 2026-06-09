@@ -8,3 +8,15 @@ export const api = axios.create({
     withCredentials: true,
     timeout: 10000,
 });
+
+
+// import axios from "axios";
+
+// console.log("ENV:", process.env.NEXT_PUBLIC_ENV);
+// console.log("API_URL:", process.env.NEXT_PUBLIC_API_URL);
+
+// export const api = axios.create({
+//   baseURL: "http://localhost:4000",
+//   withCredentials: true,
+//   timeout: 10000,
+// });

@@ -9,44 +9,46 @@ import { useRouter } from "next/navigation";
 export default function FeaturedProduct() {
   const [featuredItems, setFeaturedItems] = useState([
     {
-      img: "/image-featuredProduct/iphone2025.png",
-      title: "آیفون",
-      path: "iPhone",
+      id: 1,
+      title: "Mobile",
+      image: "/image-featuredProduct/iphone2025.png",
     },
     {
-      img: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-      title: "لوازم جانبی",
-      path: "Accessories",
+      id: 2,
+      title: "Accessories",
+      image:
+        "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
     },
     {
-      img: "/image-featuredProduct/ipads.png",
-      title: "آیپد",
-      path: "iPad",
+      id: 3,
+      title: "ipad",
+      image: "/image-featuredProduct/ipads.png",
     },
     {
-      img: "/image-featuredProduct/iphone2025.png",
-      title: "کارکرده",
-      path: "usedProducts",
+      id: 4,
+      title: "usedProducts",
+      image: "/image-featuredProduct/iphone2025.png",
     },
     {
-      img: "/image-featuredProduct/iphone2025.png",
-      title: "آیفون",
-      path: "iPhone",
+      id: 5,
+      title: "Mobile",
+      image: "/image-featuredProduct/iphone2025.png",
     },
     {
-      img: "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-      title: "لوازم جانبی",
-      path: "Accessories",
+      id: 6,
+      title: "Accessories",
+      image:
+        "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
     },
     {
-      img: "/image-featuredProduct/ipads.png",
-      title: "آیپد",
-      path: "iPad",
+      id: 7,
+      title: "ipad",
+      image: "/image-featuredProduct/ipads.png",
     },
     {
-      img: "/image-featuredProduct/iphone2025.png",
-      title: "کارکرده",
-      path: "usedProducts",
+      id: 8,
+      title: "usedProducts",
+      image: "/image-featuredProduct/iphone2025.png",
     },
   ]);
 
@@ -63,6 +65,7 @@ export default function FeaturedProduct() {
 
   //   axioshome();
   // }, []);
+
 
   const [visible, setVisible] = useState(6);
   const [index, setIndex] = useState(0);
@@ -136,49 +139,90 @@ export default function FeaturedProduct() {
   }
 
   return (
-    <div className={style.dashboardContainer}>
-      <button className={`${style.navBtn} ${style.prev}`} onClick={prevSlide}>
-        &lt;
-      </button>
-
-      <div className={style.sliderWrapper}>
-        <div className={style.dashboardCards}>
-          <div
-            ref={containerRef}
-            className={style.cardsContainer}
-            style={{
-              transform: translateValue,
-              transition: isTransitioning
-                ? "transform 0.4s ease-in-out"
-                : "none",
-            }}
+    <section
+      className={style.dashboardContainer}
+      aria-label="Featured categories"
+    >
+      <div className={style.sliderShell}>
+        <button
+          className={`${style.navBtn} ${style.prev}`}
+          onClick={prevSlide}
+          aria-label="Previous"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            {extendedItems.map((item, index) => (
-              <div
-                key={index}
-                className={style.cards}
-                style={{ flex: `0 0 ${100 / visible}%` }}
-                onClick={() => router.push(`/Category/${item.path}`)}
-              >
-                <div className={style.cardImage}>
-                  <Image
-                    className={style.image}
-                    src={item.img}
-                    alt={item.title}
-                    width={125}
-                    height={115}
-                  />
-                </div>
-                <p>{item.title}</p>
-              </div>
-            ))}
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </button>
+
+        <div className={style.sliderWrapper}>
+          <div className={style.dashboardCards}>
+            <div
+              ref={containerRef}
+              className={style.cardsContainer}
+              style={{
+                transform: translateValue,
+                transition: isTransitioning
+                  ? "transform 0.4s ease-in-out"
+                  : "none",
+              }}
+            >
+              {extendedItems.map((item, i) => (
+                <button
+                  type="button"
+                  key={`${item.id}-${i}`}
+                  className={style.cards}
+                  style={{ flex: `0 0 ${100 / visible}%` }}
+                  onClick={() => router.push(`/Category/${item.title}`)}
+                >
+                  <span className={style.cardImage}>
+                    <Image
+                      className={style.image}
+                      src={item.image}
+                      alt={item.title}
+                      width={140}
+                      height={120}
+                      priority={i < visible}
+                    />
+                  </span>
+                  <span className={style.cardTitle}>{item.title}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <button className={`${style.navBtn} ${style.next}`} onClick={nextSlide}>
-        &gt;
-      </button>
-    </div>
+        <button
+          className={`${style.navBtn} ${style.next}`}
+          onClick={nextSlide}
+          aria-label="Next"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5"></path>
+            <path d="m12 19-7-7 7-7"></path>
+          </svg>
+        </button>
+      </div>
+    </section>
   );
 }
