@@ -199,6 +199,15 @@ class MeView(APIView):
             "email",
             user.email
         )
+        user.postal_code = request.data.get(
+            "postal_code",
+            user.postal_code
+        )
+        
+        user.address = request.data.get(
+            "address",
+            user.address
+        )
 
         user.save()
 
