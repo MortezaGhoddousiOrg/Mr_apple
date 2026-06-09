@@ -4,21 +4,12 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.decorators import api_view
-from .models import (
-    Products,
-    ProductImages,
-)
-from .serializers import (
-    ProductSerializer,
-    ProductImageSerializer,
-)
-
+from .models import Products, ProductImages
+from .serializers import ProductSerializer, ProductImageSerializer
 
 
 #   PRODUCT LIST 
-
 @api_view(["GET"])
 def product_list(request):
     products = Products.objects.all()
@@ -27,7 +18,6 @@ def product_list(request):
 
 
 #   PRODUCT BY CHILD ID 
-
 @api_view(["GET"])
 def product_by_child(request, child_id):
     products = Products.objects.filter(category_id_id=child_id)
@@ -36,7 +26,6 @@ def product_by_child(request, child_id):
 
 
 #   LATEST 6 PRODUCTS 
-
 @api_view(["GET"])
 def product_latest(request):
     products = Products.objects.order_by("-created_at")[:6]
@@ -45,7 +34,6 @@ def product_latest(request):
 
 
 #   HOME PAGE — ONLY 6 PRODUCTS
-
 @api_view(["GET"])
 def product_home_list(request):
     products = Products.objects.filter(status="active").order_by("-created_at")[:6]
@@ -53,9 +41,7 @@ def product_home_list(request):
     return Response(serializer.data, status=200)
 
 
-
 #   PRODUCT IMAGE UPLOAD
-
 class UploadProductImage(APIView):
 
     def post(self, request):
@@ -82,7 +68,6 @@ class UploadProductImage(APIView):
 
 
 #   DELETE PRODUCT IMAGE
-
 class DeleteProductImage(APIView):
 
     def delete(self, request, image_id):
@@ -99,11 +84,9 @@ class DeleteProductImage(APIView):
             os.remove(file_path)
 
         return Response({"message": "Image deleted"}, status=200)
-    
 
 
 #   CREATE PRODUCT 
-
 class ProductCreateView(APIView):
 
     def post(self, request):
@@ -120,3 +103,31 @@ class ProductCreateView(APIView):
             "message": "Product created successfully",
             "product": ProductSerializer(product).data
         }, status=201)
+
+
+#   UPDATE & DELETE PRODUCT
+class ProductUpdateDeleteView(APIView):
+
+    def put(self, request, product_id):
+        try:
+            product = Products.objects.get(id=product_id)
+        except Products.DoesNotExist:
+            return Response({"error": "Product not found"}, status=404)
+
+        serializer = ProductSerializer(product, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({
+            "message": "Product updated successfully",
+            "product": serializer.data
+        }, status=200)
+
+    def delete(self, request, product_id):
+        try:
+            product = Products.objects.get(id=product_id)
+        except Products.DoesNotExist:
+            return Response({"error": "Product not found"}, status=404)
+
+        product.delete()
+        return Response({"message": "Product deleted successfully"}, status=200)

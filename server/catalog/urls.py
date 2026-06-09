@@ -7,13 +7,14 @@ from .views import (
     UploadProductImage,
     DeleteProductImage,
     ProductCreateView,
+    ProductUpdateDeleteView,
 )
 
 urlpatterns = [
 
     # PRODUCT LISTS
     path("product/", product_list),
-    path("product/<int:child_id>/", product_by_child),
+    path("product/child/<int:child_id>/", product_by_child),
     path("product/latest/", product_latest),
 
     # HOME PAGE
@@ -21,6 +22,9 @@ urlpatterns = [
 
     # PRODUCT CREATE
     path("product/create/", ProductCreateView.as_view()),
+
+    # PRODUCT UPDATE & DELETE
+    path("product/<int:product_id>/", ProductUpdateDeleteView.as_view()),
 
     # PRODUCT IMAGES
     path("product/image/upload/", UploadProductImage.as_view()),

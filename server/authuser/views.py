@@ -212,6 +212,8 @@ class MeView(APIView):
                     "firstname": user.firstname,
                     "lastname": user.lastname,
                     "email": user.email,
+                    "postal_code": user.postal_code,
+                    "address": user.address,
                     "is_staff": user.is_staff,
                 }
             },
