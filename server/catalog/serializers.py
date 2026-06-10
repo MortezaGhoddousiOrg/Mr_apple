@@ -13,17 +13,37 @@ class ProductSerializer(serializers.ModelSerializer):
 
     images = ProductImageSerializer(many=True, read_only=True)
 
-    category = CategoryChildSerializer(source="category_id", read_only=True)
+    category = CategoryChildSerializer(
+        source="category_id",
+        read_only=True
+    )
 
-    category_id = serializers.IntegerField(write_only=True, required=False)
+    category_id = serializers.IntegerField(
+        write_only=True,
+        required=False
+    )
 
-    category_child_id = serializers.IntegerField(source="category_id.id", read_only=True)
-    category_parent_id = serializers.IntegerField(source="category_id.parent.id", read_only=True)
+    category_child_id = serializers.IntegerField(
+        source="category_id.id",
+        read_only=True
+    )
+
+    category_parent_id = serializers.IntegerField(
+        source="category_id.parent.id",
+        read_only=True
+    )
+
+    # برای فرم ویرایش فرانت
+    edit_category_id = serializers.IntegerField(
+        source="category_id.id",
+        read_only=True
+    )
 
     class Meta:
         model = Products
         fields = "__all__"
-
+        
+        
     def validate_category_id(self, value):
         from category.models import CategoryChild
         if value and not CategoryChild.objects.filter(id=value).exists():

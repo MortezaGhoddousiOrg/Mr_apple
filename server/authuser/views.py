@@ -29,6 +29,8 @@ class SendCodeView(APIView):
         # code = str(random.randint(100000, 999999))
         code = "123456"
         expires_at = timezone.now() + timedelta(minutes=1)
+        
+        OTP.objects.filter(phone=phone).delete()
 
         OTP.objects.create(
             phone=phone,
@@ -67,7 +69,6 @@ class VerifyCodeView(APIView):
 
         response = Response({
             "message": "ورود موفق",
-            "access_token": access_token,
             "is_new_user": created,
             "profile_completed": user.profile_completed,
             "user": {

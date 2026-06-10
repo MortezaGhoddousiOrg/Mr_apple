@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .models import Products, ProductImages
 from .serializers import ProductSerializer, ProductImageSerializer
+from rest_framework.permissions import IsAdminUser
 
 
 #   PRODUCT LIST 
@@ -43,6 +44,7 @@ def product_home_list(request):
 
 #   PRODUCT IMAGE UPLOAD
 class UploadProductImage(APIView):
+    permission_classes = [IsAdminUser]
 
     def post(self, request):
 
@@ -69,6 +71,7 @@ class UploadProductImage(APIView):
 
 #   DELETE PRODUCT IMAGE
 class DeleteProductImage(APIView):
+    permission_classes = [IsAdminUser]
 
     def delete(self, request, image_id):
         try:
@@ -88,7 +91,8 @@ class DeleteProductImage(APIView):
 
 #   CREATE PRODUCT 
 class ProductCreateView(APIView):
-
+    permission_classes = [IsAdminUser]
+    
     def post(self, request):
         serializer = ProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -107,14 +111,49 @@ class ProductCreateView(APIView):
 
 #   UPDATE & DELETE PRODUCT
 class ProductUpdateDeleteView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, product_id):
+        try:
+            product = Products.objects.get(id=product_id)
+        except Products.DoesNotExist:
+            return Response(
+                {"error": "Product not found"},
+                status=404
+            )
+
+        serializer = ProductSerializer(product)
+        data = serializer.data
+
+        return Response({
+            "id": data["id"],
+            "name": data["name"],
+            "sell_price": data["sell_price"],
+            "buy_price": data["buy_price"],
+            "quantity": data["quantity"],
+            "discount": data["discount"],
+            "descriptions": data["descriptions"],
+            "category_id": data["category_child_id"],
+            "status": data["status"],
+            "feature": data["feature"],
+            "images": data["images"],
+        }, status=200)
 
     def put(self, request, product_id):
         try:
             product = Products.objects.get(id=product_id)
         except Products.DoesNotExist:
-            return Response({"error": "Product not found"}, status=404)
+            return Response(
+                {"error": "Product not found"},
+                status=404
+            )
 
-        serializer = ProductSerializer(product, data=request.data, partial=True)
+        serializer = ProductSerializer(
+            product,
+            data=request.data,
+            partial=True
+        )
+
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
@@ -127,7 +166,13 @@ class ProductUpdateDeleteView(APIView):
         try:
             product = Products.objects.get(id=product_id)
         except Products.DoesNotExist:
-            return Response({"error": "Product not found"}, status=404)
+            return Response(
+                {"error": "Product not found"},
+                status=404
+            )
 
         product.delete()
-        return Response({"message": "Product deleted successfully"}, status=200)
+
+        return Response({
+            "message": "Product deleted successfully"
+        }, status=200)

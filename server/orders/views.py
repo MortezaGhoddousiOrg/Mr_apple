@@ -10,6 +10,7 @@ from .serializers import (
     PaymentSerializer,
     CartSerializer
 )
+from django.db import transaction
 
 from catalog.models import Products
 import requests
@@ -31,12 +32,13 @@ class CartView(APIView):
 
         for item in cart_items:
             product = item.product
-            item_total = product.price * item.quantity
+
+            item_total = product.sell_price * item.quantity
 
             items_data.append({
                 "product_id": product.id,
-                "title": product.title,
-                "price": product.price,
+                "name": product.name,
+                "price": product.sell_price,
                 "quantity": item.quantity,
                 "total_price": item_total
             })
@@ -50,35 +52,74 @@ class CartView(APIView):
             "total_quantity": total_quantity
         })
 
-
 class AddToCart(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+
         user = request.user
+
         product_id = request.data.get("product_id")
-        quantity = int(request.data.get("quantity", 1))
+
+        try:
+            quantity = int(request.data.get("quantity", 1))
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "quantity is invalid"},
+                status=400
+            )
+
+        if quantity <= 0:
+            return Response(
+                {"error": "quantity must be greater than zero"},
+                status=400
+            )
 
         try:
             product = Products.objects.get(id=product_id)
         except Products.DoesNotExist:
-            return Response({"error": "Product not found"}, status=404)
+            return Response(
+                {"error": "Product not found"},
+                status=404
+            )
+
+        if product.status != "active":
+            return Response(
+                {"error": "Product is inactive"},
+                status=400
+            )
+
+        if product.quantity < quantity:
+            return Response(
+                {"error": "Insufficient inventory"},
+                status=400
+            )
 
         cart_item, created = Cart.objects.get_or_create(
             user=user,
             product=product
         )
 
-        if not created:
-            cart_item.quantity += quantity
-        else:
-            cart_item.quantity = quantity
+        new_quantity = (
+            quantity
+            if created
+            else cart_item.quantity + quantity
+        )
 
+        if new_quantity > product.quantity:
+            return Response(
+                {"error": "Insufficient inventory"},
+                status=400
+            )
+
+        cart_item.quantity = new_quantity
         cart_item.save()
 
-        return Response({"message": "Added to cart"})
-
-
+        return Response({
+            "message": "Added to cart"
+        })
+        
+        
 class RemoveFromCart(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -99,18 +140,46 @@ class RemoveFromCart(APIView):
 class CreateOrder(APIView):
     permission_classes = [IsAuthenticated]
 
+    @transaction.atomic
     def post(self, request):
+
         user = request.user
-        cart_items = Cart.objects.filter(user=user)
+
+        cart_items = Cart.objects.select_related(
+            "product"
+        ).filter(
+            user=user
+        )
 
         if not cart_items.exists():
-            return Response({"error": "Cart is empty"}, status=400)
+            return Response(
+                {"error": "Cart is empty"},
+                status=400
+            )
 
         total_amount = 0
 
         for item in cart_items:
-            total_amount += item.product.price * item.quantity
 
+            if item.product.status != "active":
+                return Response(
+                    {
+                        "error": f"{item.product.name} is inactive"
+                    },
+                    status=400
+                )
+
+            if item.quantity > item.product.quantity:
+                return Response(
+                    {
+                        "error": f"Insufficient inventory for {item.product.name}"
+                    },
+                    status=400
+                )
+
+            total_amount += (
+                item.product.sell_price * item.quantity
+            )
 
         order = Orders.objects.create(
             user=user,
@@ -119,14 +188,17 @@ class CreateOrder(APIView):
             product_status="pending"
         )
 
-
         for item in cart_items:
+
             OrderItems.objects.create(
                 order=order,
                 product=item.product,
                 quantity=item.quantity,
-                price=item.product.price
+                price=item.product.sell_price
             )
+
+            item.product.quantity -= item.quantity
+            item.product.save()
 
         cart_items.delete()
 
