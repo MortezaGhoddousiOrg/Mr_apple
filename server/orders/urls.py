@@ -3,6 +3,7 @@ from .views import (
     CartView,
     AddToCart,
     RemoveFromCart,
+    UpdateQuantity,
     CreateOrder,
     CreatePayment,
     UpdatePayment,
@@ -16,6 +17,7 @@ urlpatterns = [
     path("cart/", CartView.as_view(), name="cart"),
     path("cart/add/", AddToCart.as_view(), name="add_to_cart"),
     path("cart/remove/", RemoveFromCart.as_view(), name="remove_from_cart"),
+    path("cart/update/", UpdateQuantity.as_view(), name="update_quantity"),
 
     # ORDERS
     path("create/", CreateOrder.as_view(), name="create_order"),

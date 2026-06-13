@@ -1,8 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
+from django.db import transaction
 from django.utils import timezone
+from django.conf import settings
+import requests
 from .models import Orders, OrderItems, Payments, Cart
 from .serializers import (
     OrderSerializer,
@@ -10,21 +12,17 @@ from .serializers import (
     PaymentSerializer,
     CartSerializer
 )
-from django.db import transaction
-
 from catalog.models import Products
-import requests
-from django.conf import settings
-from django.utils import timezone
 
-# CART 
+
+# CART
 
 class CartView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
-        cart_items = Cart.objects.filter(user=user)
+        cart_items = Cart.objects.select_related("product").filter(user=user)
 
         items_data = []
         total_amount = 0
@@ -32,7 +30,6 @@ class CartView(APIView):
 
         for item in cart_items:
             product = item.product
-
             item_total = product.sell_price * item.quantity
 
             items_data.append({
@@ -40,7 +37,8 @@ class CartView(APIView):
                 "name": product.name,
                 "price": product.sell_price,
                 "quantity": item.quantity,
-                "total_price": item_total
+                "total_price": item_total,
+                "image": product.images.first().image.url if product.images.exists() else None
             })
 
             total_amount += item_total
@@ -52,6 +50,7 @@ class CartView(APIView):
             "total_quantity": total_quantity
         })
 
+
 class AddToCart(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -59,67 +58,53 @@ class AddToCart(APIView):
 
         user = request.user
 
+        # Validate product_id
         product_id = request.data.get("product_id")
-
-        try:
-            quantity = int(request.data.get("quantity", 1))
-        except (ValueError, TypeError):
-            return Response(
-                {"error": "quantity is invalid"},
-                status=400
-            )
-
-        if quantity <= 0:
-            return Response(
-                {"error": "quantity must be greater than zero"},
-                status=400
-            )
+        if not product_id:
+            return Response({"error": "product_id is required"}, status=400)
 
         try:
             product = Products.objects.get(id=product_id)
         except Products.DoesNotExist:
-            return Response(
-                {"error": "Product not found"},
-                status=404
-            )
+            return Response({"error": "Product not found"}, status=404)
+
+        # Validate quantity
+        try:
+            quantity = int(request.data.get("quantity", 1))
+        except:
+            return Response({"error": "Invalid quantity"}, status=400)
+
+        if quantity <= 0:
+            return Response({"error": "Quantity must be greater than zero"}, status=400)
 
         if product.status != "active":
-            return Response(
-                {"error": "Product is inactive"},
-                status=400
-            )
+            return Response({"error": "Product is inactive"}, status=400)
 
         if product.quantity < quantity:
-            return Response(
-                {"error": "Insufficient inventory"},
-                status=400
+            return Response({"error": "Insufficient inventory"}, status=400)
+
+        # Safe update (prevents IntegrityError)
+        cart_item = Cart.objects.filter(user=user, product=product).first()
+
+        if cart_item:
+            new_quantity = cart_item.quantity + quantity
+
+            if new_quantity > product.quantity:
+                return Response({"error": "Insufficient inventory"}, status=400)
+
+            cart_item.quantity = new_quantity
+            cart_item.save()
+
+        else:
+            Cart.objects.create(
+                user=user,
+                product=product,
+                quantity=quantity
             )
 
-        cart_item, created = Cart.objects.get_or_create(
-            user=user,
-            product=product
-        )
+        return Response({"message": "Added to cart"}, status=200)
 
-        new_quantity = (
-            quantity
-            if created
-            else cart_item.quantity + quantity
-        )
 
-        if new_quantity > product.quantity:
-            return Response(
-                {"error": "Insufficient inventory"},
-                status=400
-            )
-
-        cart_item.quantity = new_quantity
-        cart_item.save()
-
-        return Response({
-            "message": "Added to cart"
-        })
-        
-        
 class RemoveFromCart(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -127,12 +112,49 @@ class RemoveFromCart(APIView):
         user = request.user
         product_id = request.data.get("product_id")
 
+        if not product_id:
+            return Response({"error": "product_id is required"}, status=400)
+
         try:
             item = Cart.objects.get(user=user, product_id=product_id)
-            item.delete()
-            return Response({"message": "Removed from cart"})
         except Cart.DoesNotExist:
             return Response({"error": "Item not found"}, status=404)
+
+        item.delete()
+        return Response({"message": "Removed from cart"}, status=200)
+
+
+class UpdateQuantity(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        product_id = request.data.get("product_id")
+        quantity = request.data.get("quantity")
+
+        if not product_id or quantity is None:
+            return Response({"error": "product_id and quantity are required"}, status=400)
+
+        try:
+            quantity = int(quantity)
+        except:
+            return Response({"error": "Invalid quantity"}, status=400)
+
+        if quantity <= 0:
+            return Response({"error": "Quantity must be greater than zero"}, status=400)
+
+        try:
+            item = Cart.objects.get(user=user, product_id=product_id)
+        except Cart.DoesNotExist:
+            return Response({"error": "Item not found"}, status=404)
+
+        if quantity > item.product.quantity:
+            return Response({"error": "Insufficient inventory"}, status=400)
+
+        item.quantity = quantity
+        item.save()
+
+        return Response({"message": "Quantity updated"}, status=200)
 
 
 # CREATE ORDER (ساخت سفارش)
