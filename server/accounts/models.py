@@ -14,7 +14,6 @@ class Users(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        managed = False
         db_table = 'users'
 
     def __str__(self):
