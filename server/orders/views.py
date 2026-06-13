@@ -13,6 +13,7 @@ from .serializers import (
     CartSerializer
 )
 from catalog.models import Products
+from rest_framework.permissions import IsAdminUser
 
 
 # CART
@@ -373,3 +374,97 @@ class ZarinpalVerify(APIView):
         payment.status = "failed"
         payment.save()
         return Response({"message": "Payment failed", "details": response})
+
+
+class AdminOrderListView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        orders = Orders.objects.select_related("user").prefetch_related("items", "payments")
+
+        data = []
+
+        for order in orders:
+            items = []
+            total_quantity = 0
+
+            for item in order.items.all():
+                items.append({
+                    "product_id": item.product.id,
+                    "product_name": item.product.name,
+                    "product_code": item.product.product_code,
+                    "quantity": item.quantity,
+                    "price": item.price,
+                    "total_price": item.quantity * item.price
+                })
+                total_quantity += item.quantity
+
+            data.append({
+                "id": order.id,
+                "order_number": f"ORD-{order.created_at.strftime('%Y%m%d')}-{order.id:04d}",
+                "user": {
+                    "id": order.user.id,
+                    "firstname": order.user.first_name,
+                    "lastname": order.user.last_name,
+                    "phone": order.user.phone,
+                    "email": order.user.email,
+                },
+                "items": items,
+                "total_amount": order.total_amount,
+                "total_quantity": total_quantity,
+                "status": order.status,
+                "product_status": order.product_status,
+                "payment_status": order.payments.last().status if order.payments.exists() else "pending",
+                "payment_method": "online",
+                "shipping_address": {
+                    "postal_code": getattr(order, "shipping_postal_code", None),
+                    "address": getattr(order, "shipping_address", None)
+                },
+                "notes": getattr(order, "notes", ""),
+                "created_at": order.created_at,
+                "updated_at": order.updated_at,
+                "paid_at": order.paid_at,
+                "shipped_at": getattr(order, "shipped_at", None),
+                "delivered_at": getattr(order, "delivered_at", None),
+            })
+
+        return Response(data, status=200)
+    
+    
+class AdminOrderUpdateView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def put(self, request, order_id):
+        try:
+            order = Orders.objects.get(id=order_id)
+        except Orders.DoesNotExist:
+            return Response({"error": "Order not found"}, status=404)
+
+        status_value = request.data.get("status")
+        product_status = request.data.get("product_status")
+        payment_status = request.data.get("payment_status")
+        shipped_at = request.data.get("shipped_at")
+        delivered_at = request.data.get("delivered_at")
+
+        if status_value:
+            order.status = status_value
+
+        if product_status:
+            order.product_status = product_status
+
+        if payment_status:
+            # آخرین پرداخت را آپدیت می‌کنیم
+            payment = order.payments.last()
+            if payment:
+                payment.status = payment_status
+                payment.save()
+
+        if shipped_at:
+            order.shipped_at = shipped_at
+
+        if delivered_at:
+            order.delivered_at = delivered_at
+
+        order.save()
+
+        return Response({"message": "Order updated successfully"}, status=200)

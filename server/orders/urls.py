@@ -1,5 +1,7 @@
 from django.urls import path
 from .views import (
+    AdminOrderListView,
+    AdminOrderUpdateView,
     CartView,
     AddToCart,
     RemoveFromCart,
@@ -29,4 +31,8 @@ urlpatterns = [
     # ZARINPAL
     path("payments/zarinpal/request/", ZarinpalRequest.as_view(), name="zarinpal_request"),
     path("payments/zarinpal/verify/", ZarinpalVerify.as_view(), name="zarinpal_verify"),
+    
+    # ADMIN
+    path("admin/", AdminOrderListView.as_view(), name="admin_order_list"),
+    path("admin/<int:order_id>/", AdminOrderUpdateView.as_view(), name="admin_order_update"),
 ]
