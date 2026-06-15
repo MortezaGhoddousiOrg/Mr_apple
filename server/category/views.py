@@ -114,7 +114,11 @@ def category_detail_with_related(request, pk):
 
     parent = category_child.parent
     siblings = CategoryChild.objects.filter(parent=parent)
-    products = Products.objects.filter(category_id=category_child)
+
+    products = Products.objects.filter(
+        category_id=category_child,
+        status="active"
+    )
 
     return Response({
         "category": CategoryChildSerializer(category_child).data,

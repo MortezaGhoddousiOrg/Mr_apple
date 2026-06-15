@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAdminUser
 #   PRODUCT LIST 
 @api_view(["GET"])
 def product_list(request):
-    products = Products.objects.all()
+    products = Products.objects.filter(status="active")
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=200)
 
@@ -21,7 +21,7 @@ def product_list(request):
 #   PRODUCT BY CHILD ID 
 @api_view(["GET"])
 def product_by_child(request, child_id):
-    products = Products.objects.filter(category_id_id=child_id)
+    products = Products.objects.filter(category_id_id=child_id, status="active")
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=200)
 
@@ -29,7 +29,7 @@ def product_by_child(request, child_id):
 #   LATEST 6 PRODUCTS 
 @api_view(["GET"])
 def product_latest(request):
-    products = Products.objects.order_by("-created_at")[:6]
+    products = Products.objects.filter(status="active").order_by("-created_at")[:6]
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=200)
 

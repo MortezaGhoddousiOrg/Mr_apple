@@ -15,6 +15,14 @@ from .serializers import (
 from catalog.models import Products
 from rest_framework.permissions import IsAdminUser
 
+from django.contrib.auth import get_user_model
+from django.shortcuts import redirect
+
+
+import httpx
+import ssl
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # CART
 
@@ -37,7 +45,8 @@ class CartView(APIView):
                 "product_id": product.id,
                 "name": product.name,
                 "price": product.sell_price,
-                "quantity": item.quantity,
+                "cart_quantity": item.quantity,
+                "quantity": product.quantity,
                 "total_price": item_total,
                 "image": product.images.first().image.url if product.images.exists() else None
             })
@@ -163,97 +172,125 @@ class UpdateQuantity(APIView):
 class CreateOrder(APIView):
     permission_classes = [IsAuthenticated]
 
-    @transaction.atomic
-    def post(self, request):
+    def get(self, request):  
 
-        user = request.user
+        User = get_user_model()
+        phone = request.user
+        user = User.objects.get(phone=phone)
+        user_id = user.id
 
-        cart_items = Cart.objects.select_related(
-            "product"
-        ).filter(
-            user=user
-        )
+        cart_items = Cart.objects.select_related("product").filter(user_id=user_id)
 
         if not cart_items.exists():
-            return Response(
-                {"error": "Cart is empty"},
-                status=400
-            )
+            return Response({"error": "Cart is empty"}, status=400)
 
         total_amount = 0
 
         for item in cart_items:
-
             if item.product.status != "active":
-                return Response(
-                    {
-                        "error": f"{item.product.name} is inactive"
-                    },
-                    status=400
-                )
+                return Response({"error": f"{item.product.name} is inactive"}, status=400)
 
             if item.quantity > item.product.quantity:
-                return Response(
-                    {
-                        "error": f"Insufficient inventory for {item.product.name}"
-                    },
-                    status=400
+                return Response({"error": f"Insufficient inventory for {item.product.name}"}, status=400)
+
+            total_amount += item.product.sell_price * item.quantity
+
+        # --- Save to DB in its own transaction, isolated from gateway call ---
+        with transaction.atomic():
+            order = Orders.objects.create(
+                user_id=user_id,
+                total_amount=total_amount,
+                status="pending",
+                product_status="pending"
+            )
+
+            for item in cart_items:
+                OrderItems.objects.create(
+                    order_id=order.id,
+                    product_id=item.product.id,
+                    quantity=item.quantity,
+                    price=item.product.sell_price
                 )
 
-            total_amount += (
-                item.product.sell_price * item.quantity
+            payment = Payments.objects.create(
+                order_id=order.id,
+                gateway="Zarinpal",
+                status="pending"
             )
 
-        order = Orders.objects.create(
-            user=user,
-            total_amount=total_amount,
-            status="pending",
-            product_status="pending"
-        )
+        # --- Gateway call outside transaction so DB isn't rolled back on failure ---
+        data = {
+            "merchant_id": settings.ZARINPAL_MERCHANT_ID,
+            "amount": int(total_amount * 10),
+            "callback_url": settings.ZARINPAL_CALLBACK_URL,
+            "description": f"پرداخت سفارش شماره {order.id}",
+        }
 
-        for item in cart_items:
+        try:
+            # Bypass broken sandbox SSL
+            ssl_ctx = ssl.create_default_context()
+            ssl_ctx.check_hostname = False
+            ssl_ctx.verify_mode = ssl.CERT_NONE
 
-            OrderItems.objects.create(
-                order=order,
-                product=item.product,
-                quantity=item.quantity,
-                price=item.product.sell_price
+            with httpx.Client(verify=False) as client:
+                resp = client.post(
+                    "https://sandbox.zarinpal.com/pg/v4/payment/request.json",
+                    json=data,
+                    timeout=15
+                )
+            response = resp.json()
+
+        except Exception as e:
+            payment.status = "failed"
+            payment.save()
+            order.status = "failed"  # add this
+            order.save()
+            return Response({"error": "Gateway unreachable", "details": str(e)}, status=502)
+
+        if response.get("data", {}).get("code") == 100:
+            authority = response["data"]["authority"]
+            payment.authority = authority
+            payment.save()
+
+            return Response({
+                "payment_url": f"https://sandbox.zarinpal.com/pg/StartPay/{authority}",
+                "payment_id": payment.id
+            })
+        else:
+            payment.status = "failed"
+            payment.save()
+            order.status = "failed"  # add this
+            order.save()
+            return Response(
+                {"error": "Payment gateway error", "details": response.get("errors")},
+                status=502
             )
-
-            item.product.quantity -= item.quantity
-            item.product.save()
-
-        cart_items.delete()
-
-        return Response({
-            "message": "Order created",
-            "order": OrderSerializer(order).data
-        })
 
 
 # PAYMENT
 
-class CreatePayment(APIView):
-    permission_classes = [IsAuthenticated]
+# class CreatePayment(APIView):
+#     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        order_id = request.data.get("order_id")
+#     def post(self, request):
+#         order_id = request.data.get("order_id")
 
-        try:
-            order = Orders.objects.get(id=order_id, user=request.user)
-        except Orders.DoesNotExist:
-            return Response({"error": "Order not found"}, status=404)
+#         try:
+#             order = Orders.objects.get(id=order_id, user=request.user)
+#         except Orders.DoesNotExist:
+#             return Response({"error": "Order not found"}, status=404)
 
-        payment = Payments.objects.create(
-            order=order,
-            gateway="Zarinpal",
-            status="pending"
-        )
+        
 
-        return Response({
-            "message": "Payment created",
-            "payment": PaymentSerializer(payment).data
-        })
+#         payment = Payments.objects.create(
+#             order_id=order,
+#             gateway="Zarinpal",
+#             status="pending"
+#         )
+#         return Response({
+#             "message": "Payment created",
+#             "payment": PaymentSerializer(payment).data
+#         })
 
 
 class UpdatePayment(APIView):
@@ -288,48 +325,48 @@ class UpdatePayment(APIView):
         return Response({"message": "Payment updated"})
     
 
-class ZarinpalRequest(APIView):
-    permission_classes = [IsAuthenticated]
+# class ZarinpalRequest(APIView):
+#     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
-        order_id = request.data.get("order_id")
+#     def post(self, request):
+#         order_id = request.data.get("order_id")
 
-        try:
-            order = Orders.objects.get(id=order_id, user=request.user)
-        except Orders.DoesNotExist:
-            return Response({"error": "Order not found"}, status=404)
+#         try:
+#             order = Orders.objects.get(id=order_id, user=request.user)
+#         except Orders.DoesNotExist:
+#             return Response({"error": "Order not found"}, status=404)
 
-        amount = order.total_amount  # ریال
+#         amount = order.total_amount  # ریال
 
-        payment = Payments.objects.create(
-            order=order,
-            gateway="Zarinpal",
-            status="pending"
-        )
+#         payment = Payments.objects.create(
+#             order=order,
+#             gateway="Zarinpal",
+#             status="pending"
+#         )
 
-        data = {
-            "merchant_id": settings.ZARINPAL_MERCHANT_ID,
-            "amount": amount,
-            "callback_url": settings.ZARINPAL_CALLBACK_URL,
-            "description": f"پرداخت سفارش شماره {order.id}",
-        }
+#         data = {
+#             "merchant_id": settings.ZARINPAL_MERCHANT_ID,
+#             "amount": amount * 10,
+#             "callback_url": settings.ZARINPAL_CALLBACK_URL,
+#             "description": f"پرداخت سفارش شماره {order.id}",
+#         }
 
-        response = requests.post(
-            "https://sandbox.zarinpal.com/pg/v4/payment/request.json",
-            json=data
-        ).json()
+#         response = requests.post(
+#             "https://sandbox.zarinpal.com/pg/v4/payment/request.json",
+#             json=data
+#         ).json()
 
-        if response["data"]["code"] == 100:
-            authority = response["data"]["authority"]
-            payment.authority = authority
-            payment.save()
+#         if response["data"]["code"] == 100:
+#             authority = response["data"]["authority"]
+#             payment.authority = authority
+#             payment.save()
 
-            return Response({
-                "payment_url": f"https://sandbox.zarinpal.com/pg/StartPay/{authority}",
-                "payment_id": payment.id
-            })
+#             return Response({
+#                 "payment_url": f"https://sandbox.zarinpal.com/pg/StartPay/{authority}",
+#                 "payment_id": payment.id
+#             })
 
-        return Response({"error": "Zarinpal request failed", "details": response})
+#         return Response({"error": "Zarinpal request failed", "details": response})
 
 class ZarinpalVerify(APIView):
 
@@ -337,30 +374,58 @@ class ZarinpalVerify(APIView):
         authority = request.GET.get("Authority")
         status = request.GET.get("Status")
 
+        if not authority:
+            return redirect("http://localhost:3000/Payment?status=false")
+
         try:
-            payment = Payments.objects.get(authority=authority)
+            payment = Payments.objects.select_related("order", "order__user").get(
+                authority=authority
+            )
         except Payments.DoesNotExist:
-            return Response({"error": "Payment not found"}, status=404)
+            return redirect("http://localhost:3000/Payment?status=false")
 
         if status != "OK":
             payment.status = "failed"
-            payment.save()
-            return Response({"message": "Payment failed"})
+            payment.save(update_fields=["status"])
+            return redirect("http://localhost:3000/Payment?status=false")
 
-        data = {
+        verify_data = {
             "merchant_id": settings.ZARINPAL_MERCHANT_ID,
-            "amount": payment.order.total_amount,
-            "authority": authority
+            "amount": int(payment.order.total_amount * 10),  # same amount used in request
+            "authority": authority,
         }
 
-        response = requests.post(
-            "https://sandbox.zarinpal.com/pg/v4/payment/verify.json",
-            json=data
-        ).json()
+        try:
+            response = requests.post(
+                "https://sandbox.zarinpal.com/pg/v4/payment/verify.json",
+                json=verify_data,
+                timeout=15,
+            )
 
-        if response["data"]["code"] == 100:
+            response.raise_for_status()
+
+            result = response.json()
+
+        except requests.RequestException as e:
+            print("Zarinpal Verify Request Error:", str(e))
+
+            payment.status = "failed"
+            payment.save(update_fields=["status"])
+
+            return redirect("http://localhost:3000/Payment?status=false")
+
+        print("Zarinpal Verify Response:", result)
+
+        data = result.get("data", {})
+        errors = result.get("errors", {})
+
+        code = data.get("code")
+
+        # Successful payment
+        if code == 100:
+
             payment.status = "success"
-            payment.ref_id = response["data"]["ref_id"]
+            payment.ref_id = str(data.get("ref_id", ""))
             payment.paid_at = timezone.now()
             payment.save()
 
@@ -369,11 +434,33 @@ class ZarinpalVerify(APIView):
             order.paid_at = timezone.now()
             order.save()
 
-            return Response({"message": "Payment successful", "ref_id": payment.ref_id})
+            # Remove purchased items from cart
+            Cart.objects.filter(user=order.user).delete()
 
-        payment.status = "failed"
-        payment.save()
-        return Response({"message": "Payment failed", "details": response})
+            return redirect(
+                f"http://localhost:3000/Payment?status=true&ref_id={payment.ref_id}"
+            )
+
+        # Already verified payment
+        elif code == 101:
+
+            return redirect(
+                f"http://localhost:3000/Payment?status=true&ref_id={payment.ref_id}"
+            )
+
+        # Failed verification
+        else:
+            print("Zarinpal Verify Error:", errors)
+
+            payment.status = "failed"
+            payment.save(update_fields=["status"])
+
+            error_code = errors.get("code", "unknown")
+
+            return redirect(
+                f"http://localhost:3000/Payment?status=false&error={error_code}"
+            )
+
 
 
 class AdminOrderListView(APIView):

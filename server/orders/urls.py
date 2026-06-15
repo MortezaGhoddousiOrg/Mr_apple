@@ -7,9 +7,7 @@ from .views import (
     RemoveFromCart,
     UpdateQuantity,
     CreateOrder,
-    CreatePayment,
     UpdatePayment,
-    ZarinpalRequest,
     ZarinpalVerify
 )
 
@@ -25,11 +23,11 @@ urlpatterns = [
     path("create/", CreateOrder.as_view(), name="create_order"),
 
     # PAYMENTS (internal)
-    path("payments/create/", CreatePayment.as_view(), name="create_payment"),
+    # path("payments/create/", CreatePayment.as_view(), name="create_payment"),
     path("payments/update/", UpdatePayment.as_view(), name="update_payment"),
 
     # ZARINPAL
-    path("payments/zarinpal/request/", ZarinpalRequest.as_view(), name="zarinpal_request"),
+    # path("payments/zarinpal/request/", ZarinpalRequest.as_view(), name="zarinpal_request"),
     path("payments/zarinpal/verify/", ZarinpalVerify.as_view(), name="zarinpal_verify"),
     
     # ADMIN
