@@ -77,7 +77,7 @@ export default function ServiceSpecial({
       <div className={styles.box}>
         <h2 className={styles.title}>محصولی پیدا نشد</h2>
         <p className={styles.description}>
-          متأسفانه هیچ محصولی برای نمایش وجود ندارد.
+          متأسفانه هیچ محصولی تخفیف ویژه ای پیدا نشد !
         </p>
       </div>
     );
@@ -135,7 +135,7 @@ export default function ServiceSpecial({
                     key={item.id}
                     style={{ flex: `0 0 ${100 / visibleCards}%` }}
                   >
-                    <Image
+                    <img
                       className={styles.serviceImage}
                       src={item.image}
                       alt={item.title}

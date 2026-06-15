@@ -9,7 +9,10 @@ import style from "@/app/Components/Header/Header.module.css";
 
 export default function Header() {
   const pathname = usePathname();
-  const { isLoggedIn, productbuy } = useAuth();
+  const { isLoggedIn, productbuy, authLoading } = useAuth();
+  const [login, setLogin] = useState();
+
+
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -67,6 +70,10 @@ export default function Header() {
     { name: "آموزش", path: "/Training" },
   ];
 
+  //   if (authLoading) {
+  //   return "درحال دانلود ";
+  // }
+
   return (
     <>
       <header className={style.header}>
@@ -97,10 +104,7 @@ export default function Header() {
                   data-active={isActive ? "true" : "false"}
                   className={isActive ? style.active : ""}
                 >
-                  <Link
-                    href={link.path}
-                    onClick={() => setIsMenuOpen(false)}
-                  >
+                  <Link href={link.path} onClick={() => setIsMenuOpen(false)}>
                     {link.name}
                   </Link>
                 </li>
@@ -112,7 +116,7 @@ export default function Header() {
           <div className={style.imgHeader}>
             {/* پروفایل کاربر */}
             {isLoggedIn ? (
-              <Link href= "/PanelUser" className={style.cartWrapper}>
+              <Link href="/PanelUser" className={style.cartWrapper}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="25"

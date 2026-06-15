@@ -7,6 +7,7 @@ import Dashboard from "@/app/Components/Dashboard/Dashboard";
 import InfoSection from "./Components/InfoSection/InfoSection";
 import Service from "@/app/Components/Service/Service";
 import ServiceSpecial from "@/app/Components/ServiceSpecial/ServiceSpecial";
+import { api } from "./config";
 
 // import Footer from "./Components/Footer/Footer";
 // import style from "@/"
@@ -70,113 +71,115 @@ export default function Home() {
   // ]);
 
   const [product, setProduct] = useState([
-    {
-      id: 1,
-      images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-      category: {
-        id: 2,
-        parent: { id: 1, title: "Mobile", image: null },
-      },
-      category_child_id: 2,
-      category_parent_id: 1,
-      product_code: "IP14",
-      name: "iPhone 14",
-      buy_price: "1000000",
-      sell_price: "1500000",
-      descriptions:
-        "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-      status: "active",
-    },
-    {
-      id: 2,
-      images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-      category: {
-        id: 2,
-        parent: { id: 1, title: "Accessories", image: null },
-      },
-      category_child_id: 2,
-      category_parent_id: 1,
-      product_code: "IP14",
-      name: "iPhone 14",
-      buy_price: "1000000",
-      sell_price: "1500000",
-      descriptions:
-        "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-      status: "active",
-    },
-    {
-      id: 3,
-      images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-      category: {
-        id: 2,
-        parent: { id: 1, title: "UsedProducts", image: null },
-      },
-      category_child_id: 2,
-      category_parent_id: 1,
-      product_code: "IP14",
-      name: "iPhone 14",
-      buy_price: "1000000",
-      sell_price: "1500000",
-      descriptions:
-        "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-      status: "active",
-    },
-    {
-      id: 4,
-      images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-      category: {
-        id: 2,
-        parent: { id: 1, title: "Ipad", image: null },
-      },
-      category_child_id: 2,
-      category_parent_id: 1,
-      product_code: "IP14",
-      name: "iPhone 14",
-      buy_price: "1000000",
-      sell_price: "1500000",
-      descriptions:
-        "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-      status: "active",
-    },
-    {
-      id: 5,
-      images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-      category: {
-        id: 2,
-        parent: { id: 1, title: "Ipad", image: null },
-      },
-      category_child_id: 2,
-      category_parent_id: 1,
-      product_code: "IP14",
-      name: "iPhone 15",
-      buy_price: "1000000",
-      sell_price: "1500000",
-      descriptions:
-        "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-      status: "notactive",
-    },
+    // {
+    //   id: 1,
+    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    //   category: {
+    //     id: 2,
+    //     parent: { id: 1, title: "Mobile", image: null },
+    //   },
+    //   category_child_id: 2,
+    //   category_parent_id: 1,
+    //   product_code: "IP14",
+    //   name: "iPhone 14",
+    //   buy_price: "1000000",
+    //   sell_price: "1500000",
+    //   descriptions:
+    //     "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    //   status: "active",
+    // },
+    // {
+    //   id: 2,
+    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    //   category: {
+    //     id: 2,
+    //     parent: { id: 1, title: "Accessories", image: null },
+    //   },
+    //   category_child_id: 2,
+    //   category_parent_id: 1,
+    //   product_code: "IP14",
+    //   name: "iPhone 14",
+    //   buy_price: "1000000",
+    //   sell_price: "1500000",
+    //   descriptions:
+    //     "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    //   status: "active",
+    // },
+    // {
+    //   id: 3,
+    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    //   category: {
+    //     id: 2,
+    //     parent: { id: 1, title: "UsedProducts", image: null },
+    //   },
+    //   category_child_id: 2,
+    //   category_parent_id: 1,
+    //   product_code: "IP14",
+    //   name: "iPhone 14",
+    //   buy_price: "1000000",
+    //   sell_price: "1500000",
+    //   descriptions:
+    //     "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    //   status: "active",
+    // },
+    // {
+    //   id: 4,
+    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    //   category: {
+    //     id: 2,
+    //     parent: { id: 1, title: "Ipad", image: null },
+    //   },
+    //   category_child_id: 2,
+    //   category_parent_id: 1,
+    //   product_code: "IP14",
+    //   name: "iPhone 14",
+    //   buy_price: "1000000",
+    //   sell_price: "1500000",
+    //   descriptions:
+    //     "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    //   status: "active",
+    // },
+    // {
+    //   id: 5,
+    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
+    //   category: {
+    //     id: 2,
+    //     parent: { id: 1, title: "Ipad", image: null },
+    //   },
+    //   category_child_id: 2,
+    //   category_parent_id: 1,
+    //   product_code: "IP14",
+    //   name: "iPhone 15",
+    //   buy_price: "1000000",
+    //   sell_price: "1500000",
+    //   descriptions:
+    //     "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
+    //   status: "notactive",
+    // },
   ]);
 
-  //  useEffect(() => {
-  //       const axioshome = async () => {
-  //           try {
-  //               const response = await api.get("/api/product/latest/");
-  //               console.log(response.data);
-  //               setData(response.data);
-  //           } catch (err) {
-  //               console.log(err);
-  //           }
-  //       };
+  useEffect(() => {
+    const axioshome = async () => {
+      try {
+        const response = await api.get("/api/catalog/product/home");
+        console.log(response.data);
+        setProduct(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-  //       axioshome();
-  //   }, []);
+    axioshome();
+  }, []);
 
   const title = "آخرین محصولات";
   const titleSpecial = "محصولات ویژه";
 
   const data = product.map((item) => ({
     id: item.id,
-    image: item.images?.[0]?.url,
+    image: `http://localhost:4000${
+      item.images?.find((img) => img.is_main)?.image || ""
+    }`,
     title: item.name,
     description: item.descriptions,
     price: item.sell_price,

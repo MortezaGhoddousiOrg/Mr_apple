@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { api } from "@/app/config";
 import { useMemo } from "react";
+// import { cookies } from "next/headers";
 
 const Context = createContext();
 
@@ -13,55 +14,78 @@ export function AuthProvider({ children }) {
 
   // const [addedItems, setAddedItems] = useState([]);
 
-  const [notif, setNotif] = useState({
-    message: "",
-    type: "",
-  });
+  // const [notif, setNotif] = useState({
+  //   message: "",
+  //   type: "",
+  // });
+
+  const [notif, setNotif] = useState(null);
 
   // const [phone, setPhone] = useState();
   const [userId, setUserId] = useState();
   const [dataForm, setDataForm] = useState({
-    firstName: "dfgdfgdg",
-    lastName: "dfgdg",
-    phone: "1323212132",
-    postalCode: "dfgdgdg",
-    address: "dgdgdfgdg",
+    firstname: "",
+    lastname: "",
+    phone: "",
+    postal_code: "",
+    address: "",
   });
 
   const emptyForm = {
-    firstName: "",
-    lastName: "",
+    firstname: "",
+    lastname: "",
     phone: "",
-    postalCode: "",
+    postal_code: "",
     address: "",
   };
   const [initialData, setInitialData] = useState({});
+  const [authLoading, setAuthLoading] = useState(true);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    try {
+      const res = await api.get("/api/auth/me/");
+
+      setDataForm(res.data);
+      setUserId(res.data.id);
+      setIsLoggedIn(true);
+    } catch {
+      setIsLoggedIn(false);
+    } finally {
+      setAuthLoading(false);
+    }
+  };
 
   const saveOrUpdateUser = async (updatedData) => {
     try {
       const hasProfile = !!(initialData?.id || initialData?.userId);
 
       if (!hasProfile) {
-        const res = await api.post("/auth/me/", updatedData);
-        setDataForm(res.data);
-        setInitialData(res.data);
+        const res = await api.post("/api/auth/me/", updatedData);
+        setDataForm(res.data.data);
+        setInitialData(res.data.data);
         return "created";
       }
 
       const changed =
-        (initialData.firstName || "") !== (updatedData.firstName || "") ||
-        (initialData.lastName || "") !== (updatedData.lastName || "") ||
+        (initialData.firstname || "نام") !== (updatedData.firstname || "نام") ||
+        (initialData.lastname || "") !== (updatedData.lastname || "") ||
         (initialData.phone || "") !== (updatedData.phone || "") ||
-        (initialData.postalCode || "") !== (updatedData.postalCode || "") ||
+        (initialData.postal_code || "") !== (updatedData.postal_code || "") ||
         (initialData.address || "") !== (updatedData.address || "");
 
       if (!changed) return;
 
       const id = initialData.id ?? initialData.userId;
+      console.log("sending:", updatedData);
 
-      const res = await api.put(`/auth/me/${id}`, updatedData);
-      setDataForm(res.data);
-      setInitialData(res.data);
+      const res = await api.put(`/api/auth/me/`, updatedData);
+
+      setDataForm(res.data.data);
+      setInitialData(res.data.data);
       return;
     } catch (err) {
       // console.error(err);
@@ -69,21 +93,24 @@ export function AuthProvider({ children }) {
   };
 
   const sendCode = async (phone) => {
-    const res = await api.post("/auth/send-code/", { phone });
+    const res = await api.post("/api/auth/send-code/", { phone });
+    console.log(res.data);
+
     return res.data;
   };
 
   const verifyCode = async (phone, code) => {
-    const res = await api.post("/auth/verify-code/", {
+    const res = await api.post("/api/auth/verify-code/", {
       phone,
       code,
     });
 
-    const userData = res.data;
+    const userData = res.data.user.id;
+    console.log(userData);
 
-    if (userData?.userId) {
-      setUserId(userData.userId);
-      localStorage.setItem("userId", userData.userId);
+    if (userData) {
+      setUserId(userData);
+      // localStorage.setItem("userId", userData.userId);
       setIsLoggedIn(true);
     }
 
@@ -95,11 +122,13 @@ export function AuthProvider({ children }) {
 
     const dataUser = async () => {
       try {
-        const res = await api.get("/auth/me/", {
-          params: { userId },
-        });
+        const res = await api.get(
+          "/api/auth/me/",
+          // params: { userId },
+        );
         setDataForm(res.data);
         setInitialData(res.data);
+        console.log(res.data);
       } catch (err) {
         // console.log(err);
       }
@@ -108,22 +137,24 @@ export function AuthProvider({ children }) {
     dataUser();
   }, [userId]);
 
-  // برای ست کردن آیکن داخل هدر لاگین 
-  useEffect(() => {
-  const savedUserId = localStorage.getItem("user");
+  // برای ست کردن آیکن داخل هدر لاگین
+  //   useEffect(() => {
+  //   const savedUserId = cookies.getItem("access_token");
 
-  if (savedUserId) {
-    setUserId(savedUserId);
-    setIsLoggedIn(true);
-  }
-}, []);
-
+  //   if (savedUserId) {
+  //     setUserId(savedUserId);
+  //     setIsLoggedIn(true);
+  //   }
+  // }, []);
 
   // خواندن سبد خرید برای مهمان و بعد از لاگین ست کردن با بک اند
   const loadCart = async () => {
     try {
       if (userId) {
-        const res = await api.get(`/api/orders/cart/${userId}`);
+        // const res = await api.get(`/api/orders/cart/${userId}`);
+        const res = await api.get("/api/orders/cart/");
+        // console.log(res.data);
+
         setProductBuy(res?.data?.items || []);
       } else {
         const localCart = localStorage.getItem("cart");
@@ -139,8 +170,7 @@ export function AuthProvider({ children }) {
   const addToCart = async (item) => {
     try {
       if (userId) {
-        await api.post("/api/orders/cart/add", {
-          userId,
+        await api.post("/api/orders/cart/add/", {
           productId: item.id,
         });
 
@@ -160,6 +190,8 @@ export function AuthProvider({ children }) {
       return { success: true };
     } catch (err) {
       // console.error("خطا در افزودن به سبد خرید:", err);
+      console.log(err.response?.status);
+      console.log(err.response?.data);
       throw err;
     }
   };
@@ -262,7 +294,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("userId");
     localStorage.removeItem("tempPhone");
 
-    // setIsLoggedIn(false);
+    setIsLoggedIn(false);
     setUserId(null);
     setDataForm(emptyForm);
     setInitialData(emptyForm);
@@ -302,6 +334,8 @@ export function AuthProvider({ children }) {
       removeFromCart,
       updateQuantity,
       loadCart,
+
+      authLoading,
 
       notif,
       setNotif,

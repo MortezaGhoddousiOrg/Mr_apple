@@ -3,7 +3,7 @@
   font-family: "vazir";
   color: var(--text);
   line-height: 1.6;
-  position: relative; 
+  position: relative;
 }
 
 .headerContact {
@@ -195,7 +195,7 @@
 .questionSection {
   width: 100%;
   padding: 80px 5%;
-  background-color: var(--white);
+  background-color: #f9fbfd;
 }
 
 .questionSection h2 {

@@ -3,24 +3,21 @@
 import styles from "@/app/ProductBuy/page.module.css";
 import { useState } from "react";
 import { useAuth } from "@/app/Context/Context";
-import { useRouter } from "next/navigation";
 import DetailUserBuy from "@/app/ProductBuy/DetailUserBuy/DetailUserBuy";
 
 export default function ProductBuy() {
-  // const { productbuy, setProductBuy, userId } = useAuth();
-  const { productbuy, updateQuantity, removeFromCart } = useAuth();
-  const router = useRouter();
+  const { productbuy, updateQuantity, removeFromCart, setNotif } = useAuth();
   const [open, setOpen] = useState(false);
 
   const increaseQuantity = async (id, currentQty) => {
     try {
       await updateQuantity(id, (currentQty || 1) + 1);
+      setNotif({ id: Date.now(), message: "با موفقیت به سبد خرید اضافه شد", type: "success" });
     } catch (err) {
-      console.log(err);
+      setNotif({ id: Date.now(), message: "محصول اضافه نشد ، لطفا دوباره امتحان کنید ", type: "error" });
     }
   };
 
-  // console.log(productbuy);
 
   const decreaseQuantity = async (id, currentQty) => {
     try {
@@ -29,6 +26,20 @@ export default function ProductBuy() {
       console.log(err);
     }
   };
+
+
+  const handleCheckout = () => {
+  if (!productbuy || productbuy.length === 0) {
+    setNotif({
+      id: Date.now(),
+      message: "شما هنوز هیچ کالایی را انتخاب نکرده‌اید",
+      type: "warning",
+    });
+    return;
+  }
+
+  setOpen(true);
+};
 
   //   const removeFromCart = async (productId) => {
   //   if (userId) {
@@ -99,7 +110,7 @@ export default function ProductBuy() {
             </div>
             <button
               className={styles.checkoutBtn}
-              onClick={() => setOpen(true)}
+              onClick={handleCheckout}
             >
               ادامه فرایند خرید
             </button>
@@ -107,8 +118,6 @@ export default function ProductBuy() {
               isOpen={open}
               onClose={() => setOpen(false)}
               onSubmitSuccess={(data) => {
-                // console.log("اطلاعات فرم:", data);
-                // اینجا می‌تونی داده رو به مرحله بعدی ذخیره/ارسال کنی
               }}
             />
           </div>

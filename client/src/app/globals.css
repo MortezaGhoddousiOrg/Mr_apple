@@ -97,12 +97,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.155) 0%, rgba(255, 255, 255, 0.2) 100%);
-  color: #ffffff;
   font-family: "vazir", sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  overflow: hidden;
   backdrop-filter: blur(1.5px);
 
   box-shadow: 

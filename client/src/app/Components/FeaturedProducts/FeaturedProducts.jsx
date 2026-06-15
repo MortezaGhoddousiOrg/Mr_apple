@@ -3,71 +3,70 @@
 import { useState, useRef, useEffect } from "react";
 import style from "@/app/Components/FeaturedProducts/FeaturedProducts.module.css";
 import Image from "next/image";
-import axios from "axios";
+import { api } from "@/app/config";
 import { useRouter } from "next/navigation";
 
 export default function FeaturedProduct() {
   const [featuredItems, setFeaturedItems] = useState([
-    {
-      id: 1,
-      title: "Mobile",
-      image: "/image-featuredProduct/iphone2025.png",
-    },
-    {
-      id: 2,
-      title: "Accessories",
-      image:
-        "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-    },
-    {
-      id: 3,
-      title: "ipad",
-      image: "/image-featuredProduct/ipads.png",
-    },
-    {
-      id: 4,
-      title: "usedProducts",
-      image: "/image-featuredProduct/iphone2025.png",
-    },
-    {
-      id: 5,
-      title: "Mobile",
-      image: "/image-featuredProduct/iphone2025.png",
-    },
-    {
-      id: 6,
-      title: "Accessories",
-      image:
-        "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-    },
-    {
-      id: 7,
-      title: "ipad",
-      image: "/image-featuredProduct/ipads.png",
-    },
-    {
-      id: 8,
-      title: "usedProducts",
-      image: "/image-featuredProduct/iphone2025.png",
-    },
+    // {
+    //   id: 1,
+    //   title: "Mobile",
+    //   image: "/image-featuredProduct/iphone2025.png",
+    // },
+    // {
+    //   id: 2,
+    //   title: "Accessories",
+    //   image:
+    //     "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
+    // },
+    // {
+    //   id: 3,
+    //   title: "ipad",
+    //   image: "/image-featuredProduct/ipads.png",
+    // },
+    // {
+    //   id: 4,
+    //   title: "usedProducts",
+    //   image: "/image-featuredProduct/iphone2025.png",
+    // },
+    // {
+    //   id: 5,
+    //   title: "Mobile",
+    //   image: "/image-featuredProduct/iphone2025.png",
+    // },
+    // {
+    //   id: 6,
+    //   title: "Accessories",
+    //   image:
+    //     "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
+    // },
+    // {
+    //   id: 7,
+    //   title: "ipad",
+    //   image: "/image-featuredProduct/ipads.png",
+    // },
+    // {
+    //   id: 8,
+    //   title: "usedProducts",
+    //   image: "/image-featuredProduct/iphone2025.png",
+    // },
   ]);
 
-  // useEffect(() => {
-  //   const axioshome = async () => {
-  //     try {
-  //       const response = await api.get("/category/parent");
-  //       console.log(response.data);
-  //       setFeaturedItems(response.data);
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   };
+  useEffect(() => {
+    const axioshome = async () => {
+      try {
+        const response = await api.get("api/category/parent/");
+        console.log(response.data);
+        setFeaturedItems(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
 
-  //   axioshome();
-  // }, []);
+    axioshome();
+  }, []);
 
-
-  const [visible, setVisible] = useState(6);
+  const [visible, setVisible] = useState(4);
   const [index, setIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(true);
 
@@ -127,9 +126,9 @@ export default function FeaturedProduct() {
   }, []);
 
   if (featuredItems.length == 0) {
-    return (
+   return (
       <div className={style.box}>
-        <h2 className={style.title}>هیچ دسته بندی برای محصولات وجود نداره</h2>
+        <h2 className={style.title}>محصولی پیدا نشد</h2>
         <p className={style.description}>
           متأسفانه هیچ محصولی برای نمایش وجود ندارد. لطفاً کمی بعد دوباره تلاش
           کنید یا فیلترهای جستجو را تغییر دهید.
@@ -186,13 +185,15 @@ export default function FeaturedProduct() {
                   onClick={() => router.push(`/Category/${item.title}`)}
                 >
                   <span className={style.cardImage}>
-                    <Image
+                    <img
                       className={style.image}
-                      src={item.image}
+                      // src={`http://localhost:4000${item.image}`}
+                      // src="http://localhost:4000/media/images/categories/f11243f8-6d41-442c-880d-f95e32bf045a.png"
+                      src={`http://localhost:4000${item.image}`}
                       alt={item.title}
                       width={140}
                       height={120}
-                      priority={i < visible}
+                      // priority={i < visible}
                     />
                   </span>
                   <span className={style.cardTitle}>{item.title}</span>
@@ -226,3 +227,5 @@ export default function FeaturedProduct() {
     </section>
   );
 }
+
+

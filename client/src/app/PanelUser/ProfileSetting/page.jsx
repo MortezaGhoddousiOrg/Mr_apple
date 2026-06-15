@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "@/app/PanelUser/ProfileSetting/page.module.css";
 import { useAuth } from "@/app/Context/Context";
 
@@ -8,7 +8,7 @@ export default function ProfileSettings() {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const { dataForm, setDataForm, saveOrUpdateUser, initialData } = useAuth();
+  const { dataForm, setDataForm, saveOrUpdateUser, initialData, setNotif } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,12 +20,13 @@ export default function ProfileSettings() {
 
     try {
       await saveOrUpdateUser(dataForm);
-
       setIsEditing(false);
+      setNotif({ id: Date.now(), message: "اطلاعات با موفقیت ویرایش شد", type: "success" });
     } catch (err) {
       console.error(err);
-      // setNotif
+      setNotif({ id: Date.now(), message: "خطا در ویرایش اطلاعات ، لطفا دوباره امتحان کنید", type: "error" });
     }
+    console.log("Profile Render:", dataForm);
   };
 
   const handleEdit = () => {
@@ -63,8 +64,8 @@ export default function ProfileSettings() {
               <input
                 className={styles.input}
                 type="text"
-                name="firstName"
-                value={dataForm.firstName || ""}
+                name="firstname"
+                value={dataForm.firstname || ""}
                 onChange={handleChange}
                 placeholder="نام"
                 required
@@ -76,8 +77,8 @@ export default function ProfileSettings() {
               <input
                 className={styles.input}
                 type="text"
-                name="lastName"
-                value={dataForm.lastName || ""}
+                name="lastname"
+                value={dataForm.lastname || ""}
                 onChange={handleChange}
                 placeholder="نام خانوادگی"
                 required
@@ -104,8 +105,8 @@ export default function ProfileSettings() {
               <input
                 className={styles.input}
                 type="text"
-                name="postalCode"
-                value={dataForm.postalCode || ""}
+                name="postal_code"
+                value={dataForm.postal_code || ""}
                 onChange={handleChange}
                 placeholder="کد پستی"
                 required
@@ -131,7 +132,6 @@ export default function ProfileSettings() {
               ذخیره اطلاعات
             </button>
 
-            {/* ✅ ninja: دکمه لغو همیشه نمایش داده شود اگر در حال ادیت هستیم */}
             <button
               type="button"
               onClick={handleCancel}
@@ -147,7 +147,7 @@ export default function ProfileSettings() {
             <div className={styles.infoItem}>
               <span>نام و نام خانوادگی</span>
               <p>
-                {dataForm.firstName} {dataForm.lastName}
+                {dataForm.firstname || "ثبت نشده "} {dataForm.lastname}
               </p>
             </div>
 
@@ -158,12 +158,12 @@ export default function ProfileSettings() {
 
             <div className={styles.infoItem}>
               <span>کد پستی</span>
-              <p className={styles.ltrText}>{dataForm.postalCode}</p>
+              <p className={styles.ltrText}>{dataForm.postal_code || "ثبت نشده"}</p>
             </div>
 
             <div className={styles.infoItemFull}>
               <span>آدرس دقیق</span>
-              <p className={styles.ltrText}>{dataForm.address}</p>
+              <p className={styles.ltrText}>{dataForm.address || "ثبت نشده"}</p>
             </div>
           </div>
         </div>

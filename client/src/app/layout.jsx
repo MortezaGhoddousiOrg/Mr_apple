@@ -4,7 +4,7 @@ import Header from "@/app/Components/Header/Header";
 import Footer from "@/app/Components/Footer/Footer";
 import { AuthProvider } from "@/app/Context/Context";
 import Contentbox from "./ContentBox/Contentbox";
-// import Toast from "./ToastError/Toast";
+import Toast from "./ToastError/Toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +36,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <Header />
           <Contentbox />
-          {/* <Toast notif={notif} /> */}
+          <Toast />
           {children}
           <Footer />
         </AuthProvider>

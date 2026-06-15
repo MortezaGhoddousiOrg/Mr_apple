@@ -1,33 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/app/Context/Context";
-import styles from "@/app/ProductBuy/DetailUserBuy/DetailUserBuy.module.css";
+import styles from "@/app/DetailUserBuy/DetailUserBuy.module.css";
 
 export default function CheckoutFormPopup({
   isOpen,
   onClose,
   onSubmitSuccess,
 }) {
-  // const [form, setForm] = useState({
-  //   firstName: "",
-  //   lastName: "",
-  //   phone: "",
-  //   postalCode: "",
-  //   address: "",
-  // });
-
-  const { dataForm, setDataForm, saveOrUpdateUser } = useAuth();
-
-  useEffect(() => {
-    if (isOpen && dataForm?.phone) {
-      const cleanPhone = dataForm.phone.replace(/\D/g, "");
-
-      if (cleanPhone !== dataForm.phone) {
-        setDataForm((prev) => ({ ...prev, phone: cleanPhone }));
-      }
-    }
-  }, [isOpen, dataForm?.phone, setDataForm]);
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    postalCode: "",
+    address: "",
+  });
 
   useEffect(() => {
     if (!isOpen) return;
@@ -50,24 +37,15 @@ export default function CheckoutFormPopup({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDataForm((prev) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    try {
-    // فقط تابع کانتکست را صدا می‌زنیم و تمام!
-    await saveOrUpdateUser(dataForm); 
-    
-    onSubmitSuccess?.(); // اطلاع به کامپوننت پدر برای رفتن به استپ بعد
+    onSubmitSuccess?.(form);
     onClose?.();
-  } catch (err) {
-    alert("خطا در ثبت اطلاعات");
-  }
   };
-
-
 
   return (
     <div
@@ -90,8 +68,8 @@ export default function CheckoutFormPopup({
             <input
               className={styles.input}
               type="text"
-              name="firstname"
-              value={dataForm.firstname || ""}
+              name="firstName"
+              value={form.firstName}
               onChange={handleChange}
               required
             />
@@ -102,8 +80,8 @@ export default function CheckoutFormPopup({
             <input
               className={styles.input}
               type="text"
-              name="lastname"
-              value={dataForm.lastname || ""}
+              name="lastName"
+              value={form.lastName}
               onChange={handleChange}
               required
             />
@@ -115,7 +93,7 @@ export default function CheckoutFormPopup({
               className={styles.input}
               type="tel"
               name="phone"
-              value={dataForm.phone || ""}
+              value={form.phone}
               onChange={handleChange}
               required
             />
@@ -126,8 +104,8 @@ export default function CheckoutFormPopup({
             <input
               className={styles.input}
               type="text"
-              name="postal_code"
-              value={dataForm.postal_code || ""}
+              name="postalCode"
+              value={form.postalCode}
               onChange={handleChange}
               required
             />
@@ -139,7 +117,7 @@ export default function CheckoutFormPopup({
             <textarea
               className={styles.textarea}
               name="address"
-              value={dataForm.address || ""}
+              value={form.address}
               onChange={handleChange}
               rows={4}
               required

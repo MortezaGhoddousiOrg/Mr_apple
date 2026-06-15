@@ -6,13 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/Context";
 import Image from "next/image";
 
-export default function Service({
-  data = [],
-  title,
-  button,
-  onMoreClick,
-  setNotif,
-}) {
+export default function Service({ data = [], title, button, onMoreClick }) {
   const [index, setIndex] = useState(0);
   const [visibleCards, setVisibleCards] = useState(4);
   const touchStartX = useRef(0);
@@ -28,10 +22,12 @@ export default function Service({
   //   setUserId,
   // } = useAuth();
 
-  const { addToCart, productbuy } = useAuth();
+  const { addToCart, productbuy, setNotif } = useAuth();
 
-
-  const Active = data.filter((item) => item.status == "active");
+  const Active = React.useMemo(
+    () => data.filter((item) => item.status === "active"),
+    [data],
+  );
 
   const router = useRouter();
   useEffect(() => {
@@ -79,11 +75,11 @@ export default function Service({
 
   const handleTouchtrue = () => {
     if (touchStartX.current - touchEndX.current > 150) {
-      prevSlide();
+      nextSlide();
     }
 
     if (touchEndX.current - touchStartX.current > 150) {
-      nextSlide();
+      prevSlide();
     }
   };
 
@@ -126,44 +122,51 @@ export default function Service({
   //   }
   // };
 
-//   const handleAddToCart = async (item) => {
-//   try {
-//     await addToCart(item);
-//   } catch (err) {
-//     // console.error(err);
-//   }
-// };
+  //   const handleAddToCart = async (item) => {
+  //   try {
+  //     await addToCart(item);
+  //   } catch (err) {
+  //     // console.error(err);
+  //   }
+  // };
 
- const isInCart = (id) => {
+  const isInCart = (id) => {
     return productbuy?.some((p) => p.id === id);
   };
 
   const handleAddToCart = async (item) => {
-    try {
-      if (isInCart(item.id)) return;
+  if (isInCart(item.id)) {
+    setNotif({
+      id: Date.now(),
+      message: "این کالا قبلاً به سبد خرید اضافه شده است",
+      type: "warning",
+    });
 
-      await addToCart({
-        id: item.id,
-        title: item.title,
-        price: item.price,
-        image: item.image,
-        description: item.description,
-      });
+    return;
+  }
 
-        // setNotif({
-        //   message: "محصول با موفقیت به سبد خرید اضافه شد",
-        //   type: "success",
-        // });
-      
-    } catch (err) {
-        // setNotif({
-        //   message: "افزودن محصول به سبد خرید با خطا مواجه شد",
-        //   type: "error",
-        // });
-      
-      // console.error(err);
-    }
-  };
+  try {
+    await addToCart({
+      id: item.id,
+      title: item.title,
+      price: item.price,
+      image: item.image,
+      description: item.description,
+    });
+
+    setNotif({
+      id: Date.now(),
+      message: "محصول با موفقیت به سبد خرید اضافه شد",
+      type: "success",
+    });
+  } catch (err) {
+    setNotif({
+      id: Date.now(),
+      message: "افزودن محصول به سبد خرید با خطا مواجه شد، لطفا دوباره امتحان کنید",
+      type: "error",
+    });
+  }
+};
 
   if (Active.length === 0) {
     return (
@@ -226,8 +229,9 @@ export default function Service({
                   key={item.id}
                   style={{ flex: `0 0 ${100 / visibleCards}%` }}
                 >
-                  <Image
+                  <img
                     className={styles.serviceImage}
+                    // src={item.image}
                     src={item.image}
                     alt={item.title}
                     width={100}

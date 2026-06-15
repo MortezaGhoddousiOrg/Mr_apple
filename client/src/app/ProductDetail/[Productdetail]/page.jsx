@@ -4,50 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Head from "next/head";
-import axios from "axios";
+import Image from "next/image";
 import styles from "./page.module.css";
 import Imagedetail from "@/app/ProductDetail/ImageDetail/Imagedetail";
 import { useAuth } from "@/app/Context/Context";
-
-const fakeProductFromBackendShape = {
-  id: 6,
-  name: "ایفون 17 پرو مکس",
-  descriptions:
-    "آیفون 17 پرو مکس با طراحی مدرن، دوربین پیشرفته، نمایشگر باکیفیت و عملکرد سریع، انتخابی مناسب برای کاربرانی است که به دنبال تجربه‌ای حرفه‌ای و روان در استفاده روزمره و چندرسانه‌ای هستند.",
-  sell_price: "500000000",
-  discount: "25000000",
-  quantity: 5,
-  images: [
-    { file: "/image-detail/apple-iphone-17-pro-256gb-silver.png", type: true },
-    {
-      file: "/image-detail/_apple-iphone-17-pro-256gb-cosmic-orange.png",
-      type: false,
-    },
-    {
-      file: "/image-detail/apple-iphone-17-pro-256gb-deep-blue.png",
-      type: false,
-    },
-  ],
-  feature: [
-    { key: "برند", value: "Apple" },
-    { key: "مدل", value: "iPhone 17 Pro Max" },
-    { key: "پارت نامبر", value: "ZAA" },
-    { key: "وضعیت", value: "آکبند" },
-    { key: "حافظه داخلی", value: "256 گیگابایت" },
-    { key: "رنگ", value: "نقره‌ای" },
-  ],
-};
-
-const fakePdpContent = {
-  highlights: [
-    { title: "تیتانیوم سبک", value: "بدنه مقاوم‌تر، وزن کمتر" },
-    { title: "دوربین Pro", value: "جزئیات شارپ + Night mode" },
-    { title: "نمایشگر Super Retina", value: "روشنایی بالا، رنگ دقیق" },
-    { title: "باتری بهتر", value: "استفاده روزانه با خیال راحت" },
-  ],
-  chips: ["ارسال سریع", "ضمانت اصالت", "۷ روز بازگشت", "پشتیبانی ۲۴/۷"],
-  inTheBox: ["کابل USB‑C", "سوزن سیم‌کارت", "دفترچه راهنما"],
-};
+import { api } from "@/app/config";
 
 function toPersianDigits(value) {
   if (value === null || value === undefined) return "";
@@ -78,9 +39,15 @@ function calcDiscountPercent(sellPrice, discount) {
 }
 
 export default function Productdetail() {
-  const { id } = useParams();
-  const [product, setProduct] = useState(fakeProductFromBackendShape);
-  const [loading, setLoading] = useState(false);
+  const params = useParams();
+  // 🔥 مشکل اینجا حل شد: اسم فایل [Productdetail] است، نه [id]
+  const id = params?.Productdetail;
+
+  console.log("🔍 Product ID:", id);
+
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
@@ -88,44 +55,57 @@ export default function Productdetail() {
 
   const { addToCart, productbuy } = useAuth();
 
-  // useEffect(() => {
-  //   if (!id) return;
-  //   let alive = true;
-  //
-  //   const fetchProduct = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const res = await axios.get(`/api/product/${id}/`);
-  //       const backendProduct = res?.data?.data || res?.data;
-  //       if (!alive) return;
-  //       setProduct(backendProduct || fakeProductFromBackendShape);
-  //     } catch (error) {
-  //       if (!alive) return;
-  //       console.error("خطا در دریافت محصول:", error);
-  //       setProduct(fakeProductFromBackendShape);
-  //     } finally {
-  //       if (alive) setLoading(false);
-  //     }
-  //   };
-  //
-  //   fetchProduct();
-  //   return () => {
-  //     alive = false;
-  //   };
-  // }, [id]);
+  useEffect(() => {
+    if (!id) return;
 
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        console.log("🚀 Fetching product ID:", id);
+        const response = await api.get(`/api/catalog/product/${id}/`);
+        console.log("✅ Product data:", response.data);
+        setProduct(response.data);
+        setError(null);
+      } catch (err) {
+        console.error("❌ Error fetching product:", err);
+        setError("محصول مورد نظر یافت نشد");
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  // گالری تصاویر
   const galleryImages = useMemo(() => {
-    const imgs = Array.isArray(product?.images) ? product.images : [];
-    const validFiles = imgs
-      .filter((item) => item?.file)
-      .map((item) => item.file);
+    if (!product?.images || !Array.isArray(product.images)) return [];
 
-    const mainImage = imgs.find((item) => item?.type === true)?.file;
+    const imagesList = product.images
+      .filter((img) => img?.image)
+      .map((img) => `http://127.0.0.1:4000${img.image}`);
+
+    const mainImage = product.images.find((img) => img.is_main === true);
     if (mainImage) {
-      const rest = validFiles.filter((file) => file !== mainImage);
-      return [mainImage, ...rest];
+      const mainUrl = `http://127.0.0.1:4000${mainImage.image}`;
+      const others = imagesList.filter((url) => url !== mainUrl);
+      return [mainUrl, ...others];
     }
-    return validFiles;
+    return imagesList;
+  }, [product]);
+
+  // تبدیل feature از object به array
+  const featureArray = useMemo(() => {
+    if (!product?.feature) return [];
+    if (Array.isArray(product.feature)) return product.feature;
+    if (typeof product.feature === "object") {
+      return Object.entries(product.feature).map(([key, value]) => ({
+        key,
+        value,
+      }));
+    }
+    return [];
   }, [product]);
 
   const discountedPrice = useMemo(
@@ -158,7 +138,7 @@ export default function Productdetail() {
         id: product.id,
         title: product.name,
         price: discountedPrice ?? product?.sell_price,
-        image: galleryImages?.[0] || product?.images?.[0]?.file || "",
+        image: galleryImages?.[0] || "",
         description: product.descriptions,
       });
     } catch (err) {
@@ -168,21 +148,41 @@ export default function Productdetail() {
 
   const handleSubmitComment = (e) => {
     e.preventDefault();
-
-    const payload = {
+    console.log({
       productId: id ? Number(id) : null,
       name: commentName.trim(),
       text: commentText.trim(),
       rate: Number(commentRate),
       createdAt: new Date().toISOString(),
-    };
-
-    // console.log("NEW_COMMENT:", payload);
-
+    });
     setCommentName("");
     setCommentText("");
     setCommentRate(5);
   };
+
+  if (loading) {
+    return (
+      <div className={styles.pageShell}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.spinner}></div>
+          <p>در حال بارگذاری محصول...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className={styles.pageShell}>
+        <div className={styles.errorContainer}>
+          <p>{error || "محصول یافت نشد"}</p>
+          <Link href="/" className={styles.backLink}>
+            بازگشت به صفحه اصلی
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.pageShell}>
@@ -198,22 +198,23 @@ export default function Productdetail() {
             <div className={styles.breadcrumb}>
               <Link href="/">خانه</Link>
               <span>/</span>
-              <Link href="/products">محصولات</Link>
+              <Link href="/Products">محصولات</Link>
               <span>/</span>
               <span>{product?.name}</span>
             </div>
 
-            <div className={styles.kicker}>New • 2026</div>
+            <div className={styles.kicker}>
+              New • {product?.product_code || "2026"}
+            </div>
             <h1 className={styles.title}>{product?.name}</h1>
 
             <p className={styles.description}>{product?.descriptions}</p>
 
             <div className={styles.chipRow}>
-              {fakePdpContent.chips.map((c) => (
-                <span key={c} className={styles.chip}>
-                  {c}
-                </span>
-              ))}
+              <span className={styles.chip}>ارسال سریع</span>
+              <span className={styles.chip}>ضمانت اصالت</span>
+              <span className={styles.chip}>۷ روز بازگشت</span>
+              <span className={styles.chip}>پشتیبانی ۲۴/۷</span>
             </div>
 
             <div className={styles.purchaseCard}>
@@ -295,12 +296,22 @@ export default function Productdetail() {
         </div>
 
         <div className={styles.highlightGrid}>
-          {fakePdpContent.highlights.map((h) => (
-            <div key={h.title} className={styles.highlightCard}>
-              <div className={styles.highlightTitle}>{h.title}</div>
-              <div className={styles.highlightValue}>{h.value}</div>
-            </div>
-          ))}
+          <div className={styles.highlightCard}>
+            <div className={styles.highlightTitle}>کیفیت ساخت عالی</div>
+            <div className={styles.highlightValue}>مواد اولیه درجه یک</div>
+          </div>
+          <div className={styles.highlightCard}>
+            <div className={styles.highlightTitle}>طراحی ارگونومیک</div>
+            <div className={styles.highlightValue}>استفاده راحت و بی‌نقص</div>
+          </div>
+          <div className={styles.highlightCard}>
+            <div className={styles.highlightTitle}>قیمت مناسب</div>
+            <div className={styles.highlightValue}>ارزش خرید بالا</div>
+          </div>
+          <div className={styles.highlightCard}>
+            <div className={styles.highlightTitle}>گارانتی معتبر</div>
+            <div className={styles.highlightValue}>ضمانت اصالت و سلامت</div>
+          </div>
         </div>
       </section>
 
@@ -313,14 +324,12 @@ export default function Productdetail() {
         </div>
 
         <div className={styles.featureList}>
-          {(Array.isArray(product?.feature) ? product.feature : []).map(
-            (item, index) => (
-              <div key={`${item?.key}-${index}`} className={styles.featureRow}>
-                <span className={styles.featureKey}>{item?.key}</span>
-                <span className={styles.featureVal}>{item?.value}</span>
-              </div>
-            ),
-          )}
+          {featureArray.map((item, index) => (
+            <div key={`${item?.key}-${index}`} className={styles.featureRow}>
+              <span className={styles.featureKey}>{item?.key}</span>
+              <span className={styles.featureVal}>{item?.value}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -386,22 +395,6 @@ export default function Productdetail() {
           </div>
         </form>
       </section>
-
-      {/* <section className={styles.sectionBlock}>
-          <div className={styles.sectionHeadRow}>
-            <h2 className={styles.sectionTitle}>محتویات جعبه</h2>
-            <p className={styles.sectionSubtitle}>نمایشی (فیک) برای UI</p>
-          </div>
-
-          <div className={styles.boxGrid}>
-            {fakePdpContent.inTheBox.map((x) => (
-              <div key={x} className={styles.boxItem}>
-                <span className={styles.boxBullet} />
-                <span>{x}</span>
-              </div>
-            ))}
-          </div>
-        </section> */}
     </div>
   );
 }

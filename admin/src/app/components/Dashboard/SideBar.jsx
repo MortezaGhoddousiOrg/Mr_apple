@@ -5,8 +5,8 @@ import { useState } from "react";
 import Dashboard from "./Dashboard/Dashboard";
 import Products from "./Products/Products";
 import Users from "./Users/Users";
-import Orders from "./Orders/Orders";
-import Category from "./Category/Category"; // کامپوننت لیست دسته بندی ها
+import Orders from "@/app/components/Dashboard/Order/Order"
+import Category from "./Category/Category"; 
 
 export default function SideBar({ setRendered }) {
   const [activeItem, setActiveItem] = useState("داشبورد");

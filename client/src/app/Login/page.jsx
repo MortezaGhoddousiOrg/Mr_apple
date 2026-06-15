@@ -7,24 +7,29 @@ import { useRouter } from "next/navigation";
 import Code from "@/app/Login/Code/Code";
 import { useAuth } from "@/app/Context/Context";
 
-export default function Login({ setNotif }) {
+export default function Login() {
   const [passshow, setPsssShow] = useState(false);
   const router = useRouter();
   const [code, setCode] = useState(false);
 
-  const [login, setLogin] = useState();
+  // const [login, setLogin] = useState();
 
-  const { sendCode } = useAuth();
+// setNotif({
+//   id: Date.now(),
+//   type: "error",
+//   message: "تمام فیلدها الزامی هستند",
+// });
 
-  useEffect(() => {
-    const local = localStorage.getItem("user");
-    if (local) {
-      setLogin(true);
-      router.push("/PanelUser");
-    } else {
-      setLogin(false);
-    }
-  }, []);
+
+  const { sendCode, isLoggedIn, authLoading, setNotif } = useAuth();
+
+ useEffect(() => {
+  if (authLoading) return;
+
+  if (isLoggedIn) {
+    router.replace("/PanelUser");
+  }
+}, [isLoggedIn, authLoading, router]);
 
   const toggleshowpass = () => {
     setPsssShow((prev) => !prev);
@@ -48,24 +53,25 @@ export default function Login({ setNotif }) {
     const phoneRegex = /^09\d{9}$/;
 
     if (!phoneRegex.test(loginData.phone)) {
-      // return setNotif({ message: "شماره موبایل معتبر نیست", type: "error" });
+      return setNotif({ id: Date.now(), message: "شماره موبایل معتبر نیست", type: "error" });
     }
 
     try {
       const phone = loginData.phone;
 
-      // await sendCode(phone);
-
-      // setNotif({ message: "کد تایید برای شما ارسال شد", type: "success" });
+      const res = await sendCode(phone);
+      console.log(res);
+      
+      setNotif({ id: Date.now(), message: "کد تایید برای شما ارسال شد", type: "success" });
       setCode(true);
-      localStorage.setItem("user", phone);
 
     } catch (err) {
       console.error(err);
-      // setNotif({
-      //   message: "خطا در ارسال، لطفا دوباره امتحان کنید",
-      //   type: "error",
-      // });
+      setNotif({
+        id: Date.now(),
+        message: "خطا در ارسال، لطفا دوباره امتحان کنید",
+        type: "error",
+      });
     }
   };
 

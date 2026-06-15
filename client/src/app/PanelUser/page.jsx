@@ -3,35 +3,38 @@
 import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
+import { useAuth } from "../Context/Context";
 
 import OrdersList from "@/app/PanelUser/OrderList/page";
 import ProfileSettings from "@/app/PanelUser/ProfileSetting/page";
+import Logout from "@/app/PanelUser/Logout/page";
 
 export default function PanelUser() {
   const [activeTab, setActiveTab] = useState("orders");
   const router = useRouter();
-  const [panelUser, setPanelUser] = useState();
+  // const [panelUser, setPanelUser] = useState();
+  const { isLoggedIn, authLoading, dataForm } = useAuth();
 
   useEffect(() => {
-    const local = localStorage.getItem("user");
-    if (local) {
-      setPanelUser(true);
-      // router.push("/");
-      
-    } else {
-      setPanelUser(false);
-      router.push("/Login");
+    if (authLoading) return;
+
+    if (!isLoggedIn) {
+      router.push("/");
     }
+  }, [isLoggedIn, authLoading, router]);
 
-  }, []);
+  // if (authLoading) {
+  //   return <div>در حال بارگذاری...</div>;
+  // }
 
-  // useEffect(() => {
-   
-  // }, [panelUser]);
+  // if (!isLoggedIn) {
+  //   return null;
+  // }
 
   const menuItems = [
     { id: "orders", title: "سفارش‌های من" },
     { id: "profile", title: "اطلاعات حساب" },
+    { id: "logout", title: "خروج" },
   ];
 
   const renderContent = () => {
@@ -40,18 +43,24 @@ export default function PanelUser() {
         return <OrdersList />;
       case "profile":
         return <ProfileSettings />;
-      // default: return <OrdersList />;
+      case "logout":
+        return <Logout />;
     }
   };
 
   return (
     <section className={styles.panelWrapper}>
       <div className={styles.panelContainer}>
-        {/* سایدبار سمت راست */}
         <aside className={styles.sidebar}>
           <div className={styles.containerProfile}>
             <img src="/image-about/images (3).jfif" alt="profile" />
-            <p>username</p>
+            {dataForm.firstname && dataForm.lastname !== "" ? (
+              <p>
+                {dataForm.firstname} {dataForm.lastname}
+              </p>
+            ) : (
+              <p>username</p>
+            )}
           </div>
           <div className={styles.sidebarHeader}>
             <h1 className={styles.sidebarTitle}>پنل کاربری</h1>
@@ -72,7 +81,6 @@ export default function PanelUser() {
           </nav>
         </aside>
 
-        {/* محتوای اصلی */}
         <main className={styles.content}>{renderContent()}</main>
       </div>
     </section>
