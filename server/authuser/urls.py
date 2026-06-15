@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    AdminMeView,
     MeView,
     SendCodeView,
     VerifyCodeView,
@@ -13,4 +14,5 @@ urlpatterns = [
     path("admin/login/", AdminLoginView.as_view()),
     path("logout/", LogoutView.as_view()),
     path("me/", MeView.as_view()),
+    path("admin/me/", AdminMeView.as_view()),
 ]

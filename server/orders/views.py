@@ -555,3 +555,78 @@ class AdminOrderUpdateView(APIView):
         order.save()
 
         return Response({"message": "Order updated successfully"}, status=200)
+
+
+class MyOrdersView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        User = get_user_model()
+        phone = request.user
+        user = User.objects.get(phone=phone)
+        user_id = user.id
+        orders = Orders.objects.filter(user_id=user_id).prefetch_related("items")
+
+        data = []
+
+        for order in orders:
+            items = []
+            for item in order.items.all():
+                items.append({
+                    "product_id": item.product.id,
+                    "product_name": item.product.name,
+                    "product_code": item.product.product_code,
+                    "quantity": item.quantity,
+                    "price": item.price,
+                    "total_price": item.quantity * item.price,
+                    "image": item.product.images.first().image.url if item.product.images.exists() else None
+                })
+
+            data.append({
+                "id": order.id,
+                "total_amount": order.total_amount,
+                "status": order.status,
+                "product_status": order.product_status,
+                "created_at": order.created_at,
+                "paid_at": order.paid_at,
+                "items": items
+            })
+
+        return Response(data, status=200)
+
+
+class MyOrderDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, order_id):
+        User = get_user_model()
+        phone = request.user
+        user = User.objects.get(phone=phone)
+        user_id = user.id
+
+        try:
+            order = Orders.objects.get(id=order_id, user_id=user_id)
+        except Orders.DoesNotExist:
+            return Response({"error": "Order not found"}, status=404)
+
+        items = []
+        for item in order.items.all():
+            items.append({
+                "product_id": item.product.id,
+                "product_name": item.product.name,
+                "product_code": item.product.product_code,
+                "quantity": item.quantity,
+                "price": item.price,
+                "total_price": item.quantity * item.price,
+                "image": item.product.images.first().image.url if item.product.images.exists() else None
+            })
+
+        return Response({
+            "id": order.id,
+            "total_amount": order.total_amount,
+            "status": order.status,
+            "product_status": order.product_status,
+            "created_at": order.created_at,
+            "paid_at": order.paid_at,
+            "items": items
+        }, status=200)

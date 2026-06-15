@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAdminUser
 #   PRODUCT LIST 
 @api_view(["GET"])
 def product_list(request):
-    products = Products.objects.filter(status="active")
+    products = Products.objects.all()
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=200)
 
@@ -21,7 +21,7 @@ def product_list(request):
 #   PRODUCT BY CHILD ID 
 @api_view(["GET"])
 def product_by_child(request, child_id):
-    products = Products.objects.filter(category_id_id=child_id, status="active")
+    products = Products.objects.filter(category_id_id=child_id)
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=200)
 
@@ -29,7 +29,7 @@ def product_by_child(request, child_id):
 #   LATEST 6 PRODUCTS 
 @api_view(["GET"])
 def product_latest(request):
-    products = Products.objects.filter(status="active").order_by("-created_at")[:6]
+    products = Products.objects.order_by("-created_at")[:6]
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=200)
 
@@ -37,7 +37,7 @@ def product_latest(request):
 #   HOME PAGE — ONLY 6 PRODUCTS
 @api_view(["GET"])
 def product_home_list(request):
-    products = Products.objects.filter(status="active").order_by("-created_at")[:6]
+    products = Products.objects.order_by("-created_at")[:6]
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=200)
 
@@ -112,7 +112,7 @@ class ProductCreateView(APIView):
 #   UPDATE & DELETE PRODUCT
 class ProductUpdateDeleteView(APIView):
     permission_classes = [IsAdminUser]
-
+    
     def get(self, request, product_id):
         try:
             product = Products.objects.get(id=product_id)
@@ -125,8 +125,12 @@ class ProductUpdateDeleteView(APIView):
         serializer = ProductSerializer(product)
         data = serializer.data
 
+        all_images = product.images.all()
+        images_data = ProductImageSerializer(all_images, many=True).data
+
         return Response({
             "id": data["id"],
+            "product_code": data["product_code"],
             "name": data["name"],
             "sell_price": data["sell_price"],
             "buy_price": data["buy_price"],
@@ -136,7 +140,7 @@ class ProductUpdateDeleteView(APIView):
             "category_id": data["category_child_id"],
             "status": data["status"],
             "feature": data["feature"],
-            "images": data["images"],
+            "images": images_data,  
         }, status=200)
 
     def put(self, request, product_id):

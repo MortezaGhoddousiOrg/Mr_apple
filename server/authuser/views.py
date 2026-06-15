@@ -244,4 +244,44 @@ class LogoutView(APIView):
 
         return response
     
-    
+
+class AdminMeView(APIView):
+    permission_classes = [AllowAny]
+
+    def get_admin_from_token(self, request):
+        token = request.COOKIES.get("admin_access_token")
+
+        if not token:
+            return None
+
+        try:
+            decoded = AccessToken(token)
+            user_id = decoded["user_id"]
+            user = User.objects.get(id=user_id)
+
+            if not user.is_staff:
+                return None
+
+            return user
+
+        except Exception:
+            return None
+
+    def get(self, request):
+        user = self.get_admin_from_token(request)
+
+        if not user:
+            return Response(
+                {"error": "ادمین لاگین نیست یا دسترسی ندارد"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "firstname": user.firstname,
+            "lastname": user.lastname,
+            "email": user.email,
+            "phone": user.phone,
+            "is_staff": user.is_staff,
+        })

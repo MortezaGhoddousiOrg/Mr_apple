@@ -4,6 +4,8 @@ from .views import (
     AdminOrderUpdateView,
     CartView,
     AddToCart,
+    MyOrderDetailView,
+    MyOrdersView,
     RemoveFromCart,
     UpdateQuantity,
     CreateOrder,
@@ -33,4 +35,8 @@ urlpatterns = [
     # ADMIN
     path("admin/", AdminOrderListView.as_view(), name="admin_order_list"),
     path("admin/<int:order_id>/", AdminOrderUpdateView.as_view(), name="admin_order_update"),
+    
+    #My-ORDERS
+    path("my-orders/", MyOrdersView.as_view()),
+    path("my-orders/<int:order_id>/", MyOrderDetailView.as_view()),
 ]
