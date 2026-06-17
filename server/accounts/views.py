@@ -7,8 +7,8 @@ from authuser.models import User
 class UserView(APIView):
 
     def get(self, request):
-        User = User.objects.all()
-        serializer = UserSerializer(User, many=True)
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
     def post(self, request):

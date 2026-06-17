@@ -174,11 +174,9 @@ class CreateOrder(APIView):
 
     def get(self, request):  
 
-        User = get_user_model()
-        phone = request.user
-        user = User.objects.get(phone=phone)
+        user = request.user
         user_id = user.id
-
+        
         cart_items = Cart.objects.select_related("product").filter(user_id=user_id)
 
         if not cart_items.exists():
@@ -491,8 +489,8 @@ class AdminOrderListView(APIView):
                 "order_number": f"ORD-{order.created_at.strftime('%Y%m%d')}-{order.id:04d}",
                 "user": {
                     "id": order.user.id,
-                    "firstname": order.user.first_name,
-                    "lastname": order.user.last_name,
+                    "firstname": order.user.firstname,
+                    "lastname": order.user.lastname,
                     "phone": order.user.phone,
                     "email": order.user.email,
                 },
@@ -509,7 +507,7 @@ class AdminOrderListView(APIView):
                 },
                 "notes": getattr(order, "notes", ""),
                 "created_at": order.created_at,
-                "updated_at": order.updated_at,
+                # "updated_at": order.updated_at,
                 "paid_at": order.paid_at,
                 "shipped_at": getattr(order, "shipped_at", None),
                 "delivered_at": getattr(order, "delivered_at", None),
@@ -561,9 +559,7 @@ class MyOrdersView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        User = get_user_model()
-        phone = request.user
-        user = User.objects.get(phone=phone)
+        user = request.user
         user_id = user.id
         orders = Orders.objects.filter(user_id=user_id).prefetch_related("items")
 
@@ -599,9 +595,7 @@ class MyOrderDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, order_id):
-        User = get_user_model()
-        phone = request.user
-        user = User.objects.get(phone=phone)
+        user = request.user
         user_id = user.id
 
         try:
