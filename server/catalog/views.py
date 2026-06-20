@@ -5,6 +5,8 @@ from django.core.files.storage import default_storage
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+
+from authuser.authentication import AdminJWTAuthentication
 from .models import Products, ProductImages
 from .serializers import ProductSerializer, ProductImageSerializer
 from rest_framework.permissions import IsAdminUser
@@ -91,6 +93,7 @@ class DeleteProductImage(APIView):
 
 #   CREATE PRODUCT 
 class ProductCreateView(APIView):
+    authentication_classes = [AdminJWTAuthentication]
     permission_classes = [IsAdminUser]
     
     def post(self, request):
@@ -111,6 +114,7 @@ class ProductCreateView(APIView):
 
 #   UPDATE & DELETE PRODUCT
 class ProductUpdateDeleteView(APIView):
+    authentication_classes = [AdminJWTAuthentication]
     permission_classes = [IsAdminUser]
     
     def get(self, request, product_id):

@@ -5,6 +5,8 @@ from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
 import requests
+
+from authuser.authentication import AdminJWTAuthentication, UserJWTAuthentication
 from .models import Orders, OrderItems, Payments, Cart
 from .serializers import (
     OrderSerializer,
@@ -27,6 +29,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # CART
 
 class CartView(APIView):
+    authentication_classes = [UserJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -62,6 +65,7 @@ class CartView(APIView):
 
 
 class AddToCart(APIView):
+    authentication_classes = [UserJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -116,6 +120,7 @@ class AddToCart(APIView):
 
 
 class RemoveFromCart(APIView):
+    authentication_classes = [UserJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -135,6 +140,7 @@ class RemoveFromCart(APIView):
 
 
 class UpdateQuantity(APIView):
+    authentication_classes = [UserJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -170,6 +176,7 @@ class UpdateQuantity(APIView):
 # CREATE ORDER (ساخت سفارش)
 
 class CreateOrder(APIView):
+    authentication_classes = [UserJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):  
@@ -462,6 +469,7 @@ class ZarinpalVerify(APIView):
 
 
 class AdminOrderListView(APIView):
+    authentication_classes = [AdminJWTAuthentication]
     permission_classes = [IsAdminUser]
 
     def get(self, request):
@@ -517,6 +525,7 @@ class AdminOrderListView(APIView):
     
     
 class AdminOrderUpdateView(APIView):
+    authentication_classes = [AdminJWTAuthentication]
     permission_classes = [IsAdminUser]
 
     def put(self, request, order_id):
@@ -556,6 +565,7 @@ class AdminOrderUpdateView(APIView):
 
 
 class MyOrdersView(APIView):
+    authentication_classes = [UserJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -592,6 +602,7 @@ class MyOrdersView(APIView):
 
 
 class MyOrderDetailView(APIView):
+    authentication_classes = [UserJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, order_id):

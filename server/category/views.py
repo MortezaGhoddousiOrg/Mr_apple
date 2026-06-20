@@ -1,6 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAdminUser
+
+from authuser.authentication import AdminJWTAuthentication
 from .models import CategoryParent, CategoryChild
 from .serializers import CategoryParentSerializer, CategoryChildSerializer
 from catalog.models import Products
@@ -10,6 +13,9 @@ from catalog.serializers import ProductSerializer
 #   CATEGORY PARENT CRUD
 
 class CategoryParentList(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+    
     def get(self, request):
         parents = CategoryParent.objects.all()
         serializer = CategoryParentSerializer(parents, many=True)
@@ -58,6 +64,9 @@ class CategoryParentDetail(APIView):
 #   CATEGORY CHILD CRUD
 
 class CategoryChildList(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+    
     def get(self, request):
         children = CategoryChild.objects.all()
         serializer = CategoryChildSerializer(children, many=True)

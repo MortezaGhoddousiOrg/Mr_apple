@@ -5,21 +5,24 @@ from django.contrib.auth import authenticate, get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken
-from .models import OTP
-from .serializers import AdminLoginSerializer, SendCodeSerializer, VerifyCodeSerializer
 from rest_framework.permissions import AllowAny
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from .serializers import UserProfileSerializer
-
-
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from .models import OTP
+from .serializers import (
+    AdminLoginSerializer,
+    SendCodeSerializer,
+    VerifyCodeSerializer,
+)
 
 User = get_user_model()
 
 
+# -----------------------------
+# SEND OTP
+# -----------------------------
 class SendCodeView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = SendCodeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -29,7 +32,7 @@ class SendCodeView(APIView):
         # code = str(random.randint(100000, 999999))
         code = "123456"
         expires_at = timezone.now() + timedelta(minutes=1)
-        
+
         OTP.objects.filter(phone=phone).delete()
 
         OTP.objects.create(
@@ -40,10 +43,15 @@ class SendCodeView(APIView):
 
         print("OTP:", code)
 
-        return Response({"message": "کد ارسال شد"})
+        return Response({"message": "کد ارسال شد"}, status=status.HTTP_200_OK)
 
 
+# -----------------------------
+# VERIFY OTP (USER LOGIN)
+# -----------------------------
 class VerifyCodeView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = VerifyCodeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -54,13 +62,13 @@ class VerifyCodeView(APIView):
         otp = OTP.objects.filter(phone=phone).order_by("-created_at").first()
 
         if not otp:
-            return Response({"error": "کد یافت نشد"}, status=400)
+            return Response({"error": "کد یافت نشد"}, status=status.HTTP_400_BAD_REQUEST)
 
         if otp.code != code:
-            return Response({"error": "کد اشتباه است"}, status=400)
+            return Response({"error": "کد اشتباه است"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not otp.is_valid():
-            return Response({"error": "کد منقضی شده"}, status=400)
+            return Response({"error": "کد منقضی شده"}, status=status.HTTP_400_BAD_REQUEST)
 
         user, created = User.objects.get_or_create(phone=phone)
 
@@ -70,16 +78,16 @@ class VerifyCodeView(APIView):
         response = Response({
             "message": "ورود موفق",
             "is_new_user": created,
-            "profile_completed": user.profile_completed,
+            "profile_completed": getattr(user, "profile_completed", False),
             "user": {
                 "id": user.id,
                 "phone": user.phone,
                 "username": user.username,
-                "firstname": user.firstname,
-                "lastname": user.lastname,
+                "firstname": getattr(user, "firstname", ""),
+                "lastname": getattr(user, "lastname", ""),
                 "email": user.email,
             }
-        })
+        }, status=status.HTTP_200_OK)
 
         response.set_cookie(
             key="access_token",
@@ -91,10 +99,14 @@ class VerifyCodeView(APIView):
         )
 
         return response
-    
 
 
+# -----------------------------
+# ADMIN LOGIN
+# -----------------------------
 class AdminLoginView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = AdminLoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -105,15 +117,21 @@ class AdminLoginView(APIView):
         user = authenticate(request, username=username, password=password)
 
         if not user:
-            return Response({"error": "یوزرنیم یا پسورد اشتباه است"}, status=400)
+            return Response(
+                {"error": "یوزرنیم یا پسورد اشتباه است"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         if not user.is_staff:
-            return Response({"error": "دسترسی ادمین ندارید"}, status=403)
+            return Response(
+                {"error": "دسترسی ادمین ندارید"},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
-        response = Response({"message": "ورود ادمین موفق"})
+        response = Response({"message": "ورود ادمین موفق"}, status=status.HTTP_200_OK)
 
         response.set_cookie(
             key="admin_access_token",
@@ -126,15 +144,15 @@ class AdminLoginView(APIView):
 
         return response
 
+
+# -----------------------------
+# USER PROFILE (ONLY CLIENT)
+# -----------------------------
 class MeView(APIView):
     permission_classes = [AllowAny]
 
-    # /auth/me
     def get_user_from_token(self, request):
-        access_token = request.COOKIES.get("access_token")
-        admin_token = request.COOKIES.get("admin_access_token")
-
-        token = access_token or admin_token
+        token = request.COOKIES.get("access_token")
 
         if not token:
             return None
@@ -142,11 +160,13 @@ class MeView(APIView):
         try:
             decoded = AccessToken(token)
             user_id = decoded["user_id"]
+            user = User.objects.get(id=user_id)
 
-            return User.objects.get(id=user_id)
+            # جلوگیری از استفاده ادمین از این endpoint
+            if user.is_staff:
+                return None
 
-        except User.DoesNotExist:
-            return None
+            return user
 
         except Exception:
             return None
@@ -170,7 +190,7 @@ class MeView(APIView):
             "postal_code": user.postal_code,
             "address": user.address,
             "is_staff": user.is_staff,
-        })
+        }, status=status.HTTP_200_OK)
 
     def put(self, request):
         user = self.get_user_from_token(request)
@@ -181,34 +201,12 @@ class MeView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        user.username = request.data.get(
-            "username",
-            user.username
-        )
-
-        user.firstname = request.data.get(
-            "firstname",
-            user.firstname
-        )
-
-        user.lastname = request.data.get(
-            "lastname",
-            user.lastname
-        )
-
-        user.email = request.data.get(
-            "email",
-            user.email
-        )
-        user.postal_code = request.data.get(
-            "postal_code",
-            user.postal_code
-        )
-        
-        user.address = request.data.get(
-            "address",
-            user.address
-        )
+        user.username = request.data.get("username", user.username)
+        user.firstname = request.data.get("firstname", user.firstname)
+        user.lastname = request.data.get("lastname", user.lastname)
+        user.email = request.data.get("email", user.email)
+        user.postal_code = request.data.get("postal_code", user.postal_code)
+        user.address = request.data.get("address", user.address)
 
         user.save()
 
@@ -229,7 +227,11 @@ class MeView(APIView):
             },
             status=status.HTTP_200_OK
         )
-        
+
+
+# -----------------------------
+# LOGOUT USER
+# -----------------------------
 class LogoutView(APIView):
     permission_classes = [AllowAny]
 
@@ -240,10 +242,12 @@ class LogoutView(APIView):
         )
 
         response.delete_cookie("access_token")
-        # response.delete_cookie("admin_access_token")
-
         return response
-    
+
+
+# -----------------------------
+# LOGOUT ADMIN
+# -----------------------------
 class LogoutAdminView(APIView):
     permission_classes = [AllowAny]
 
@@ -253,12 +257,13 @@ class LogoutAdminView(APIView):
             status=status.HTTP_200_OK
         )
 
-        # response.delete_cookie("access_token")
         response.delete_cookie("admin_access_token")
-
         return response
-    
 
+
+# -----------------------------
+# ADMIN PROFILE (ONLY ADMIN)
+# -----------------------------
 class AdminMeView(APIView):
     permission_classes = [AllowAny]
 
@@ -298,4 +303,4 @@ class AdminMeView(APIView):
             "email": user.email,
             "phone": user.phone,
             "is_staff": user.is_staff,
-        })
+        }, status=status.HTTP_200_OK)
