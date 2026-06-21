@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { api } from "@/app/config";
@@ -10,10 +10,29 @@ export default function Login({ setNotif }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginData, setLoginData] = useState({
-    username: "",
+    phone: "",
     password: "",
   });
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const logoutFromBackend = async () => {
+      try {
+        await api.get("/api/auth/admin/logout/");
+      } catch (err) {
+        console.log("Logout error (ignored):", err);
+      }
+    };
+    logoutFromBackend();
+
+    // ✅ پاک کردن کوکی admin_access_token از مرورگر
+    document.cookie =
+      "admin_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+    // ✅ پاک کردن localStorage
+    localStorage.removeItem("admin");
+    localStorage.removeItem("isAuthenticated");
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,29 +43,65 @@ export default function Login({ setNotif }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!loginData.username.trim() || !loginData.password.trim()) {
-      setError("نام کاربری و گذرواژه الزامی هستند");
+    if (!loginData.phone.trim() || !loginData.password.trim()) {
+      setError("شماره تلفن و گذرواژه الزامی هستند");
       return;
     }
 
     setLoading(true);
+    setError("");
+
     try {
-      const response = await api.post("/api/auth/admin/login/", {
-        username: loginData.username,
+      const loginResponse = await api.post("/api/auth/admin/login/", {
+        username: loginData.phone,
         password: loginData.password,
       });
 
-      if (response.status === 200) {
-        localStorage.setItem("admin", loginData.username);
-        localStorage.setItem("isAuthenticated", "true");
-        router.push("/dashboard");
+      if (loginResponse.status === 200) {
+        try {
+          const meResponse = await api.get("/api/auth/admin/me/");
+          const adminData = meResponse.data;
+
+          if (adminData.is_staff === true) {
+            localStorage.setItem("admin", loginData.phone);
+            localStorage.setItem("isAuthenticated", "true");
+
+            if (setNotif) {
+              setNotif({
+                id: Date.now(),
+                message: "ورود موفق! خوش آمدید",
+                type: "success",
+              });
+            }
+
+            router.push("/dashboard");
+          } else {
+            setError("شما دسترسی ادمین ندارید");
+            document.cookie =
+              "admin_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            localStorage.removeItem("admin");
+            localStorage.removeItem("isAuthenticated");
+          }
+        } catch (meErr) {
+          console.error("Error fetching admin info:", meErr);
+          setError("خطا در تأیید دسترسی ادمین");
+          document.cookie =
+            "admin_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        }
       }
     } catch (err) {
       console.error("Login error:", err);
-      if (err.response?.status === 401) {
-        setError("نام کاربری یا گذرواژه اشتباه است");
+
+      if (err.response?.status === 400 || err.response?.status === 401) {
+        setError("شماره تلفن یا گذرواژه اشتباه است");
       } else if (err.response?.status === 403) {
         setError("شما دسترسی ادمین ندارید");
+      } else if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.code === "ERR_NETWORK") {
+        setError("خطا در ارتباط با سرور. لطفاً اتصال خود را بررسی کنید.");
       } else {
         setError("خطا در ارتباط با سرور");
       }
@@ -63,7 +118,6 @@ export default function Login({ setNotif }) {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        {/* Logo / Brand */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-black rounded-2xl shadow-lg mb-4">
             <svg
@@ -88,26 +142,23 @@ export default function Login({ setNotif }) {
           </p>
         </div>
 
-        {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Username Field */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                نام کاربری
+                شماره تلفن
               </label>
               <input
                 type="text"
-                name="username"
-                value={loginData.username}
+                name="phone"
+                value={loginData.phone}
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition-all outline-none text-gray-900 placeholder:text-gray-400"
-                placeholder="نام کاربری خود را وارد کنید"
+                placeholder="شماره تلفن خود را وارد کنید"
                 required
               />
             </div>
 
-            {/* Password Field with Show/Hide */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 گذرواژه
@@ -128,7 +179,6 @@ export default function Login({ setNotif }) {
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
                 >
                   {showPassword ? (
-                    // Eye Slash Icon (مشخص نبودن)
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -144,7 +194,6 @@ export default function Login({ setNotif }) {
                       />
                     </svg>
                   ) : (
-                    // Eye Icon (مشخص بودن)
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -169,7 +218,6 @@ export default function Login({ setNotif }) {
               </div>
             </div>
 
-            {/* Error Message */}
             {error && (
               <motion.div
                 initial={{ opacity: 0, x: -10 }}
@@ -180,7 +228,6 @@ export default function Login({ setNotif }) {
               </motion.div>
             )}
 
-            {/* Submit Button */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -199,7 +246,6 @@ export default function Login({ setNotif }) {
             </motion.button>
           </form>
 
-          {/* Footer */}
           <div className="mt-6 pt-4 border-t border-gray-100 text-center">
             <p className="text-xs text-gray-400">
               این بخش فقط برای مدیران سیستم قابل دسترسی است

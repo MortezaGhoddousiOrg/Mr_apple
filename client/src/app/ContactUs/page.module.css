@@ -33,7 +33,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: transparent; 
+  color: transparent;
 }
 
 .descriptionContact {
@@ -122,10 +122,14 @@
 .heroImg {
   transform: scale(2);
   object-fit: contain;
-  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .6));
+  filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.6));
   position: absolute;
   bottom: 142px;
 }
+
+/* ========================================== */
+/* INFO SECTION - SIDE BY SIDE (Default)     */
+/* ========================================== */
 
 .infoContact {
   display: grid;
@@ -133,6 +137,9 @@
   gap: 40px;
   padding: 80px 6vw;
   margin-bottom: 100px;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .contactInfoBox {
@@ -195,7 +202,7 @@
 .questionSection {
   width: 100%;
   padding: 80px 5%;
-  background-color: #f9fbfd;
+  background-color: white;
 }
 
 .questionSection h2 {
@@ -242,8 +249,8 @@
 .icon {
   width: 24px;
   height: 24px;
-  flex-shrink: 0; 
-  min-width: 24px; 
+  flex-shrink: 0;
+  min-width: 24px;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   color: #0f73b3;
 }
@@ -263,6 +270,10 @@
   font-size: 0.95rem;
 }
 
+/* ========================================== */
+/* MODAL OVERLAY & CONTAINER - FIXED         */
+/* ========================================== */
+
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -273,6 +284,8 @@
   backdrop-filter: blur(20px);
   z-index: 999;
   animation: fadeOverlay 0.3s ease-out forwards;
+  padding: 8px;
+  overflow: hidden;
 }
 
 @keyframes fadeOverlay {
@@ -286,14 +299,17 @@
 
 .contactModal {
   width: 92%;
-  max-width: 430px;
+  max-width: 400px;
+  max-height: 96vh;
+  overflow-y: auto;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 18px;
-  padding: 34px 30px;
+  border-radius: 16px;
+  padding: 24px 20px;
   position: relative;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
   animation: modalOpen 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   border: 1px solid rgba(255, 255, 255, 0.15);
+  margin: auto;
 }
 
 @keyframes modalOpen {
@@ -331,22 +347,29 @@
   color: #0f73b3;
 }
 
+/* ========================================== */
+/* MODAL FORM - FIXED BUTTON CLICK ISSUE     */
+/* ========================================== */
+
 .modalForm {
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 16px;
+  position: relative;
+  z-index: 5;
+  width: 100%;
 }
 
 .inputGroup {
   position: relative;
+  width: 100%;
 }
 
-/* فیلدها */
 .inputGroup input,
 .inputGroup textarea,
 .inputGroup select {
   width: 100%;
-  padding: 16px 14px;
+  padding: 14px 12px;
   border-radius: 12px;
   border: 2px solid #ddd;
   font-family: "vazir";
@@ -354,9 +377,10 @@
   outline: none;
   transition: all 0.3s ease;
   color: #000;
+  background: #fff;
+  box-sizing: border-box;
 }
 
-/* حذف استایل پیش فرض select */
 .inputGroup select {
   appearance: none;
   -webkit-appearance: none;
@@ -365,7 +389,7 @@
 }
 
 .inputGroup textarea {
-  height: 110px;
+  height: 90px;
   resize: none;
 }
 
@@ -376,20 +400,19 @@
   box-shadow: 0 0 0 4px rgba(15, 115, 179, 0.15);
 }
 
-/* لیبل ها */
 .inputGroup label {
   position: absolute;
   right: 12px;
-  top: 16px;
+  top: 14px;
   font-size: 14px;
-  color: var(--blue);
+  color: #0f73b3;
   padding: 0 6px;
   pointer-events: none;
   transition: all 0.3s ease;
   transform-origin: right top;
+  background: transparent;
 }
 
-/* input و textarea */
 .inputGroup input:focus + label,
 .inputGroup textarea:focus + label,
 .inputGroup input:not(:placeholder-shown) + label,
@@ -398,34 +421,41 @@
   font-size: 13px;
   color: #0f73b3;
   transform: translateY(-50%) scale(0.9);
+  background: white;
+  padding: 0 6px;
+  border-radius: 4px;
 }
 
-/* select */
 .inputGroup select:focus + label,
 .inputGroup select:valid + label {
   top: -9px;
   font-size: 13px;
   color: #0f73b3;
   transform: translateY(-50%) scale(0.9);
-}
-
-/* رنگ گزینه ها */
-.inputGroup select option {
-  color: #000;
+  background: white;
+  padding: 0 6px;
+  border-radius: 4px;
 }
 
 .modalForm button {
-  margin-top: 6px;
+  margin-top: 8px;
   background: var(--blue);
   color: white;
   border: none;
-  padding: 13px;
+  padding: 14px 20px;
   border-radius: 999px;
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 10px 25px rgba(15, 115, 179, 0.2);
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modalForm button:hover {
@@ -433,63 +463,561 @@
   box-shadow: 0 15px 30px rgba(15, 115, 179, 0.3);
 }
 
-/* ================= RESPONSIVE STYLES ================= */
-@media (max-width: 900px) {
-  .infoContact {
-    grid-template-columns: 1fr;
+.modalForm button:active {
+  transform: scale(0.97);
+}
+
+/* ========================================== */
+/* RESPONSIVE MODAL - FIXED BUTTON           */
+/* ========================================== */
+
+/* Mobile (up to 768px) */
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding: 10px;
   }
 
-  .contactInfoBox {
-    order: 2;
+  .contactModal {
+    max-width: 95%;
+    max-height: 94vh;
+    padding: 20px 16px;
+    border-radius: 14px;
   }
 
-  .mapContact {
-    height: 350px;
-    order: 1;
+  .modalTitle {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .modalForm {
+    gap: 14px;
+  }
+
+  .inputGroup input,
+  .inputGroup textarea,
+  .inputGroup select {
+    padding: 12px 10px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .inputGroup label {
+    font-size: 12px;
+    top: 12px;
+    right: 10px;
+  }
+
+  .inputGroup textarea {
+    height: 70px;
+  }
+
+  .modalForm button {
+    padding: 12px 16px;
+    font-size: 15px;
+    min-height: 48px;
   }
 }
 
-@media (max-width: 950px) {
+/* Small Mobile (up to 480px) */
+@media (max-width: 480px) {
+  .modalOverlay {
+    padding: 8px;
+  }
+
+  .contactModal {
+    max-width: 98%;
+    max-height: 92vh;
+    padding: 16px 12px;
+    border-radius: 12px;
+  }
+
+  .modalTitle {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .modalForm {
+    gap: 10px;
+  }
+
+  .inputGroup input,
+  .inputGroup textarea,
+  .inputGroup select {
+    padding: 10px 8px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .inputGroup label {
+    font-size: 11px;
+    top: 10px;
+    right: 8px;
+  }
+
+  .inputGroup textarea {
+    height: 60px;
+  }
+
+  .modalForm button {
+    padding: 10px 14px;
+    font-size: 14px;
+    min-height: 44px;
+    border-radius: 999px;
+  }
+
+  .closeModal {
+    top: 10px;
+    right: 10px;
+    font-size: 22px;
+  }
+}
+
+/* Extra Small Mobile (up to 380px) */
+@media (max-width: 380px) {
+  .modalOverlay {
+    padding: 5px;
+  }
+
+  .contactModal {
+    max-width: 100%;
+    max-height: 90vh;
+    padding: 12px 10px;
+    border-radius: 10px;
+  }
+
+  .modalTitle {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .modalForm {
+    gap: 8px;
+  }
+
+  .inputGroup input,
+  .inputGroup textarea,
+  .inputGroup select {
+    padding: 8px 6px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  .inputGroup label {
+    font-size: 10px;
+    top: 8px;
+    right: 6px;
+  }
+
+  .inputGroup textarea {
+    height: 50px;
+  }
+
+  .modalForm button {
+    padding: 8px 12px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+
+  .closeModal {
+    top: 8px;
+    right: 8px;
+    font-size: 18px;
+  }
+}
+
+/* Height-based adjustments for very short screens */
+@media (max-height: 600px) {
+  .modalOverlay {
+    padding: 4px;
+  }
+
+  .contactModal {
+    max-height: 96vh;
+    padding: 14px 12px;
+    border-radius: 12px;
+  }
+
+  .modalTitle {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .modalForm {
+    gap: 8px;
+  }
+
+  .inputGroup input,
+  .inputGroup textarea,
+  .inputGroup select {
+    padding: 8px 8px;
+    font-size: 12px;
+  }
+
+  .inputGroup label {
+    font-size: 11px;
+    top: 8px;
+    right: 8px;
+  }
+
+  .inputGroup textarea {
+    height: 50px;
+  }
+
+  .modalForm button {
+    padding: 8px 12px;
+    font-size: 13px;
+    min-height: 38px;
+  }
+
+  .closeModal {
+    top: 8px;
+    right: 8px;
+    font-size: 18px;
+  }
+}
+
+@media (max-height: 450px) {
+  .modalOverlay {
+    padding: 3px;
+  }
+
+  .contactModal {
+    max-height: 98vh;
+    padding: 10px 10px;
+    border-radius: 10px;
+  }
+
+  .modalTitle {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .modalForm {
+    gap: 6px;
+  }
+
+  .inputGroup input,
+  .inputGroup textarea,
+  .inputGroup select {
+    padding: 6px 6px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  .inputGroup label {
+    font-size: 10px;
+    top: 6px;
+    right: 6px;
+  }
+
+  .inputGroup textarea {
+    height: 40px;
+  }
+
+  .modalForm button {
+    padding: 6px 10px;
+    font-size: 12px;
+    min-height: 34px;
+  }
+
+  .closeModal {
+    top: 6px;
+    right: 6px;
+    font-size: 16px;
+  }
+}
+
+/* ========================================== */
+/* RESPONSIVE HERO - CONTACT PAGE            */
+/* ========================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
   .headerContact {
     flex-direction: column;
     text-align: center;
-    padding: 120px 20px 60px;
+    padding: 120px 5vw 60px;
+    gap: 40px;
+    min-height: auto;
   }
 
   .heroContent {
     width: 100%;
+    max-width: 100%;
+  }
+
+  .titleContact {
+    font-size: clamp(36px, 5vw, 48px);
+    text-align: center;
+  }
+
+  .descriptionContact {
+    font-size: 15px;
+    max-width: 100%;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .heroFeatures {
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .heroFeatureItem {
+    font-size: 14px;
   }
 
   .heroButtons {
     justify-content: center;
   }
 
-  .heroFeatures {
-    justify-content: center;
+  .heroImageContainer {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .heroImg {
+    transform: scale(1.8);
+    position: relative;
+    bottom: 0;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 400px;
+    object-fit: contain;
   }
 }
 
-/* Custom styles for Bx Icons */
-.bx-phone::before {
-  content: "\ea48";
+/* Mobile (up to 768px) - Stack info section vertically */
+@media (max-width: 768px) {
+  .headerContact {
+    padding: 100px 4vw 40px;
+    gap: 30px;
+  }
+
+  .titleContact {
+    font-size: clamp(28px, 6vw, 34px);
+    letter-spacing: -1px;
+  }
+
+  .descriptionContact {
+    font-size: 14px;
+    line-height: 1.9;
+    max-width: 100%;
+  }
+
+  .heroFeatures {
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    justify-content: center;
+  }
+
+  .heroFeatureItem {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .heroFeatureItem svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .heroButtons {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    height: 52px;
+    padding: 0 24px;
+    font-size: 13px;
+  }
+
+  .heroImageContainer {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .heroImg {
+    transform: scale(1.2);
+    position: relative;
+    bottom: 0;
+    max-height: 350px;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain;
+    margin: 0 -4vw;
+  }
+
+  /* Info Section - Stacked vertically on mobile */
+  .infoContact {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 40px 4vw;
+    margin-bottom: 60px;
+  }
+
+  .contactInfoBox {
+    padding: 28px 20px;
+    gap: 18px;
+    order: 1;
+  }
+
+  .mapContact {
+    height: 280px;
+    order: 2;
+  }
+
+  .infoItem {
+    font-size: 14px;
+    gap: 12px;
+  }
+
+  .iconBox {
+    width: 36px;
+    height: 36px;
+  }
+
+  .iconBox svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .questionSection {
+    padding: 50px 4%;
+  }
+
+  .questionSection h2 {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+  }
+
+  .question {
+    width: 100%;
+  }
+
+  .questionHeader {
+    font-size: 0.95rem;
+    padding: 18px 20px;
+  }
+
+  .answerContent {
+    padding: 0 20px 18px 20px;
+    font-size: 0.85rem;
+  }
 }
 
-.bx-envelope::before {
-  content: "\ea42";
-}
+/* Small Mobile (up to 480px) */
+@media (max-width: 480px) {
+  .headerContact {
+    padding: 80px 3vw 30px;
+    gap: 20px;
+  }
 
-.bx-map::before {
-  content: "\ea3f";
-}
+  .titleContact {
+    font-size: clamp(22px, 7vw, 28px);
+  }
 
-.bx-time::before {
-  content: "\ea5e";
-}
+  .descriptionContact {
+    font-size: 13px;
+    line-height: 1.8;
+  }
 
-.bx-phone-call::before {
-  content: "\ea4b";
-}
+  .heroFeatures {
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
 
-.bx-message-rounded::before {
-  content: "\eb69";
+  .heroFeatureItem {
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .heroFeatureItem svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .primaryBtn,
+  .secondaryBtn {
+    height: 42px;
+    padding: 0 16px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .heroButtons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .heroButtons .primaryBtn,
+  .heroButtons .secondaryBtn {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .heroImageContainer {
+    max-width: 100%;
+    padding: 0;
+    margin: 0 -2vw;
+  }
+
+  .heroImg {
+    transform: scale(1.1);
+    max-height: 250px;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain;
+    margin: 0 -2vw;
+    bottom: -20px;
+  }
+
+  .infoContact {
+    padding: 30px 3vw;
+    gap: 20px;
+  }
+
+  .contactInfoBox {
+    padding: 20px 16px;
+    gap: 14px;
+  }
+
+  .infoItem {
+    font-size: 13px;
+    gap: 10px;
+  }
+
+  .iconBox {
+    width: 32px;
+    height: 32px;
+  }
+
+  .iconBox svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mapContact {
+    height: 220px;
+  }
+
+  .questionHeader {
+    font-size: 0.85rem;
+    padding: 14px 16px;
+  }
+
+  .answerContent {
+    padding: 0 16px 14px 16px;
+    font-size: 0.8rem;
+  }
 }

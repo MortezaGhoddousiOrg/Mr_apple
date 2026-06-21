@@ -12,24 +12,13 @@ import Logout from "@/app/PanelUser/Logout/page";
 export default function PanelUser() {
   const [activeTab, setActiveTab] = useState("orders");
   const router = useRouter();
-  // const [panelUser, setPanelUser] = useState();
   const { isLoggedIn, authLoading, dataForm } = useAuth();
 
   useEffect(() => {
-    if (authLoading) return;
-
     if (!isLoggedIn) {
       router.push("/");
     }
   }, [isLoggedIn, authLoading, router]);
-
-  // if (authLoading) {
-  //   return <div>در حال بارگذاری...</div>;
-  // }
-
-  // if (!isLoggedIn) {
-  //   return null;
-  // }
 
   const menuItems = [
     { id: "orders", title: "سفارش‌های من" },

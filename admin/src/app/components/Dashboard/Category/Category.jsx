@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { api } from "@/app/config";
+import { publicApi, api } from "@/app/config";
 import AddCategory from "./AddCategory";
 import { useNotification } from "@/app/Context/NotificationContext";
 
@@ -12,11 +12,14 @@ export default function Category() {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
-  const [activeTab, setActiveTab] = useState("parent"); // "parent" or "child"
+  const [activeTab, setActiveTab] = useState("parent");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const fetchCategories = async () => {
     setLoading(true);
     try {
+      // ✅ دریافت با publicApi (بدون احراز هویت)
       const parentRes = await api.get("/api/category/parent/");
       const childRes = await api.get("/api/category/child/");
       setParents(parentRes.data);
@@ -36,44 +39,38 @@ export default function Category() {
     fetchCategories();
   }, []);
 
-  const handleDeleteParent = async (id) => {
-    if (!confirm("آیا از حذف دسته‌بندی اصلی مطمئن هستید؟")) return;
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+
     try {
-      await api.delete(`/api/category/parent/${id}/`);
+      if (deleteTarget.type === "parent") {
+        await api.delete(`/api/category/parent/${deleteTarget.id}/`);
+      } else {
+        await api.delete(`/api/category/child/${deleteTarget.id}/`);
+      }
+
       setNotif({
         id: Date.now(),
-        message: "دسته‌بندی اصلی با موفقیت حذف شد",
+        message: `${deleteTarget.type === "parent" ? "دسته‌بندی اصلی" : "دسته‌بندی فرعی"} با موفقیت حذف شد`,
         type: "success",
       });
+
+      setShowDeleteModal(false);
+      setDeleteTarget(null);
       fetchCategories();
     } catch (err) {
       console.error(err);
       setNotif({
         id: Date.now(),
-        message: "خطا در حذف دسته‌بندی اصلی",
+        message: `خطا در حذف ${deleteTarget.type === "parent" ? "دسته‌بندی اصلی" : "دسته‌بندی فرعی"}`,
         type: "error",
       });
     }
   };
 
-  const handleDeleteChild = async (id) => {
-    if (!confirm("آیا از حذف دسته‌بندی فرعی مطمئن هستید؟")) return;
-    try {
-      await api.delete(`/api/category/child/${id}/`);
-      setNotif({
-        id: Date.now(),
-        message: "دسته‌بندی فرعی با موفقیت حذف شد",
-        type: "success",
-      });
-      fetchCategories();
-    } catch (err) {
-      console.error(err);
-      setNotif({
-        id: Date.now(),
-        message: "خطا در حذف دسته‌بندی فرعی",
-        type: "error",
-      });
-    }
+  const openDeleteModal = (id, type, title) => {
+    setDeleteTarget({ id, type, title });
+    setShowDeleteModal(true);
   };
 
   const handleEditParent = (category) => {
@@ -99,7 +96,6 @@ export default function Category() {
 
   return (
     <section className="p-4 md:p-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
           دسته‌بندی‌ها
@@ -112,7 +108,6 @@ export default function Category() {
         </button>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2 border-b border-gray-200 mb-6">
         <button
           onClick={() => setActiveTab("parent")}
@@ -140,14 +135,12 @@ export default function Category() {
         </button>
       </div>
 
-      {/* Loading */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </div>
       ) : (
         <>
-          {/* Parent Categories Tab */}
           {activeTab === "parent" && (
             <div className="space-y-4">
               {parents.length === 0 ? (
@@ -228,7 +221,9 @@ export default function Category() {
                                 </svg>
                               </button>
                               <button
-                                onClick={() => handleDeleteParent(p.id)}
+                                onClick={() =>
+                                  openDeleteModal(p.id, "parent", p.title)
+                                }
                                 className="text-red-500 hover:text-red-700 transition p-1"
                                 title="حذف"
                               >
@@ -258,7 +253,6 @@ export default function Category() {
             </div>
           )}
 
-          {/* Child Categories Tab */}
           {activeTab === "child" && (
             <div className="space-y-4">
               {children.length === 0 ? (
@@ -347,7 +341,9 @@ export default function Category() {
                                 </svg>
                               </button>
                               <button
-                                onClick={() => handleDeleteChild(c.id)}
+                                onClick={() =>
+                                  openDeleteModal(c.id, "child", c.title)
+                                }
                                 className="text-red-500 hover:text-red-700 transition p-1"
                                 title="حذف"
                               >
@@ -377,6 +373,49 @@ export default function Category() {
             </div>
           )}
         </>
+      )}
+
+      {showDeleteModal && deleteTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 text-center">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-6 h-6 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold mb-2">حذف دسته‌بندی</h3>
+            <p className="text-gray-600 mb-6">
+              آیا از حذف دسته‌بندی "{deleteTarget.title}" مطمئن هستید؟
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteTarget(null);
+                }}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-xl font-medium transition"
+              >
+                انصراف
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-xl font-medium transition"
+              >
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </section>
   );

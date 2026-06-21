@@ -8,8 +8,8 @@ import styles from "@/app/ContentBox/Contentbox.module.css";
 export default function Contentbox() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const phoneNumber = "0513-1234-567";
-  const address = "مشهد، برج آبان، طبقه منفی ۱";
+  const phoneNumber = "0519-100-1631";
+  const address = "مشهد، برج آبان، طبقه منفی ۱، مستر اپل";
   const instagramLink = "https://www.instagram.com/apple_store_iran_official/";
 
   return (

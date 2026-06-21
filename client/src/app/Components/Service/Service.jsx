@@ -13,15 +13,6 @@ export default function Service({ data = [], title, button, onMoreClick }) {
   const touchEndX = useRef(0);
   const gap = 20;
 
-  // const {
-  //   addedItems,
-  //   setAddedItems,
-  //   productBuy,
-  //   setProductBuy,
-  //   userId,
-  //   setUserId,
-  // } = useAuth();
-
   const { addToCart, productbuy, setNotif } = useAuth();
 
   const Active = React.useMemo(
@@ -85,88 +76,37 @@ export default function Service({ data = [], title, button, onMoreClick }) {
 
   const translateValue = `translateX(${index * (100 / visibleCards)}%) translateX(${index * gap}px)`;
 
-  // const [addedItems, setAddedItems] = useState([]);
-
-  // const handleAddToCart = (item) => {
-  //   setProductBuy((prev) => {
-  //     const product = prev.find((p) => p.id === item.id);
-
-  //     if (product) {
-  //       return prev.map((p) =>
-  //         p.id === item.id ? { ...p, pro: p.pro + 1 } : p,
-  //       );
-  //     }
-
-  //     return [...prev, { ...item, pro: 1 }];
-  //   });
-  //   setAddedItems((prev) =>
-  //     prev.includes(item.id) ? prev : [...prev, item.id],
-  //   );
-  // };
-
-  // const handleAddToCart = async (item) => {
-  //   const isAlreadyAdded = productBuy.some((p) => p.id === item.id);
-  //   if (isAlreadyAdded) return;
-
-  //   if (userId) {
-  //     try {
-  //       const res = await api.post("/api/orders/cart/add", {
-  //         userId,
-  //         productId: item.id,
-  //       });
-  //       console.log(res.data);
-  //     } catch (err) {
-  //       console.error(err);
-  //       return;
-  //     }
-  //   }
-  // };
-
-  //   const handleAddToCart = async (item) => {
-  //   try {
-  //     await addToCart(item);
-  //   } catch (err) {
-  //     // console.error(err);
-  //   }
-  // };
-
   const isInCart = (id) => {
-    return productbuy?.some((p) => p.id === id);
+    return productbuy?.some((p) => (p.product_id || p.id) === id);
   };
 
   const handleAddToCart = async (item) => {
-  if (isInCart(item.id)) {
-    setNotif({
-      id: Date.now(),
-      message: "این کالا قبلاً به سبد خرید اضافه شده است",
-      type: "warning",
-    });
+    if (isInCart(item.id)) {
+      setNotif({
+        id: Date.now(),
+        message: "این محصول قبلاً به سبد خرید اضافه شده است",
+        type: "warning",
+      });
 
-    return;
-  }
+      return;
+    }
 
-  try {
-    await addToCart({
-      id: item.id,
-      title: item.title,
-      price: item.price,
-      image: item.image,
-      description: item.description,
-    });
+    try {
+      await addToCart(item);
 
-    setNotif({
-      id: Date.now(),
-      message: "محصول با موفقیت به سبد خرید اضافه شد",
-      type: "success",
-    });
-  } catch (err) {
-    setNotif({
-      id: Date.now(),
-      message: "افزودن محصول به سبد خرید با خطا مواجه شد، لطفا دوباره امتحان کنید",
-      type: "error",
-    });
-  }
-};
+      setNotif({
+        id: Date.now(),
+        message: "محصول با موفقیت به سبد خرید اضافه شد",
+        type: "success",
+      });
+    } catch (err) {
+      setNotif({
+        id: Date.now(),
+        message: "خطا در افزودن محصول",
+        type: "error",
+      });
+    }
+  };
 
   if (Active.length === 0) {
     return (
@@ -229,9 +169,9 @@ export default function Service({ data = [], title, button, onMoreClick }) {
                   key={item.id}
                   style={{ flex: `0 0 ${100 / visibleCards}%` }}
                 >
-                  <img
+                  <Image
+                    unoptimized
                     className={styles.serviceImage}
-                    // src={item.image}
                     src={item.image}
                     alt={item.title}
                     width={100}
@@ -271,21 +211,22 @@ export default function Service({ data = [], title, button, onMoreClick }) {
               );
             })}
 
-            <div>
-              <div className={styles.serviceCardLast}>
-                <div className={styles.serviceCardLastDiv}>
-                  <h2>{title}</h2>
-                  <p>برای نمایش بیشتر کلیک کنید</p>
-                </div>
-                {button && (
-                  <button
-                    className={styles.serviceCardLastButton}
-                    onClick={onMoreClick}
-                  >
-                    {button}
-                  </button>
-                )}
+            <div
+              className={styles.serviceCardLast}
+              style={{ flex: `0 0 ${100 / visibleCards}%` }}
+            >
+              <div className={styles.serviceCardLastDiv}>
+                <h2>{title}</h2>
+                <p>برای نمایش بیشتر کلیک کنید</p>
               </div>
+              {button && (
+                <button
+                  className={styles.serviceCardLastButton}
+                  onClick={onMoreClick}
+                >
+                  {button}
+                </button>
+              )}
             </div>
           </div>
         </div>

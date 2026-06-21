@@ -8,7 +8,7 @@ import InfoSection from "./Components/InfoSection/InfoSection";
 import Service from "@/app/Components/Service/Service";
 import ServiceSpecial from "@/app/Components/ServiceSpecial/ServiceSpecial";
 import { api } from "./config";
-
+import { MEDIA_URL } from "@/app/config";
 // import Footer from "./Components/Footer/Footer";
 // import style from "@/"
 // import { useRouter } from "next/router";
@@ -162,7 +162,7 @@ export default function Home() {
     const axioshome = async () => {
       try {
         const response = await api.get("/api/catalog/product/home");
-        console.log(response.data);
+        console.log("djjfgdffgdfgdgdfg", response.data);
         setProduct(response.data);
       } catch (err) {
         console.log(err);
@@ -177,13 +177,15 @@ export default function Home() {
 
   const data = product.map((item) => ({
     id: item.id,
-    image: `http://localhost:4000${
+    image: `${MEDIA_URL}${
       item.images?.find((img) => img.is_main)?.image || ""
     }`,
     title: item.name,
     description: item.descriptions,
     price: item.sell_price,
     status: item.status,
+
+    
   }));
 
   return (

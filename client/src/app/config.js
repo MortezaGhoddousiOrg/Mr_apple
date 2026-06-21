@@ -9,6 +9,10 @@ export const api = axios.create({
     timeout: 10000,
 });
 
+export const MEDIA_URL =
+  process.env.NEXT_PUBLIC_ENV === "development"
+    ? "http://localhost:4000"
+    : process.env.NEXT_PUBLIC_API_URL;
 
 // import axios from "axios";
 

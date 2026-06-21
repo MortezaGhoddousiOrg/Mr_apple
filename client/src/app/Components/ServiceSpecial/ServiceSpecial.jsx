@@ -21,12 +21,40 @@ export default function ServiceSpecial({
 
   const router = useRouter();
 
-  const { productbuy, addToCart } = useAuth();
+  const { productbuy, addToCart, setNotif } = useAuth();
 
   const Active = data.filter((item) => item.status === "active");
 
   const isInCart = (id) => {
-    return productbuy?.some((p) => p.id === id);
+    return productbuy?.some((p) => (p.product_id || p.id) === id);
+  };
+
+  const handleAddToCart = async (item) => {
+    if (isInCart(item.id)) {
+      setNotif({
+        id: Date.now(),
+        message: "این محصول قبلاً به سبد خرید اضافه شده است",
+        type: "warning",
+      });
+
+      return;
+    }
+
+    try {
+      await addToCart(item);
+
+      setNotif({
+        id: Date.now(),
+        message: "محصول با موفقیت به سبد خرید اضافه شد",
+        type: "success",
+      });
+    } catch (err) {
+      setNotif({
+        id: Date.now(),
+        message: "خطا در افزودن محصول",
+        type: "error",
+      });
+    }
   };
 
   useEffect(() => {
@@ -99,19 +127,19 @@ export default function ServiceSpecial({
             disabled={index === 0}
           >
             <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M5 12h14"></path>
-            <path d="m12 5 7 7-7 7"></path>
-          </svg>
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
           </button>
 
           <div
@@ -135,15 +163,14 @@ export default function ServiceSpecial({
                     key={item.id}
                     style={{ flex: `0 0 ${100 / visibleCards}%` }}
                   >
-                    <img
+                    <Image
+                      unoptimized
                       className={styles.serviceImage}
                       src={item.image}
                       alt={item.title}
                       width={100}
                       height={180}
-                      onClick={() =>
-                        router.push(`/ProductDetail/${item.id}`)
-                      }
+                      onClick={() => router.push(`/ProductDetail/${item.id}`)}
                     />
 
                     <p className={styles.serviceTitle}>{item.title}</p>
@@ -160,54 +187,69 @@ export default function ServiceSpecial({
                       className={`${styles.serviceBtn} ${
                         added ? styles.serviceBtnGreen : ""
                       }`}
-                      onClick={() => addToCart(item)}
-                      disabled={added}
+                      onClick={() => handleAddToCart(item)}
                     >
-                      {added ? "به سبد خرید اضافه شد" : "افزودن به سبد خرید"}
+                      {added ? (
+                        <>
+                          به سبد خرید اضافه شد
+                          <svg
+                            className={styles.svg}
+                            viewBox="0 0 24 24"
+                            fill="white"
+                            width="18"
+                            height="18"
+                            style={{ marginLeft: "8px" }}
+                          >
+                            <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
+                          </svg>
+                        </>
+                      ) : (
+                        "افزودن به سبد خرید"
+                      )}
                     </button>
                   </div>
                 );
               })}
 
-              <div>
-                <div className={styles.serviceCardLast}>
-                  <div className={styles.serviceCardLastDiv}>
-                    <h2>{title}</h2>
-                    <p>برای نمایش بیشتر کلیک کنید</p>
-                  </div>
-
-                  {button && (
-                    <button
-                      className={styles.serviceCardLastButton}
-                      onClick={onMoreClick}
-                    >
-                      {button}
-                    </button>
-                  )}
-                </div>
+              <div
+              className={styles.serviceCardLast}
+              style={{ flex: `0 0 ${100 / visibleCards}%` }}
+            >
+              <div className={styles.serviceCardLastDiv}>
+                <h2>{title}</h2>
+                <p>برای نمایش بیشتر کلیک کنید</p>
               </div>
+              {button && (
+                <button
+                  className={styles.serviceCardLastButton}
+                  onClick={onMoreClick}
+                >
+                  {button}
+                </button>
+              )}
+            </div>
             </div>
           </div>
 
           <button
             className={`${styles.navBtn} ${styles.left}`}
             onClick={nextSlide}
-            // disabled={index >= Active.length + 1 - visibleCards}
+            disabled={index >= Active.length + 1 - visibleCards}
           >
             <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5"></path>
-            <path d="m12 19-7-7 7-7"></path>
-          </svg>
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5"></path>
+              <path d="m12 19-7-7 7-7"></path>
+            </svg>
           </button>
         </div>
       </article>

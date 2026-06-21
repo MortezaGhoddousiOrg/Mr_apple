@@ -119,9 +119,10 @@ function Products() {
   const totalPages = Math.ceil(products.length / productsPerPage);
 
   const getMainImage = (images) => {
-    const main = images?.find((img) => img.is_main === true);
+    if (!images || images.length === 0) return null;
+    const main = images.find((img) => img.is_main === true);
     if (main) return `http://127.0.0.1:4000${main.image}`;
-    if (images?.[0]) return `http://127.0.0.1:4000${images[0].image}`;
+    if (images[0]) return `http://127.0.0.1:4000${images[0].image}`;
     return null;
   };
 

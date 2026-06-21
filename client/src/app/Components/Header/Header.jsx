@@ -9,31 +9,17 @@ import style from "@/app/Components/Header/Header.module.css";
 
 export default function Header() {
   const pathname = usePathname();
-  const { isLoggedIn, productbuy, authLoading } = useAuth();
-  const [login, setLogin] = useState();
-
-
+  const { isLoggedIn, productbuy, } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const navRef = useRef(null);
   const sliderRef = useRef(null);
-  // const [panelUser, setPanelUser] = useState();
-
-  // useEffect(() => {
-  //   const local = localStorage.getItem("user");
-  //   if (local) {
-  //       setPanelUser(true);
-  //   } else {
-  //       setPanelUser(false);
-  //   }
-  // }, []);
 
   const totalCount =
     productbuy?.reduce((sum, item) => sum + (item.qty || 1), 0) || 0;
 
-  // ========== حرکت حباب شیشه‌ای ==========
   useEffect(() => {
     const nav = navRef.current;
     const slider = sliderRef.current;
@@ -52,7 +38,6 @@ export default function Header() {
     slider.style.transform = `translateX(${left}px)`;
   }, [pathname, isMenuOpen]);
 
-  // ========== بستن جستجو با Escape ==========
   useEffect(() => {
     const handleEsc = (e) => e.key === "Escape" && setIsSearchOpen(false);
     window.addEventListener("keydown", handleEsc);
@@ -70,15 +55,10 @@ export default function Header() {
     { name: "آموزش", path: "/Training" },
   ];
 
-  //   if (authLoading) {
-  //   return "درحال دانلود ";
-  // }
-
   return (
     <>
       <header className={style.header}>
         <div className={style.navContainer}>
-          {/* لوگو */}
           <div className={style.logo}>
             <Image
               src="/image-header/apple.svg"
@@ -88,16 +68,18 @@ export default function Header() {
             />
           </div>
 
-          {/* ===== نویگیشن با اسلایدر شیشه‌ای ===== */}
           <nav
             ref={navRef}
             className={`${style.navLinks} ${isMenuOpen ? style.open : ""}`}
           >
-            {/* حباب شیشه‌ای متحرک */}
             <div ref={sliderRef} className={style.glassSlider} />
 
             {navLinks.map((link) => {
-              const isActive = pathname === link.path;
+              const isActive =
+                link.path === "/Products"
+                  ? pathname.startsWith("/Products") ||
+                    pathname.startsWith("/Category")
+                  : pathname === link.path;
               return (
                 <li
                   key={link.path}
@@ -112,9 +94,7 @@ export default function Header() {
             })}
           </nav>
 
-          {/* ===== آیکون‌های سمت راست ===== */}
           <div className={style.imgHeader}>
-            {/* پروفایل کاربر */}
             {isLoggedIn ? (
               <Link href="/PanelUser" className={style.cartWrapper}>
                 <svg
@@ -161,7 +141,6 @@ export default function Header() {
               </Link>
             )}
 
-            {/* سبد خرید */}
             <Link href="/ProductBuy" className={style.cartWrapper}>
               <Image
                 src="/image-header/bag.svg"
@@ -172,7 +151,6 @@ export default function Header() {
               <span className={style.cartBadge}>{totalCount}</span>
             </Link>
 
-            {/* جستجو */}
             <Image
               src="/image-header/search.svg"
               width={20}
@@ -183,7 +161,6 @@ export default function Header() {
             />
           </div>
 
-          {/* ===== همبرگر (موبایل) ===== */}
           <div className={style.menuIcon} onClick={toggleMenu}>
             <div
               className={`${style.hamburger} ${
@@ -198,7 +175,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ===== مودال جستجو ===== */}
       {isSearchOpen && (
         <div className={style.searchOverlay} onClick={toggleSearch}>
           <div

@@ -166,8 +166,9 @@ ZARINPAL_SANDBOX = os.getenv("ZARINPAL_SANDBOX") == "True"
 from datetime import timedelta
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "authuser.authentication.UserJWTAuthentication",
+        "authuser.authentication.AdminJWTAuthentication",  # ✅ اضافه کنید
     ),
 }
 

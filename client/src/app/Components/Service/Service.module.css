@@ -19,34 +19,12 @@
   transition: all 1s ease;
 }
 
-/* .iconImage {
-  margin-right: 40px;
-} */
 
 .iconTitle {
   font-size: 16px;
   margin-right: 50px;
 }
-/* 
-.more {
-  position: absolute;
-  top: 0;
-  left: 3%;
-  padding: 5px;
-  box-shadow: 10px 0px 40px rgba(0, 0, 0, 0.15);
-  font-family: "vazir";
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(18px);
-  box-shadow:
-    0px 8px 25px rgba(0, 0, 0, 0.4),
-    inset 0px 1px 2px rgba(255, 255, 255, 0.3),
-    inset 0px -1px 3px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-} */
+
 
 .sliderContainer {
   position: relative;
@@ -59,15 +37,14 @@
 .servicesSlider {
   overflow: hidden;
   width: 90%;
-  /* display: flex;
-  justify-content: end;
-  align-items: center; */
 }
 
-.servicesAll {
-  display: flex;
-  gap: 20px;
-  width: 94%;
+
+.servicesAll{
+    display:flex;
+    align-items: stretch;
+    gap:20px;
+    width:100%;
 }
 
 .serviceCard {
@@ -77,18 +54,17 @@
   align-items: start;
   height: 430px;
   width: 250px;
-  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(18px);
-  /* box-shadow:
-    0px 8px 25px rgba(0, 0, 0, 0.4),
-    inset 0px 1px 2px rgba(255, 255, 255, 0.3),
-    inset 0px -1px 3px rgba(0, 0, 0, 0.2); */
   background-color: white;
   border: 1px solid rgba(255, 255, 255, 0.18);
   padding: 0 1.5vw;
   border-radius: 24px;
   transition: all 0.3s ease-out;
+  flex-shrink:0;
+    min-width:0;
+    width:auto;
+    box-sizing:border-box;
 }
 
 .serviceCardLast {
@@ -98,8 +74,8 @@
   align-items: center;
   gap: 50px;
   border-radius: 24px;
-  width: 230px;
-  height: 100%;
+  height: auto;
+  width: 250px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: linear-gradient(
     135deg,
@@ -112,6 +88,10 @@
   font-weight: 500;
   backdrop-filter: blur(1.5px);
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    min-width:0;
+    box-sizing:border-box;
+    padding:25px;
+
 }
 
 .serviceCardLastDiv {
@@ -122,18 +102,11 @@
   font-size: 14px;
 }
 
-/* .serviceCardLastP {
-  font-size: 14px;
-} */
-
 .serviceCardLastButton {
   width: 50%;
   padding: 8px 12px;
-  /* border: none; */
   font-family: "vazir";
   border-radius: 20px;
-  /* border: 1px solid rgba(255, 255, 255, 0.25); */
-
  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.155) 0%, rgba(255, 255, 255, 0.2) 100%);
@@ -152,7 +125,6 @@
 
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
   color: white;
-  /* color: var(--blue); */
 }
 .serviceCardLastButton:hover {
   transform: translateY(-2px);
@@ -255,15 +227,6 @@
     inset 0 -1px 10px 0 rgba(0, 0, 0, 0.1);
 }
 
-/* .moreBtn {
-  padding: 8px 16px;
-  border: none;
-  background-color: #000;
-  color: white;
-  cursor: pointer;
-  border-radius: 6px;
-  background-color: red;
-} */
 
 .navBtn {
   position: absolute;
@@ -359,10 +322,6 @@
     justify-content: space-around;
   }
 
-  .serviceCardLast {
-    width: 65vw;
-  }
-
   .serviceCardLastDiv {
     font-size: 20px;
   }
@@ -425,10 +384,6 @@
   .serviceCard {
     height: 480px;
     justify-content: space-around;
-  }
-
-  .serviceCardLast {
-    width: 280px;
   }
 
   .serviceCardLastDiv {
@@ -495,10 +450,6 @@
     justify-content: space-around;
   }
 
-  .serviceCardLast {
-    width: 280px;
-  }
-
   .serviceCardLastDiv {
     font-size: 20px;
   }
@@ -562,10 +513,6 @@
     justify-content: space-around;
   }
 
-  .serviceCardLast {
-    width: 200px;
-  }
-
   .serviceCardLastDiv {
     font-size: 14px;
   }
@@ -619,7 +566,6 @@
     display: flex;
     justify-content: start;
     align-items: center;
-    /* background-color: #0fa314; */
   }
 
   .servicesAll {
@@ -629,10 +575,6 @@
   .serviceCard {
     height: 500px;
     justify-content: space-around;
-  }
-
-  .serviceCardLast {
-    width: 250px;
   }
 
   .serviceCardLastDiv {
@@ -698,10 +640,6 @@
     justify-content: space-around;
   }
 
-  .serviceCardLast {
-    width: 320px;
-  }
-
   .serviceCardLastDiv {
     font-size: 20px;
   }
@@ -756,10 +694,6 @@
   .serviceCard {
     height: 600px;
     justify-content: space-around;
-  }
-
-  .serviceCardLast {
-    width: 350px;
   }
 
   .serviceCardLastDiv {
@@ -823,10 +757,6 @@
   .serviceCard {
     height: 600px;
     justify-content: space-around;
-  }
-
-  .serviceCardLast {
-    width: 21vw;
   }
 
   .serviceCardLastDiv {

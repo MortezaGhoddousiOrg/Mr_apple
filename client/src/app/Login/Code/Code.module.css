@@ -1,13 +1,6 @@
 .bodyCode {
   width: 100%;
-  /* height: 100vh; */
   height: 200px;
-  /* background: radial-gradient(
-    circle at top,
-    #1f2933 0,
-    #1b202b 50%,
-    #020204 100%
-  ); */
   display: flex;
   flex-direction: column;
   justify-content: center;

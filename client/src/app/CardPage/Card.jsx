@@ -3,21 +3,47 @@
 import style from "@/app/CardPage/Card.module.css";
 import { useAuth } from "@/app/Context/Context";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-const FALLBACK_IMAGE =
-  "/image-infosection/IMG_SEGMENT_20260513_115454.png";
+const FALLBACK_IMAGE = "/image-infosection/IMG_SEGMENT_20260513_115454.png";
 
 export default function Card({ product = [] }) {
   const router = useRouter();
 
-  const { productbuy, addToCart } = useAuth();
+  const { productbuy, addToCart, setNotif } = useAuth();
 
-  const activeProducts = product.filter(
-    (item) => item.status === "active"
-  );
+  const activeProducts = product.filter((item) => item.status === "active");
 
   const isInCart = (id) => {
-    return productbuy?.some((p) => p.id === id);
+    return productbuy?.some((p) => (p.product_id || p.id) === id);
+  };
+
+  const handleAddToCart = async (item) => {
+    if (isInCart(item.id)) {
+      setNotif({
+        id: Date.now(),
+        message: "این محصول قبلاً به سبد خرید اضافه شده است",
+        type: "warning",
+      });
+
+      return;
+    }
+
+    try {
+      await addToCart(item);
+
+      setNotif({
+        id: Date.now(),
+        message: "محصول با موفقیت به سبد خرید اضافه شد",
+        type: "success",
+      });
+    } catch (err) {
+      setNotif({
+        id: Date.now(),
+        message: "خطا در افزودن محصول",
+        type: "error",
+      });
+    }
   };
 
   if (activeProducts.length === 0) {
@@ -40,13 +66,14 @@ export default function Card({ product = [] }) {
           return (
             <div className={style.serviceCard} key={item.id}>
               <div className={style.imageBox}>
-                <img
+                <Image
+                  unoptimized
                   className={style.serviceImage}
-                  src={item.image || FALLBACK_IMAGE}
+                  src={item.image}
                   alt={item.title || "product-image"}
-                  onClick={() =>
-                    router.push(`/ProductDetail/${item.id}`)
-                  }
+                  width={300}
+                  height={300}
+                  onClick={() => router.push(`/ProductDetail/${item.id}`)}
                   onError={(e) => {
                     e.currentTarget.src = FALLBACK_IMAGE;
                   }}
@@ -54,13 +81,10 @@ export default function Card({ product = [] }) {
               </div>
 
               <div className={style.content}>
-                <p className={style.serviceTitle}>
-                  {item.title}
-                </p>
+                <p className={style.serviceTitle}>{item.title}</p>
 
                 <h2 className={style.serviceDescription}>
-                  {item.description ||
-                    "توضیحاتی برای این محصول ثبت نشده است."}
+                  {item.description || "توضیحاتی برای این محصول ثبت نشده است."}
                 </h2>
               </div>
 
@@ -73,8 +97,7 @@ export default function Card({ product = [] }) {
                   className={`${style.serviceBtn} ${
                     added ? style.serviceBtnGreen : ""
                   }`}
-                  onClick={() => addToCart(item)}
-                  disabled={added}
+                  onClick={() => handleAddToCart(item)}
                 >
                   {added ? (
                     <>

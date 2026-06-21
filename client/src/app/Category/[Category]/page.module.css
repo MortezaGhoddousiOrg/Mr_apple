@@ -1,22 +1,5 @@
 .categoryBody {
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(55, 90, 160, 0.14),
-      transparent 26%
-    ),
-    radial-gradient(
-      circle at left center,
-      rgba(255, 255, 255, 0.05),
-      transparent 18%
-    ),
-    linear-gradient(
-      180deg,
-      #050608 0,
-      #0b0d12 100vh,
-      #f6f7fb 100vh,
-      #f7f8fc 100%
-    );
+  background: #f7f8fc;
   color: black;
   width: 100%;
   min-height: 100vh;
@@ -41,6 +24,8 @@
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
+  background: #050608;
+  margin-bottom: 0;
 }
 
 .heroGlowOne {
@@ -245,22 +230,6 @@
 }
 
 @media (max-width: 1000px) {
-  .categoryBody {
-    background:
-      radial-gradient(
-        circle at top right,
-        rgba(55, 90, 160, 0.14),
-        transparent 30%
-      ),
-      linear-gradient(
-        180deg,
-        #050608 0,
-        #0b0d12 100vh,
-        #f6f7fb 100vh,
-        #f7f8fc 100%
-      );
-  }
-
   .categoryHeader {
     grid-template-columns: 1fr;
     min-height: 100vh;
@@ -289,6 +258,10 @@
     min-height: 320px;
     height: auto;
     order: -1;
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
   }
 
   .categoryImage {
@@ -307,79 +280,200 @@
   }
 }
 
-@media (max-width: 640px) {
+/* ========================================== */
+/* RESPONSIVE MOBILE - 75vh HEIGHT           */
+/* ========================================== */
+
+@media (max-width: 768px) {
   .categoryHeader {
-    min-height: 100vh;
-    padding: 82px 16px 44px;
-    gap: 18px;
+    min-height: 75vh !important;
+    height: 75vh !important;
+    padding: 60px 16px 0 !important;
+    gap: 0 !important;
+    align-content: space-between !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    background: #050608;
+  }
+
+  .categoryBox {
+    order: 1;
+    margin-top: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
   }
 
   .categoryEyebrow {
     font-size: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     justify-content: center;
   }
 
   .categoryTitle {
-    font-size: clamp(34px, 10vw, 48px);
-    margin-bottom: 16px;
+    font-size: clamp(28px, 7vw, 36px);
+    margin-bottom: 12px;
     line-height: 1.12;
+    text-align: center;
   }
 
   .categoryDescription {
-    font-size: 14px;
-    line-height: 1.95;
-    margin-bottom: 24px;
+    font-size: 13px;
+    line-height: 1.9;
+    margin-bottom: 16px;
+    text-align: center;
+    max-width: 100%;
   }
 
   .categoryFeatures {
-    gap: 10px;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 10px;
   }
 
   .categoryFeatureItem {
-    width: 100%;
-    justify-content: center;
-    white-space: normal;
-    text-align: center;
-    padding: 12px 14px;
-    min-height: unset;
-    border-radius: 18px;
+    font-size: 12px;
+    padding: 8px 14px;
+    min-height: 36px;
+    white-space: nowrap;
+  }
+
+  .featureIcon {
+    width: 20px;
+    height: 20px;
   }
 
   .categoryImageContainer {
-    min-height: 250px;
+    order: 2;
+    min-height: 180px !important;
+    height: auto !important;
+    margin-top: auto !important;
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding-bottom: 20px;
+    width: 100%;
   }
 
   .categoryImage {
-    width: min(100%, 320px);
-    max-height: 34vh;
+    width: min(100%, 300px) !important;
+    max-height: 28vh !important;
+    transform: scale(1.1);
+    position: relative !important;
   }
 
   .imageOrb {
-    width: 260px;
-    height: 260px;
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .tabSection {
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .categoryHeader {
+    padding: 40px 12px 0 !important;
+    height: 75vh !important;
+    min-height: 75vh !important;
+    justify-content: space-between !important;
+    gap: 0 !important;
+  }
+
+  .categoryBox {
+    margin-top: 90px;
+    gap: 10px;
+  }
+
+  .categoryEyebrow{
+    font-size: 18px;
+  }
+
+  .categoryTitle {
+    font-size: 42px;
+    margin-bottom: 8px;
+  }
+
+  .categoryDescription {
+    font-size: 12px;
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+
+  .categoryFeatures {
+    gap: 15px;
+  }
+
+  .categoryFeatureItem {
+    font-size: 14px;
+    padding: 6px 12px;
+    min-height: 30px;
+  }
+
+  .categoryImageContainer {
+    min-height: 120px !important;
+    padding-bottom: 10px;
+  }
+
+  .categoryImage {
+    width: min(100%, 200px) !important;
+    max-height: 22vh !important;
+    transform: scale(2.6);
+    bottom: 109px;
+  }
+
+  .imageOrb {
+    width: 130px;
+    height: 130px;
   }
 }
 
 @media (max-width: 420px) {
   .categoryHeader {
-    padding: 78px 14px 40px;
+    padding: 30px 10px 0 !important;
+    height: 75vh !important;
+    min-height: 75vh !important;
   }
 
   .categoryTitle {
-    font-size: clamp(30px, 9.5vw, 40px);
+    font-size: clamp(20px, 7vw, 26px);
   }
 
   .categoryDescription {
-    font-size: 13px;
-  }
-
-  .categoryImage {
-    width: min(100%, 280px);
-    max-height: 30vh;
+    font-size: 11px;
+    line-height: 1.7;
+    margin-bottom: 10px;
   }
 
   .categoryFeatureItem {
-    font-size: 13px;
+    font-size: 10px;
+    padding: 5px 10px;
+    min-height: 26px;
+  }
+
+  .categoryImageContainer {
+    min-height: 100px !important;
+  }
+
+  .categoryImage {
+    width: min(100%, 150px) !important;
+    max-height: 18vh !important;
+  }
+
+  .imageOrb {
+    width: 100px;
+    height: 100px;
   }
 }

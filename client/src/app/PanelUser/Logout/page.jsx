@@ -14,7 +14,7 @@ export default function Logout() {
 
   const handleLogout = async () => {
   try {
-    await api.post("/api/auth/logout/");
+    await api.get("/api/auth/logout/");
     logout();
     setIsLoggedIn(false);
     router.replace("/");

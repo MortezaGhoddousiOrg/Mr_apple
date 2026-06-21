@@ -2,71 +2,27 @@
 
 import { useState, useRef, useEffect } from "react";
 import style from "@/app/Components/FeaturedProducts/FeaturedProducts.module.css";
-import Image from "next/image";
-import { api } from "@/app/config";
 import { useRouter } from "next/navigation";
+import { api, MEDIA_URL } from "@/app/config";
+import Image from "next/image";
 
 export default function FeaturedProduct() {
-  const [featuredItems, setFeaturedItems] = useState([
-    // {
-    //   id: 1,
-    //   title: "Mobile",
-    //   image: "/image-featuredProduct/iphone2025.png",
-    // },
-    // {
-    //   id: 2,
-    //   title: "Accessories",
-    //   image:
-    //     "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-    // },
-    // {
-    //   id: 3,
-    //   title: "ipad",
-    //   image: "/image-featuredProduct/ipads.png",
-    // },
-    // {
-    //   id: 4,
-    //   title: "usedProducts",
-    //   image: "/image-featuredProduct/iphone2025.png",
-    // },
-    // {
-    //   id: 5,
-    //   title: "Mobile",
-    //   image: "/image-featuredProduct/iphone2025.png",
-    // },
-    // {
-    //   id: 6,
-    //   title: "Accessories",
-    //   image:
-    //     "/image-category-accessories/apple-40w-usb-c-dynamic-power-adapter-with-60w-max-uk-3pin.png",
-    // },
-    // {
-    //   id: 7,
-    //   title: "ipad",
-    //   image: "/image-featuredProduct/ipads.png",
-    // },
-    // {
-    //   id: 8,
-    //   title: "usedProducts",
-    //   image: "/image-featuredProduct/iphone2025.png",
-    // },
-  ]);
+  const [featuredItems, setFeaturedItems] = useState([]);
 
   useEffect(() => {
     const axioshome = async () => {
       try {
         const response = await api.get("api/category/parent/");
-        console.log(response.data);
+
         setFeaturedItems(response.data);
       } catch (err) {
-        console.log(err);
+        console.log("error:", err.response?.data || err.message);
       }
     };
-
     axioshome();
   }, []);
 
-  const [visible, setVisible] = useState(4);
+  const [visible, setVisible] = useState(6);
   const [index, setIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(true);
 
@@ -86,7 +42,12 @@ export default function FeaturedProduct() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const extendedItems = [...featuredItems, ...featuredItems.slice(0, visible)];
+  const actualVisible = Math.min(visible, featuredItems.length);
+
+  const extendedItems = [
+    ...featuredItems,
+    ...featuredItems.slice(0, actualVisible),
+  ];
 
   const nextSlide = () => {
     setIndex((prev) => prev + 1);
@@ -114,7 +75,7 @@ export default function FeaturedProduct() {
     }
   }, [isTransitioning]);
 
-  const cardsWidth = 100 / visible;
+  const cardsWidth = 100 / actualVisible;
   const translateValue = `translateX(${index * cardsWidth}%)`;
 
   useEffect(() => {
@@ -126,7 +87,7 @@ export default function FeaturedProduct() {
   }, []);
 
   if (featuredItems.length == 0) {
-   return (
+    return (
       <div className={style.box}>
         <h2 className={style.title}>محصولی پیدا نشد</h2>
         <p className={style.description}>
@@ -181,19 +142,17 @@ export default function FeaturedProduct() {
                   type="button"
                   key={`${item.id}-${i}`}
                   className={style.cards}
-                  style={{ flex: `0 0 ${100 / visible}%` }}
+                  style={{ flex: `0 0 ${100 / actualVisible}%` }}
                   onClick={() => router.push(`/Category/${item.title}`)}
                 >
                   <span className={style.cardImage}>
-                    <img
+                    <Image
+                      unoptimized
                       className={style.image}
-                      // src={`http://localhost:4000${item.image}`}
-                      // src="http://localhost:4000/media/images/categories/f11243f8-6d41-442c-880d-f95e32bf045a.png"
-                      src={`http://localhost:4000${item.image}`}
+                      src={`${MEDIA_URL}${item.image}`}
                       alt={item.title}
                       width={140}
                       height={120}
-                      // priority={i < visible}
                     />
                   </span>
                   <span className={style.cardTitle}>{item.title}</span>
@@ -227,5 +186,3 @@ export default function FeaturedProduct() {
     </section>
   );
 }
-
-

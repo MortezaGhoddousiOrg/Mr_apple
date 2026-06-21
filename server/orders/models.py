@@ -41,6 +41,11 @@ class Payments(models.Model):
     status = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     paid_at = models.DateTimeField(null=True, blank=True)
+    authority = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         db_table = "payments"
@@ -63,3 +68,4 @@ class Cart(models.Model):
 
     def __str__(self):
         return f"Cart {self.id} - User {self.user_id}"
+    

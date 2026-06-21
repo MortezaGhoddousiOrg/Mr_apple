@@ -12,15 +12,6 @@ export default function Login() {
   const router = useRouter();
   const [code, setCode] = useState(false);
 
-  // const [login, setLogin] = useState();
-
-// setNotif({
-//   id: Date.now(),
-//   type: "error",
-//   message: "تمام فیلدها الزامی هستند",
-// });
-
-
   const { sendCode, isLoggedIn, authLoading, setNotif } = useAuth();
 
  useEffect(() => {
@@ -64,6 +55,7 @@ export default function Login() {
       
       setNotif({ id: Date.now(), message: "کد تایید برای شما ارسال شد", type: "success" });
       setCode(true);
+      
 
     } catch (err) {
       console.error(err);

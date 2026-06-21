@@ -21,7 +21,6 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
     status: "active",
   });
 
-  // مقادیر خام (بدون ویرگول) برای قیمت‌ها
   const [rawSellPrice, setRawSellPrice] = useState("");
   const [rawBuyPrice, setRawBuyPrice] = useState("");
 
@@ -34,7 +33,6 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState({});
 
-  // بارگذاری دسته‌بندی‌ها
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -73,8 +71,14 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         setFeatures(featuresArray);
       }
 
+      // تنظیم تصاویر هنگام ویرایش
       if (initialData.images && initialData.images.length > 0) {
         const mainImg = initialData.images.find((img) => img.is_main === true);
+        const galleryImgs = initialData.images.filter(
+          (img) => img.is_main !== true,
+        );
+
+        // تصویر اصلی
         if (mainImg) {
           setMainImage({
             id: mainImg.id,
@@ -82,6 +86,17 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
             status: "success",
             isExisting: true,
           });
+        }
+
+        // تصاویر گالری
+        if (galleryImgs.length > 0) {
+          const existingGalleryImages = galleryImgs.map((img) => ({
+            id: img.id,
+            preview: `http://127.0.0.1:4000${img.image}`,
+            status: "success",
+            isExisting: true,
+          }));
+          setGalleryImages(existingGalleryImages);
         }
       }
     }

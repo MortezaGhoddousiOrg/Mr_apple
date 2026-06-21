@@ -6,6 +6,7 @@ import { useNotification } from "@/app/Context/NotificationContext";
 
 function AddUser({ onBack, mode = "create", initialData = null }) {
   const { setNotif } = useNotification();
+
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
@@ -19,6 +20,19 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    if (mode === "create") {
+      setFormData({
+        firstname: "",
+        lastname: "",
+        phone: "",
+        postal_code: "",
+        address: "",
+        role: "customer",
+        status: "active",
+      });
+      return;
+    }
+
     if (mode === "edit" && initialData) {
       setFormData({
         firstname: initialData.firstname || "",
@@ -26,11 +40,25 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
         phone: initialData.phone || "",
         postal_code: initialData.postal_code || "",
         address: initialData.address || "",
-        role: initialData.role || "customer",
-        status: initialData.status || "active",
+        role: initialData.is_staff ? "admin" : "customer",
+        status: initialData.is_active ? "active" : "inactive",
       });
     }
   }, [mode, initialData]);
+
+  useEffect(() => {
+    if (mode === "create") {
+      setFormData({
+        firstname: "",
+        lastname: "",
+        phone: "",
+        postal_code: "",
+        address: "",
+        role: "customer",
+        status: "active",
+      });
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,23 +87,28 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
         firstname: formData.firstname,
         lastname: formData.lastname,
         phone: formData.phone,
-        role: formData.role,
+        is_staff: formData.role === "admin",
+        is_active: formData.status === "active",
       };
 
-      // اضافه کردن فیلدهای اختیاری (اگه پر شده بودن)
-      if (formData.postal_code) userData.postal_code = formData.postal_code;
-      if (formData.address) userData.address = formData.address;
-      if (mode === "edit") userData.status = formData.status;
+      if (formData.postal_code && formData.postal_code.trim()) {
+        userData.postal_code = formData.postal_code;
+      }
+      if (formData.address && formData.address.trim()) {
+        userData.address = formData.address;
+      }
+
+      console.log("📤 Sending data:", userData);
 
       if (mode === "edit" && initialData?.id) {
-        await api.put(`/api/accounts/user/${initialData.id}`, userData);
+        await api.put(`/api/accounts/user/${initialData.id}/`, userData);
         setNotif({
           id: Date.now(),
           message: "کاربر با موفقیت ویرایش شد",
           type: "success",
         });
       } else {
-        await api.post("/api/accounts/user", userData);
+        await api.post("/api/accounts/user/", userData);
         setNotif({
           id: Date.now(),
           message: "کاربر با موفقیت اضافه شد",
@@ -166,7 +199,6 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* نام و نام خانوادگی */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {inputFields.slice(0, 2).map((field) => (
               <div key={field.id}>
@@ -190,7 +222,6 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
             ))}
           </div>
 
-          {/* تلفن و کد پستی */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {inputFields.slice(2, 4).map((field) => (
               <div key={field.id}>
@@ -215,7 +246,6 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
             ))}
           </div>
 
-          {/* آدرس (اختیاری) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               آدرس
@@ -231,7 +261,6 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
             />
           </div>
 
-          {/* نقش کاربری */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               نقش کاربری
@@ -248,7 +277,6 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
             </select>
           </div>
 
-          {/* وضعیت (فقط در ویرایش) */}
           {mode === "edit" && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

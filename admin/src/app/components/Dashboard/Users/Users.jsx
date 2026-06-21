@@ -20,11 +20,10 @@ function Users() {
   const [editLoading, setEditLoading] = useState(false);
   const usersPerPage = 20;
 
-  // گرفتن لیست کاربران
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await api.get("/api/accounts/user");
+      const response = await api.get("/api/accounts/user/");
       setUsers(response.data);
     } catch (err) {
       setError("خطا در دریافت لیست کاربران");
@@ -38,7 +37,11 @@ function Users() {
     fetchUsers();
   }, []);
 
-  const handleAddUser = () => setShowAddUser(true);
+  const handleAddUser = () => {
+    setEditUserData(null);
+    setShowAddUser(true);
+  };
+
   const handleBackToList = () => {
     setShowAddUser(false);
     setEditUserData(null);
@@ -48,7 +51,7 @@ function Users() {
   const handleEdit = async (user) => {
     setEditLoading(true);
     try {
-      const response = await api.get(`/api/accounts/user/${user.id}`);
+      const response = await api.get(`/api/accounts/user/${user.id}/`);
       setEditUserData(response.data);
       setNotif({
         id: Date.now(),
@@ -75,7 +78,8 @@ function Users() {
   const confirmDelete = async () => {
     setEditLoading(true);
     try {
-      await api.delete(`/api/accounts/user/${selectedUser.id}`);
+      // ✅ اصلاح: اضافه کردن / به انتهای آدرس
+      await api.delete(`/api/accounts/user/${selectedUser.id}/`);
       setNotif({
         id: Date.now(),
         message: "کاربر با موفقیت حذف شد",
@@ -100,6 +104,7 @@ function Users() {
   if (editUserData) {
     return (
       <AddUser
+        key={`edit-${editUserData.id}`}
         mode="edit"
         initialData={editUserData}
         onBack={handleBackToList}
@@ -107,21 +112,22 @@ function Users() {
     );
   }
 
-  if (showAddUser) return <AddUser mode="create" onBack={handleBackToList} />;
+  if (showAddUser) {
+    return <AddUser key="create" mode="create" onBack={handleBackToList} />;
+  }
 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(users.length / usersPerPage);
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (isActive) => {
     const config = {
-      active: { label: "فعال", color: "bg-green-50 text-green-700" },
-      inactive: { label: "غیرفعال", color: "bg-red-50 text-red-700" },
-      pending: { label: "در انتظار", color: "bg-yellow-50 text-yellow-700" },
+      true: { label: "فعال", color: "bg-green-50 text-green-700" },
+      false: { label: "غیرفعال", color: "bg-red-50 text-red-700" },
     };
-    const { label, color } = config[status] || {
-      label: status,
+    const { label, color } = config[isActive] || {
+      label: "نامشخص",
       color: "bg-gray-50 text-gray-700",
     };
     return (
@@ -131,14 +137,13 @@ function Users() {
     );
   };
 
-  const getRoleBadge = (role) => {
+  const getRoleBadge = (isStaff) => {
     const config = {
-      admin: { label: "مدیر", color: "bg-purple-50 text-purple-700" },
-      customer: { label: "مشتری", color: "bg-blue-50 text-blue-700" },
-      normal: { label: "کاربر عادی", color: "bg-gray-50 text-gray-700" },
+      true: { label: "مدیر", color: "bg-purple-50 text-purple-700" },
+      false: { label: "کاربر عادی", color: "bg-gray-50 text-gray-700" },
     };
-    const { label, color } = config[role] || {
-      label: role,
+    const { label, color } = config[isStaff] || {
+      label: "کاربر عادی",
       color: "bg-gray-50 text-gray-700",
     };
     return (
@@ -248,8 +253,10 @@ function Users() {
                   <td className="px-6 py-4 text-sm text-gray-900 dir-ltr">
                     {user.email || "—"}
                   </td>
-                  <td className="px-6 py-4">{getRoleBadge(user.role)}</td>
-                  <td className="px-6 py-4">{getStatusBadge(user.status)}</td>
+                  <td className="px-6 py-4">{getRoleBadge(user.is_staff)}</td>
+                  <td className="px-6 py-4">
+                    {getStatusBadge(user.is_active)}
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {formatDate(user.created_at)}
                   </td>
@@ -330,8 +337,8 @@ function Users() {
                   </p>
                 </div>
                 <div className="flex gap-1">
-                  {getRoleBadge(user.role)}
-                  {getStatusBadge(user.status)}
+                  {getRoleBadge(user.is_staff)}
+                  {getStatusBadge(user.is_active)}
                 </div>
               </div>
               <div className="mt-3">

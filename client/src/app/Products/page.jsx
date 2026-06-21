@@ -5,97 +5,12 @@ import { useState, useEffect, useRef } from "react";
 import Service from "../Components/Service/Service";
 import { useRouter } from "next/navigation";
 import { api } from "../config";
+import { MEDIA_URL } from "../config";
 
 import Image from "next/image";
-// import { image } from "framer-motion/client";
-
-// import { useRouter } from "next/navigation";
-// import Card from "../CardProduct/Card";
-// import axios from "axios";
 
 export default function Products({ setNotif }) {
-  const [product, setProduct] = useState([
-    // {
-    //   id: 1,
-    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-    //   category: {
-    //     id: 2,
-    //     parent: {id: 1, title: "Mobile", image: null}
-    //   },
-    //   category_child_id: 2,
-    //   category_parent_id: 1,
-    //   product_code: "IP14",
-    //   name: "iPhone 14",
-    //   buy_price: "1000000",
-    //   sell_price: "1500000",
-    //   descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-    //   status: "active",
-    // },
-    // {
-    //   id: 2,
-    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-    //   category: {
-    //     id: 2,
-    //     parent: {id: 1, title: "Mobile", image: null}
-    //   },
-    //   category_child_id: 2,
-    //   category_parent_id: 1,
-    //   product_code: "IP14",
-    //   name: "iPhone 14",
-    //   buy_price: "1000000",
-    //   sell_price: "1500000",
-    //   descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-    //   status: "active",
-    // },
-    // {
-    //   id: 3,
-    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-    //   category: {
-    //     id: 2,
-    //     parent: {id: 1, title: "Mobile", image: null}
-    //   },
-    //   category_child_id: 2,
-    //   category_parent_id: 1,
-    //   product_code: "IP14",
-    //   name: "iPhone 14",
-    //   buy_price: "1000000",
-    //   sell_price: "1500000",
-    //   descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-    //   status: "active",
-    // },
-    // {
-    //   id: 4,
-    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-    //   category: {
-    //     id: 2,
-    //     parent: {id: 1, title: "Mobile", image: null}
-    //   },
-    //   category_child_id: 2,
-    //   category_parent_id: 1,
-    //   product_code: "IP14",
-    //   name: "iPhone 14",
-    //   buy_price: "1000000",
-    //   sell_price: "1500000",
-    //   descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-    //   status: "active",
-    // },
-    // {
-    //   id: 5,
-    //   images: [{ url: "/image-services/apple-iphone-17-pro-max-cover.png" }],
-    //   category: {
-    //     id: 2,
-    //     parent: {id: 1, title: "Mobile", image: null}
-    //   },
-    //   category_child_id: 2,
-    //   category_parent_id: 1,
-    //   product_code: "IP14",
-    //   name: "iPhone 14",
-    //   buy_price: "1000000",
-    //   sell_price: "1500000",
-    //   descriptions: "گوشی قدرتمند اپل مدل iPhone 17 Pro Max با طراحی پریمیوم و عملکرد بسیار سریع.",
-    //   status: "active",
-    // },
-  ]);
+  const [product, setProduct] = useState([]);
 
   useEffect(() => {
     const axioshome = async () => {
@@ -112,15 +27,6 @@ export default function Products({ setNotif }) {
   }, []);
 
   const router = useRouter();
-
-  const serviceData = product.map((item) => ({
-    id: item.id,
-    image: item.images?.[0]?.url,
-    title: item.name,
-    description: item.descriptions,
-    price: item.sell_price,
-    status: item.status,
-  }));
 
   const categories = Object.values(
     product.reduce((acc, item) => {
@@ -237,10 +143,11 @@ export default function Products({ setNotif }) {
             data={category.products.map((item) => ({
               id: item.id,
 
-              image:
+              image: `${MEDIA_URL}${
                 item.images?.find((img) => img.is_main)?.image ||
                 item.images?.[0]?.image ||
-                "",
+                ""
+              }`,
 
               title: item.name,
               description: item.descriptions,

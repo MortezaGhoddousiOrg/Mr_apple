@@ -22,28 +22,30 @@ function formatPriceFa(price) {
   return toPersianDigits(n.toLocaleString("en-US"));
 }
 
-function calcDiscountedPrice(sellPrice, discount) {
+// ✅ تابع محاسبه قیمت نهایی با تخفیف درصدی
+function calcDiscountedPrice(sellPrice, discountPercent) {
   const price = Number(sellPrice);
-  const off = Number(discount);
-  if (Number.isNaN(price)) return null;
-  if (Number.isNaN(off) || off <= 0) return price;
-  return Math.max(0, price - off);
+  const percent = Number(discountPercent);
+
+  if (isNaN(price)) return null;
+  if (isNaN(percent) || percent <= 0) return price;
+
+  const discountAmount = price * (percent / 100);
+  const finalPrice = price - discountAmount;
+
+  return Math.max(0, finalPrice);
 }
 
-function calcDiscountPercent(sellPrice, discount) {
-  const price = Number(sellPrice);
-  const off = Number(discount);
-  if (Number.isNaN(price) || Number.isNaN(off) || price <= 0 || off <= 0)
-    return 0;
-  return Math.min(95, Math.max(0, Math.round((off / price) * 100)));
+// ✅ تابع محاسبه درصد تخفیف برای نمایش
+function calcDiscountPercent(discountPercent) {
+  const percent = Number(discountPercent);
+  if (isNaN(percent) || percent <= 0) return 0;
+  return Math.min(95, Math.max(0, Math.round(percent)));
 }
 
 export default function Productdetail() {
   const params = useParams();
-  // 🔥 مشکل اینجا حل شد: اسم فایل [Productdetail] است، نه [id]
   const id = params?.Productdetail;
-
-  console.log("🔍 Product ID:", id);
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export default function Productdetail() {
   const [commentText, setCommentText] = useState("");
   const [commentRate, setCommentRate] = useState(5);
 
-  const { addToCart, productbuy } = useAuth();
+  const { addToCart, productbuy, setNotif } = useAuth();
 
   useEffect(() => {
     if (!id) return;
@@ -61,13 +63,12 @@ export default function Productdetail() {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        console.log("🚀 Fetching product ID:", id);
+        // ✅ اصلاح: حذف /public/ از آدرس
         const response = await api.get(`/api/catalog/product/${id}/`);
-        console.log("✅ Product data:", response.data);
         setProduct(response.data);
         setError(null);
       } catch (err) {
-        console.error("❌ Error fetching product:", err);
+        console.error("Error fetching product:", err);
         setError("محصول مورد نظر یافت نشد");
         setProduct(null);
       } finally {
@@ -108,41 +109,74 @@ export default function Productdetail() {
     return [];
   }, [product]);
 
+  // ✅ قیمت نهایی بعد از اعمال تخفیف
   const discountedPrice = useMemo(
     () => calcDiscountedPrice(product?.sell_price, product?.discount),
     [product?.sell_price, product?.discount],
   );
 
+  // ✅ بررسی وجود تخفیف
   const hasDiscount = useMemo(() => {
-    const off = Number(product?.discount);
-    return !Number.isNaN(off) && off > 0;
+    const percent = Number(product?.discount);
+    return !isNaN(percent) && percent > 0;
   }, [product?.discount]);
 
+  // ✅ درصد تخفیف برای نمایش
   const discountPercent = useMemo(
-    () => calcDiscountPercent(product?.sell_price, product?.discount),
-    [product?.sell_price, product?.discount],
+    () => calcDiscountPercent(product?.discount),
+    [product?.discount],
   );
 
   const stockCount = Number(product?.quantity ?? 0);
   const inStock = stockCount > 0;
 
-  const isAdded = productbuy?.some((p) => p.id === product?.id);
+  const isAdded = productbuy?.some(
+    (p) => (p.product_id || p.id) === product?.id,
+  );
 
   const handleAddToCart = async () => {
     if (!product?.id) return;
-    if (!inStock) return;
-    if (isAdded) return;
+
+    if (!inStock) {
+      setNotif({
+        id: Date.now(),
+        message: "این محصول موجود نیست",
+        type: "warning",
+      });
+      return;
+    }
+
+    if (isAdded) {
+      setNotif({
+        id: Date.now(),
+        message: "این محصول قبلاً به سبد خرید اضافه شده است",
+        type: "warning",
+      });
+      return;
+    }
 
     try {
       await addToCart({
         id: product.id,
         title: product.name,
-        price: discountedPrice ?? product?.sell_price,
+        price: discountedPrice ?? product.sell_price,
         image: galleryImages?.[0] || "",
         description: product.descriptions,
       });
+
+      setNotif({
+        id: Date.now(),
+        message: "محصول با موفقیت به سبد خرید اضافه شد",
+        type: "success",
+      });
     } catch (err) {
       console.error(err);
+
+      setNotif({
+        id: Date.now(),
+        message: "خطا در افزودن محصول",
+        type: "error",
+      });
     }
   };
 
