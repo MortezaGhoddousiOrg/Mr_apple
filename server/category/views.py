@@ -13,8 +13,8 @@ from catalog.serializers import ProductSerializer
 #   CATEGORY PARENT CRUD
 
 class CategoryParentList(APIView):
-    authentication_classes = [AdminJWTAuthentication]
-    permission_classes = [IsAdminUser]
+    # authentication_classes = [AdminJWTAuthentication]
+    # permission_classes = [IsAdminUser]
     
     def get(self, request):
         parents = CategoryParent.objects.all()
