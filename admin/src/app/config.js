@@ -1,12 +1,14 @@
 import axios from "axios";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export const api = axios.create({
-  baseURL: "http://localhost:4000",
+  baseURL: BASE_URL,
   withCredentials: true,
   timeout: 10000,
 });
 
-export const MEDIA_URL = "http://localhost:4000";
+export const MEDIA_URL = BASE_URL;
 
 api.interceptors.request.use(
   (config) => {
