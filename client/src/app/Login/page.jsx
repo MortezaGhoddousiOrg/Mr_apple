@@ -7,15 +7,12 @@ import { useRouter } from "next/navigation";
 import Code from "@/app/Login/Code/Code";
 import { useAuth } from "@/app/Context/Context";
 
-export default function Login({ setNotif }) {
+export default function Login() {
   const [passshow, setPsssShow] = useState(false);
   const router = useRouter();
   const [code, setCode] = useState(false);
 
-  // const [login, setLogin] = useState();
-
-
-  const { sendCode, isLoggedIn, authLoading } = useAuth();
+  const { sendCode, isLoggedIn, authLoading, setNotif } = useAuth();
 
  useEffect(() => {
   if (authLoading) return;
@@ -47,7 +44,7 @@ export default function Login({ setNotif }) {
     const phoneRegex = /^09\d{9}$/;
 
     if (!phoneRegex.test(loginData.phone)) {
-      // return setNotif({ message: "شماره موبایل معتبر نیست", type: "error" });
+      return setNotif({ id: Date.now(), message: "شماره موبایل معتبر نیست", type: "error" });
     }
 
     try {
@@ -56,16 +53,17 @@ export default function Login({ setNotif }) {
       const res = await sendCode(phone);
       console.log(res);
       
-      // setNotif({ message: "کد تایید برای شما ارسال شد", type: "success" });
+      setNotif({ id: Date.now(), message: "کد تایید برای شما ارسال شد", type: "success" });
       setCode(true);
-      // localStorage.setItem("user", phone);
+      
 
     } catch (err) {
       console.error(err);
-      // setNotif({
-      //   message: "خطا در ارسال، لطفا دوباره امتحان کنید",
-      //   type: "error",
-      // });
+      setNotif({
+        id: Date.now(),
+        message: "خطا در ارسال، لطفا دوباره امتحان کنید",
+        type: "error",
+      });
     }
   };
 

@@ -1,4 +1,7 @@
+// "use client"
+
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 function Dashboard() {
     const [stats, setStats] = useState({
@@ -7,9 +10,19 @@ function Dashboard() {
         monthly: { sales: 0, users: 0, orders: 0 },
     });
 
-    // Simulate data loading
+    const router = useRouter();
+    
     useEffect(() => {
-        // You can replace this with actual API calls
+        const local = localStorage.getItem("admin");
+        if (local) {
+            router.push("/dashboard");
+        } else {
+            router.push("/");
+        }
+    }, []);
+
+
+    useEffect(() => {
         setStats({
             daily: { sales: 12500000, users: 45, orders: 128 },
             weekly: { sales: 87600000, users: 312, orders: 856 },
@@ -47,7 +60,6 @@ function Dashboard() {
 
     return (
         <div className="space-y-6">
-            {/* Header Section */}
             <div className="mb-8">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800 border-r-4 border-blue-500 pr-4">
                     داشبورد مدیریت
@@ -58,14 +70,12 @@ function Dashboard() {
                 </p>
             </div>
 
-            {/* Statistics Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {reportCards.map((card, idx) => (
                     <div
                         key={idx}
                         className={`bg-gradient-to-br ${card.color} rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl`}
                     >
-                        {/* Card Header */}
                         <div className="px-6 pt-6 pb-4">
                             <div className="flex justify-between items-start">
                                 <div>
@@ -94,7 +104,6 @@ function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Card Body with Stats */}
                         <div className="bg-white/10 backdrop-blur-sm px-6 py-4">
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
@@ -130,7 +139,6 @@ function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Card Footer */}
                         <div className="px-6 py-3 bg-black/20">
                             <button className="text-white text-sm hover:text-white/80 transition-colors flex items-center gap-1">
                                 مشاهده جزئیات
@@ -153,7 +161,6 @@ function Dashboard() {
                 ))}
             </div>
 
-            {/* Detailed Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
                 {/* Sales Chart */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
@@ -191,7 +198,6 @@ function Dashboard() {
                     </div>
                 </div>
 
-                {/* Activity Feed */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                     <h3 className="text-lg font-bold text-gray-800 mb-4">
                         آخرین فعالیت‌ها
@@ -245,7 +251,6 @@ function Dashboard() {
                 </div>
             </div>
 
-            {/* Quick Actions */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 mt-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">
                     دسترسی سریع
@@ -270,13 +275,12 @@ function Dashboard() {
                         </span>
                     </button>
                     <button className="bg-white hover:bg-blue-600 text-gray-700 hover:text-white px-4 py-3 rounded-xl shadow-sm transition-all duration-200 flex flex-col items-center gap-2 group">
-                        <span className="text-2xl">📊</span>
+                        <span className="text-2xl">📊   </span>
                         <span className="text-sm font-medium">گزارشات</span>
                     </button>
                 </div>
             </div>
 
-            {/* Progress Section */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 <div className="bg-white rounded-xl shadow p-4">
                     <div className="flex justify-between items-center mb-2">

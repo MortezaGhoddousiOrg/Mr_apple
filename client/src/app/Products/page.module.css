@@ -60,7 +60,7 @@
 .heroContent {
   max-width: 500px;
   text-align: right;
-  align-self: center;  
+  align-self: center;
 }
 
 .heroTitle {
@@ -95,10 +95,9 @@
 }
 
 .heroFeatureItem svg {
-  border: none;   /* قبلی حذف شد */
-  padding: 0;     /* قبلی حذف شد */
+  border: none;
+  padding: 0;
 }
-
 
 .heroImageContainer {
   align-self: center;
@@ -126,6 +125,7 @@
   background: #fafafa;
   text-align: center;
   margin-top: 50px;
+  font-family: "vazir";
 }
 
 .title {
@@ -143,33 +143,152 @@
   color: #6b7280;
 }
 
-/* ========= RESPONSIVE ========= */
-@media (max-width: 1000px) {
+/* ========================================== */
+/* RESPONSIVE HERO - ONLY HERO SECTION       */
+/* ========================================== */
+
+/* Tablet & Large Mobile (768px - 1024px) */
+@media (max-width: 1024px) {
   .heroProducts {
-    flex-direction: column-reverse;
-    justify-content: center;
-    text-align: center;
-    padding: 110px 5vw 60px;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
     height: auto;
     min-height: 100vh;
+    padding: 120px 5vw 60px;
+    gap: 20px;
   }
 
   .heroContent {
     max-width: 100%;
-    margin-top: 20px;
+    text-align: center;
+    align-self: flex-start;
+  }
+
+  .heroTitle {
+    font-size: clamp(30px, 4vw, 40px);
+    text-align: center;
+  }
+
+  .heroDescription {
+    text-align: center;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .heroFeatures {
     justify-content: center;
   }
 
+  .heroFeatureItem {
+    white-space: nowrap;
+    font-size: 13px;
+  }
+
   .heroImageContainer {
-    margin-left: 0;
-    justify-content: center;
+    align-self: center;
+    justify-self: center;
+    width: 100%;
+    max-width: 500px;
   }
 
   .heroImage {
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+    object-fit: contain;
+    max-height: 400px;
+  }
+}
+
+/* Mobile (up to 768px) */
+@media (max-width: 768px) {
+  .heroProducts {
+    padding: 100px 4vw 40px;
+    min-height: auto;
+    gap: 30px;
+  }
+
+  .heroContent {
+    order: 1;
+    text-align: center;
+  }
+
+  .heroTitle {
+    font-size: clamp(24px, 5vw, 32px);
+  }
+
+  .heroDescription {
+    font-size: 13px;
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .heroFeatures {
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    justify-content: center;
+  }
+
+  .heroFeatureItem {
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .heroFeatureItem svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .heroImageContainer {
+    order: 2;
     width: 100%;
-    max-width: 340px;
+    max-width: 100%;
+    align-self: center;
+  }
+
+  .heroImage {
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+    object-fit: contain;
+    max-height: 350px;
+  }
+}
+
+/* Small Mobile (up to 480px) */
+@media (max-width: 480px) {
+  .heroProducts {
+    padding: 90px 3vw 30px;
+    gap: 20px;
+  }
+
+  .heroTitle {
+    font-size: clamp(20px, 6vw, 26px);
+  }
+
+  .heroDescription {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .heroFeatures {
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .heroFeatureItem {
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .heroImageContainer {
+    max-width: 100%;
+  }
+
+  .heroImage {
+    max-height: 380px;
+    transform: scale(1.3);
   }
 }

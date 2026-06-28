@@ -264,7 +264,7 @@ export default function Contactus() {
                   <option>مشکل در ارسال کالا</option>
                   <option>انتقاد و پیشنهاد</option>
                 </select>
-                <label>موضوع</label>
+                {/* <label>موضوع</label> */}
               </div>
               <div className={style.inputGroup}>
                 <textarea

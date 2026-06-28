@@ -173,16 +173,7 @@
   display: none;
 }
 
-/* .login {
-  display: flex;
-} */
 
-
-/* ========================================================== */
-/* RESPONSIVE: MOBILE FIRST - KEEPING ORIGINAL STYLING RULES */
-/* ========================================================== */
-
-/* Mobile (Small) */
 @media (max-width: 480px) {
   .loginContent {
     width: 95%;
@@ -223,7 +214,6 @@
   }
 }
 
-/* Tablets (Portrait) */
 @media (min-width: 481px) and (max-width: 768px) {
   .loginContent {
     width: 85%;
@@ -245,7 +235,6 @@
   }
 }
 
-/* Tablets (Landscape) & Small Laptops */
 @media (min-width: 769px) and (max-width: 1024px) {
   .loginContent {
     width: 70%;
@@ -260,14 +249,12 @@
   }
 }
 
-/* Laptops & Desktops */
 @media (min-width: 1025px) and (max-width: 1440px) {
   .loginContent {
     width: 50%;
   }
 }
 
-/* Large Screens (1441px to 2000px) */
 @media (min-width: 1441px) and (max-width: 2000px) {
   .loginContent {
     width: 40%;

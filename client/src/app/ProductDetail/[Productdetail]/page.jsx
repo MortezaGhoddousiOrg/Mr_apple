@@ -4,50 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Head from "next/head";
-import axios from "axios";
+import Image from "next/image";
 import styles from "./page.module.css";
 import Imagedetail from "@/app/ProductDetail/ImageDetail/Imagedetail";
 import { useAuth } from "@/app/Context/Context";
-
-const fakeProductFromBackendShape = {
-  id: 6,
-  name: "ایفون 17 پرو مکس",
-  descriptions:
-    "آیفون 17 پرو مکس با طراحی مدرن، دوربین پیشرفته، نمایشگر باکیفیت و عملکرد سریع، انتخابی مناسب برای کاربرانی است که به دنبال تجربه‌ای حرفه‌ای و روان در استفاده روزمره و چندرسانه‌ای هستند.",
-  sell_price: "500000000",
-  discount: "25000000",
-  quantity: 5,
-  images: [
-    { file: "/image-detail/apple-iphone-17-pro-256gb-silver.png", type: true },
-    {
-      file: "/image-detail/_apple-iphone-17-pro-256gb-cosmic-orange.png",
-      type: false,
-    },
-    {
-      file: "/image-detail/apple-iphone-17-pro-256gb-deep-blue.png",
-      type: false,
-    },
-  ],
-  feature: [
-    { key: "برند", value: "Apple" },
-    { key: "مدل", value: "iPhone 17 Pro Max" },
-    { key: "پارت نامبر", value: "ZAA" },
-    { key: "وضعیت", value: "آکبند" },
-    { key: "حافظه داخلی", value: "256 گیگابایت" },
-    { key: "رنگ", value: "نقره‌ای" },
-  ],
-};
-
-const fakePdpContent = {
-  highlights: [
-    { title: "تیتانیوم سبک", value: "بدنه مقاوم‌تر، وزن کمتر" },
-    { title: "دوربین Pro", value: "جزئیات شارپ + Night mode" },
-    { title: "نمایشگر Super Retina", value: "روشنایی بالا، رنگ دقیق" },
-    { title: "باتری بهتر", value: "استفاده روزانه با خیال راحت" },
-  ],
-  chips: ["ارسال سریع", "ضمانت اصالت", "۷ روز بازگشت", "پشتیبانی ۲۴/۷"],
-  inTheBox: ["کابل USB‑C", "سوزن سیم‌کارت", "دفترچه راهنما"],
-};
+import { api } from "@/app/config";
 
 function toPersianDigits(value) {
   if (value === null || value === undefined) return "";
@@ -61,128 +22,201 @@ function formatPriceFa(price) {
   return toPersianDigits(n.toLocaleString("en-US"));
 }
 
-function calcDiscountedPrice(sellPrice, discount) {
+// ✅ تابع محاسبه قیمت نهایی با تخفیف درصدی
+function calcDiscountedPrice(sellPrice, discountPercent) {
   const price = Number(sellPrice);
-  const off = Number(discount);
-  if (Number.isNaN(price)) return null;
-  if (Number.isNaN(off) || off <= 0) return price;
-  return Math.max(0, price - off);
+  const percent = Number(discountPercent);
+
+  if (isNaN(price)) return null;
+  if (isNaN(percent) || percent <= 0) return price;
+
+  const discountAmount = price * (percent / 100);
+  const finalPrice = price - discountAmount;
+
+  return Math.max(0, finalPrice);
 }
 
-function calcDiscountPercent(sellPrice, discount) {
-  const price = Number(sellPrice);
-  const off = Number(discount);
-  if (Number.isNaN(price) || Number.isNaN(off) || price <= 0 || off <= 0)
-    return 0;
-  return Math.min(95, Math.max(0, Math.round((off / price) * 100)));
+// ✅ تابع محاسبه درصد تخفیف برای نمایش
+function calcDiscountPercent(discountPercent) {
+  const percent = Number(discountPercent);
+  if (isNaN(percent) || percent <= 0) return 0;
+  return Math.min(95, Math.max(0, Math.round(percent)));
 }
 
 export default function Productdetail() {
-  const { id } = useParams();
-  const [product, setProduct] = useState(fakeProductFromBackendShape);
-  const [loading, setLoading] = useState(false);
+  const params = useParams();
+  const id = params?.Productdetail;
+
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
   const [commentRate, setCommentRate] = useState(5);
 
-  const { addToCart, productbuy } = useAuth();
+  const { addToCart, productbuy, setNotif } = useAuth();
 
-  // useEffect(() => {
-  //   if (!id) return;
-  //   let alive = true;
-  //
-  //   const fetchProduct = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const res = await axios.get(`/api/product/${id}/`);
-  //       const backendProduct = res?.data?.data || res?.data;
-  //       if (!alive) return;
-  //       setProduct(backendProduct || fakeProductFromBackendShape);
-  //     } catch (error) {
-  //       if (!alive) return;
-  //       console.error("خطا در دریافت محصول:", error);
-  //       setProduct(fakeProductFromBackendShape);
-  //     } finally {
-  //       if (alive) setLoading(false);
-  //     }
-  //   };
-  //
-  //   fetchProduct();
-  //   return () => {
-  //     alive = false;
-  //   };
-  // }, [id]);
+  useEffect(() => {
+    if (!id) return;
 
+    const fetchProduct = async () => {
+      setLoading(true);
+      try {
+        // ✅ اصلاح: حذف /public/ از آدرس
+        const response = await api.get(`/api/catalog/product/${id}/`);
+        setProduct(response.data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError("محصول مورد نظر یافت نشد");
+        setProduct(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  // گالری تصاویر
   const galleryImages = useMemo(() => {
-    const imgs = Array.isArray(product?.images) ? product.images : [];
-    const validFiles = imgs
-      .filter((item) => item?.file)
-      .map((item) => item.file);
+    if (!product?.images || !Array.isArray(product.images)) return [];
 
-    const mainImage = imgs.find((item) => item?.type === true)?.file;
+    const imagesList = product.images
+      .filter((img) => img?.image)
+      .map((img) => `http://127.0.0.1:4000${img.image}`);
+
+    const mainImage = product.images.find((img) => img.is_main === true);
     if (mainImage) {
-      const rest = validFiles.filter((file) => file !== mainImage);
-      return [mainImage, ...rest];
+      const mainUrl = `http://127.0.0.1:4000${mainImage.image}`;
+      const others = imagesList.filter((url) => url !== mainUrl);
+      return [mainUrl, ...others];
     }
-    return validFiles;
+    return imagesList;
   }, [product]);
 
+  // تبدیل feature از object به array
+  const featureArray = useMemo(() => {
+    if (!product?.feature) return [];
+    if (Array.isArray(product.feature)) return product.feature;
+    if (typeof product.feature === "object") {
+      return Object.entries(product.feature).map(([key, value]) => ({
+        key,
+        value,
+      }));
+    }
+    return [];
+  }, [product]);
+
+  // ✅ قیمت نهایی بعد از اعمال تخفیف
   const discountedPrice = useMemo(
     () => calcDiscountedPrice(product?.sell_price, product?.discount),
     [product?.sell_price, product?.discount],
   );
 
+  // ✅ بررسی وجود تخفیف
   const hasDiscount = useMemo(() => {
-    const off = Number(product?.discount);
-    return !Number.isNaN(off) && off > 0;
+    const percent = Number(product?.discount);
+    return !isNaN(percent) && percent > 0;
   }, [product?.discount]);
 
+  // ✅ درصد تخفیف برای نمایش
   const discountPercent = useMemo(
-    () => calcDiscountPercent(product?.sell_price, product?.discount),
-    [product?.sell_price, product?.discount],
+    () => calcDiscountPercent(product?.discount),
+    [product?.discount],
   );
 
   const stockCount = Number(product?.quantity ?? 0);
   const inStock = stockCount > 0;
 
-  const isAdded = productbuy?.some((p) => p.id === product?.id);
+  const isAdded = productbuy?.some(
+    (p) => (p.product_id || p.id) === product?.id,
+  );
 
   const handleAddToCart = async () => {
     if (!product?.id) return;
-    if (!inStock) return;
-    if (isAdded) return;
+
+    if (!inStock) {
+      setNotif({
+        id: Date.now(),
+        message: "این محصول موجود نیست",
+        type: "warning",
+      });
+      return;
+    }
+
+    if (isAdded) {
+      setNotif({
+        id: Date.now(),
+        message: "این محصول قبلاً به سبد خرید اضافه شده است",
+        type: "warning",
+      });
+      return;
+    }
 
     try {
       await addToCart({
         id: product.id,
         title: product.name,
-        price: discountedPrice ?? product?.sell_price,
-        image: galleryImages?.[0] || product?.images?.[0]?.file || "",
+        price: discountedPrice ?? product.sell_price,
+        image: galleryImages?.[0] || "",
         description: product.descriptions,
+      });
+
+      setNotif({
+        id: Date.now(),
+        message: "محصول با موفقیت به سبد خرید اضافه شد",
+        type: "success",
       });
     } catch (err) {
       console.error(err);
+
+      setNotif({
+        id: Date.now(),
+        message: "خطا در افزودن محصول",
+        type: "error",
+      });
     }
   };
 
   const handleSubmitComment = (e) => {
     e.preventDefault();
-
-    const payload = {
+    console.log({
       productId: id ? Number(id) : null,
       name: commentName.trim(),
       text: commentText.trim(),
       rate: Number(commentRate),
       createdAt: new Date().toISOString(),
-    };
-
-    // console.log("NEW_COMMENT:", payload);
-
+    });
     setCommentName("");
     setCommentText("");
     setCommentRate(5);
   };
+
+  if (loading) {
+    return (
+      <div className={styles.pageShell}>
+        <div className={styles.loadingContainer}>
+          <div className={styles.spinner}></div>
+          <p>در حال بارگذاری محصول...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className={styles.pageShell}>
+        <div className={styles.errorContainer}>
+          <p>{error || "محصول یافت نشد"}</p>
+          <Link href="/" className={styles.backLink}>
+            بازگشت به صفحه اصلی
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.pageShell}>
@@ -198,22 +232,23 @@ export default function Productdetail() {
             <div className={styles.breadcrumb}>
               <Link href="/">خانه</Link>
               <span>/</span>
-              <Link href="/products">محصولات</Link>
+              <Link href="/Products">محصولات</Link>
               <span>/</span>
               <span>{product?.name}</span>
             </div>
 
-            <div className={styles.kicker}>New • 2026</div>
+            <div className={styles.kicker}>
+              New • {product?.product_code || "2026"}
+            </div>
             <h1 className={styles.title}>{product?.name}</h1>
 
             <p className={styles.description}>{product?.descriptions}</p>
 
             <div className={styles.chipRow}>
-              {fakePdpContent.chips.map((c) => (
-                <span key={c} className={styles.chip}>
-                  {c}
-                </span>
-              ))}
+              <span className={styles.chip}>ارسال سریع</span>
+              <span className={styles.chip}>ضمانت اصالت</span>
+              <span className={styles.chip}>۷ روز بازگشت</span>
+              <span className={styles.chip}>پشتیبانی ۲۴/۷</span>
             </div>
 
             <div className={styles.purchaseCard}>
@@ -295,12 +330,22 @@ export default function Productdetail() {
         </div>
 
         <div className={styles.highlightGrid}>
-          {fakePdpContent.highlights.map((h) => (
-            <div key={h.title} className={styles.highlightCard}>
-              <div className={styles.highlightTitle}>{h.title}</div>
-              <div className={styles.highlightValue}>{h.value}</div>
-            </div>
-          ))}
+          <div className={styles.highlightCard}>
+            <div className={styles.highlightTitle}>کیفیت ساخت عالی</div>
+            <div className={styles.highlightValue}>مواد اولیه درجه یک</div>
+          </div>
+          <div className={styles.highlightCard}>
+            <div className={styles.highlightTitle}>طراحی ارگونومیک</div>
+            <div className={styles.highlightValue}>استفاده راحت و بی‌نقص</div>
+          </div>
+          <div className={styles.highlightCard}>
+            <div className={styles.highlightTitle}>قیمت مناسب</div>
+            <div className={styles.highlightValue}>ارزش خرید بالا</div>
+          </div>
+          <div className={styles.highlightCard}>
+            <div className={styles.highlightTitle}>گارانتی معتبر</div>
+            <div className={styles.highlightValue}>ضمانت اصالت و سلامت</div>
+          </div>
         </div>
       </section>
 
@@ -313,14 +358,12 @@ export default function Productdetail() {
         </div>
 
         <div className={styles.featureList}>
-          {(Array.isArray(product?.feature) ? product.feature : []).map(
-            (item, index) => (
-              <div key={`${item?.key}-${index}`} className={styles.featureRow}>
-                <span className={styles.featureKey}>{item?.key}</span>
-                <span className={styles.featureVal}>{item?.value}</span>
-              </div>
-            ),
-          )}
+          {featureArray.map((item, index) => (
+            <div key={`${item?.key}-${index}`} className={styles.featureRow}>
+              <span className={styles.featureKey}>{item?.key}</span>
+              <span className={styles.featureVal}>{item?.value}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -386,22 +429,6 @@ export default function Productdetail() {
           </div>
         </form>
       </section>
-
-      {/* <section className={styles.sectionBlock}>
-          <div className={styles.sectionHeadRow}>
-            <h2 className={styles.sectionTitle}>محتویات جعبه</h2>
-            <p className={styles.sectionSubtitle}>نمایشی (فیک) برای UI</p>
-          </div>
-
-          <div className={styles.boxGrid}>
-            {fakePdpContent.inTheBox.map((x) => (
-              <div key={x} className={styles.boxItem}>
-                <span className={styles.boxBullet} />
-                <span>{x}</span>
-              </div>
-            ))}
-          </div>
-        </section> */}
     </div>
   );
 }

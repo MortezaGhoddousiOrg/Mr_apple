@@ -3,60 +3,100 @@
 import styles from "@/app/ProductBuy/page.module.css";
 import { useState } from "react";
 import { useAuth } from "@/app/Context/Context";
-import { useRouter } from "next/navigation";
 import DetailUserBuy from "@/app/ProductBuy/DetailUserBuy/DetailUserBuy";
+import Image from "next/image";
+import { MEDIA_URL } from "../config";
 
 export default function ProductBuy() {
-  // const { productbuy, setProductBuy, userId } = useAuth();
-  const { productbuy, updateQuantity, removeFromCart } = useAuth();
-  const router = useRouter();
+  const { productbuy, updateQuantity, removeFromCart, setNotif } = useAuth();
   const [open, setOpen] = useState(false);
 
-  const increaseQuantity = async (id, currentQty) => {
+  const increaseQuantity = async (id, currentQty, stock) => {
+    if (currentQty >= stock) {
+      setNotif({
+        id: Date.now(),
+        message: "موجودی این محصول به پایان رسیده است",
+        type: "warning",
+      });
+
+      return;
+    }
+
     try {
-      await updateQuantity(id, (currentQty || 1) + 1);
+      await updateQuantity(id, currentQty + 1);
+
+      setNotif({
+        id: Date.now(),
+        message: "تعداد محصول افزایش یافت",
+        type: "success",
+      });
     } catch (err) {
-      console.log(err);
+      setNotif({
+        id: Date.now(),
+        message: "خطا در افزایش تعداد",
+        type: "error",
+      });
     }
   };
-
-  // console.log(productbuy);
 
   const decreaseQuantity = async (id, currentQty) => {
+    if (currentQty <= 1) {
+      setNotif({
+        id: Date.now(),
+        message: "حداقل تعداد یک عدد است",
+        type: "warning",
+      });
+
+      return;
+    }
+
     try {
-      await updateQuantity(id, Math.max((currentQty || 1) - 1, 1));
+      await updateQuantity(id, currentQty - 1);
+
+      setNotif({
+        id: Date.now(),
+        message: "تعداد محصول کاهش یافت",
+        type: "success",
+      });
     } catch (err) {
-      console.log(err);
+      setNotif({
+        id: Date.now(),
+        message: err.response?.data?.error || "خطا در کاهش تعداد",
+        type: "error",
+      });
     }
   };
 
-  //   const removeFromCart = async (productId) => {
-  //   if (userId) {
-  //     try {
-  //       const res = await api.post("/cart/remove", {
-  //         userId,
-  //         productId
-  //       });
-  //       console.log(res);
+  const handleRemoveCart = async (productId) => {
+    try {
+      await removeFromCart(productId);
 
-  //       setProductBuy((prev) => prev.filter((item) => item.id !== productId));
-  //       // setAddedItems((prev) => prev.filter((id) => id !== productId));
+      setNotif({
+        id: Date.now(),
+        message: "محصول از سبد خرید حذف شد",
+        type: "success",
+      });
+    } catch {
+      setNotif({
+        id: Date.now(),
+        message: "خطا در حذف محصول",
+        type: "error",
+      });
+    }
+  };
 
-  //       return { success: true };
-  //     } catch (err) {
-  //       console.log(err);
-  //       return;
-  //     }
-  //   } else {
-  //     setProductBuy((prev) => prev.filter((item) => item.id !== productId));
-  //     // setAddedItems((prev) => prev.filter((id) => id !== productId));
-  //     return { success: true };
-  //   }
-  // };
+  const handleCheckout = () => {
+    if (!productbuy || productbuy.length === 0) {
+      setNotif({
+        id: Date.now(),
+        message: "شما هنوز هیچ کالایی را انتخاب نکرده‌اید",
+        type: "warning",
+      });
+      return;
+    }
 
-  // const removeItem = (id) => {
-  //   setProductBuy((prev) => prev.filter((item) => item.id !== id));
-  // };
+    setOpen(true);
+  };
 
   const formatPrice = (price) => {
     const value =
@@ -73,13 +113,12 @@ export default function ProductBuy() {
         ? item.price
         : Number(String(item.price).replace(/,/g, "").trim()) || 0;
 
-    return sum + price * (item.qty || 1);
+    return sum + price * (item.cart_quantity || 1);
   }, 0);
 
-  const totalCount = productbuy?.reduce(
-    (sum, item) => sum + (item.qty || 1),
-    0,
-  );
+  const totalCount =
+    productbuy?.reduce((sum, item) => sum + (item.cart_quantity || 1), 0) || 0;
+  console.log(productbuy);
 
   return (
     <div className={styles.container}>
@@ -97,19 +136,13 @@ export default function ProductBuy() {
                 {formatPrice(totalPrice)} تومان
               </span>
             </div>
-            <button
-              className={styles.checkoutBtn}
-              onClick={() => setOpen(true)}
-            >
+            <button className={styles.checkoutBtn} onClick={handleCheckout}>
               ادامه فرایند خرید
             </button>
             <DetailUserBuy
               isOpen={open}
               onClose={() => setOpen(false)}
-              onSubmitSuccess={(data) => {
-                // console.log("اطلاعات فرم:", data);
-                // اینجا می‌تونی داده رو به مرحله بعدی ذخیره/ارسال کنی
-              }}
+              onSubmitSuccess={(data) => {}}
             />
           </div>
         </div>
@@ -138,21 +171,28 @@ export default function ProductBuy() {
                     ? item.price
                     : Number(String(item.price).replace(/,/g, "").trim()) || 0;
 
-                const qty = item.qty || 1;
+                const qty = item.cart_quantity || 1;
                 const itemTotal = itemPrice * qty;
 
                 return (
-                  <div key={item.id} className={styles.card}>
+                  <div key={item.product_id} className={styles.card}>
                     <div className={styles.imageBox}>
-                      <img
-                        src={item.image}
-                        alt={item.title}
+                      <Image
+                        unoptimized
+                        src={
+                          item.image?.startsWith("http")
+                            ? item.image
+                            : `${MEDIA_URL}${item.image}`
+                        }
+                        alt={item.name || item.title}
+                        width={30}
+                        height={30}
                         className={styles.productImage}
                       />
                     </div>
 
                     <div className={styles.info}>
-                      <h3 className={styles.cardTitle}>{item.title}</h3>
+                      <h3 className={styles.cardTitle}>{item.name}</h3>
                       <div className={styles.meta}>
                         <p className={styles.price}>
                           قیمت واحد: <span>{formatPrice(itemPrice)} تومان</span>
@@ -163,7 +203,7 @@ export default function ProductBuy() {
                     <div className={styles.controls}>
                       <button
                         className={styles.qtyBtn}
-                        onClick={() => decreaseQuantity(item.id, qty)}
+                        onClick={() => decreaseQuantity(item.product_id, qty)}
                         aria-label="کاهش تعداد"
                       >
                         −
@@ -171,7 +211,9 @@ export default function ProductBuy() {
                       <span className={styles.qtyCount}>{qty}</span>
                       <button
                         className={styles.qtyBtn}
-                        onClick={() => increaseQuantity(item.id, qty)}
+                        onClick={() =>
+                          increaseQuantity(item.product_id, qty, item.quantity)
+                        }
                         aria-label="افزایش تعداد"
                       >
                         +
@@ -184,7 +226,7 @@ export default function ProductBuy() {
                       </div>
                       <button
                         className={styles.removeBtn}
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => handleRemoveCart(item.product_id)}
                       >
                         حذف
                       </button>

@@ -1,23 +1,58 @@
-'use client';
+"use client";
 
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import style from "@/app/Components/Footer/Footer.module.css";
+import { api } from "@/app/config";
 
 export default function Footer() {
+  const router = useRouter();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get("/api/category/parent/");
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const formatCategoryUrl = (title) => {
+    return `/Category/${title.trim().replace(/\s+/g, "-")}`;
+  };
+
   return (
     <footer className={style.footer}>
       <div className={style.footerTop}>
         {/* Brand Section */}
         <div className={style.brandSection}>
-          <h2 className={style.brand}>MR•APPLE</h2>
+          <div className={style.brandWrapper}>
+            <Image
+              src="/image-header/IMG_3321.png"
+              width={40}
+              height={40}
+              alt="apple"
+              className={style.brandLogo}
+              onClick={() => router.push("/")}
+            />
+            <h2 className={style.brand}>MR•APPLE</h2>
+          </div>
 
           <p className={style.brandText}>
-            فروشگاه تخصصی محصولات اپل، عرضه جدیدترین دستگاه‌ها
-            به همراه گوشی‌های کارکرده کارشناسی‌شده با ضمانت سلامت.
+            فروشگاه تخصصی محصولات اپل، عرضه جدیدترین دستگاه‌ها به همراه گوشی‌های
+            کارکرده کارشناسی‌شده با ضمانت سلامت.
           </p>
 
           {/* Socials */}
           <div className={style.socials}>
-            {/* Instagram */}
             <a href="#" className={style.socialLink} aria-label="Instagram">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -30,7 +65,6 @@ export default function Footer() {
               </svg>
             </a>
 
-            {/* Telegram */}
             <a href="#" className={style.socialLink} aria-label="Telegram">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -43,7 +77,6 @@ export default function Footer() {
               </svg>
             </a>
 
-            {/* YouTube */}
             <a href="#" className={style.socialLink} aria-label="YouTube">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -58,30 +91,32 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Column 1 */}
+        {/* Column 1 - Products */}
         <div className={style.footerColumn}>
-          <h4 className={style.columnTitle}>محصولات اپل</h4>
+          <h4 className={style.columnTitle}>محصولات مستر اپل</h4>
 
           <ul className={style.columnList}>
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>خرید آیفون</a>
-            </li>
-
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>مک‌بوک و آی‌مک</a>
-            </li>
-
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>اپل واچ</a>
-            </li>
-
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>ایرپاد</a>
-            </li>
-
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>آیپد</a>
-            </li>
+            {loading ? (
+              <li className={style.footerItem}>
+                <span className={style.link}>در حال بارگذاری...</span>
+              </li>
+            ) : categories.length > 0 ? (
+              categories.map((category) => (
+                <li key={category.id} className={style.footerItem}>
+                  {/* ✅ تغییر از id به title */}
+                  <a
+                    href={formatCategoryUrl(category.title)}
+                    className={style.link}
+                  >
+                    {category.title}
+                  </a>
+                </li>
+              ))
+            ) : (
+              <li className={style.footerItem}>
+                <span className={style.link}>دسته‌بندی موجود نیست</span>
+              </li>
+            )}
           </ul>
         </div>
 
@@ -91,23 +126,33 @@ export default function Footer() {
 
           <ul className={style.columnList}>
             <li className={style.footerItem}>
-              <a href="" className={style.link}>آیفون کارکرده</a>
+              <a href="" className={style.link}>
+                آیفون کارکرده
+              </a>
             </li>
 
             <li className={style.footerItem}>
-              <a href="" className={style.link}>گوشی تعویضی</a>
+              <a href="" className={style.link}>
+                گوشی تعویضی
+              </a>
             </li>
 
             <li className={style.footerItem}>
-              <a href="" className={style.link}>گوشی کارشناسی‌شده</a>
+              <a href="" className={style.link}>
+                گوشی کارشناسی‌شده
+              </a>
             </li>
 
             <li className={style.footerItem}>
-              <a href="" className={style.link}>دستگاه‌های اقتصادی</a>
+              <a href="" className={style.link}>
+                دستگاه‌های اقتصادی
+              </a>
             </li>
 
             <li className={style.footerItem}>
-              <a href="" className={style.link}>مقایسه دستگاه‌ها</a>
+              <a href="" className={style.link}>
+                مقایسه دستگاه‌ها
+              </a>
             </li>
           </ul>
         </div>
@@ -118,23 +163,33 @@ export default function Footer() {
 
           <ul className={style.columnList}>
             <li className={style.footerItem}>
-              <a href="" className={style.link}>مشاوره خرید</a>
+              <a href="" className={style.link}>
+                مشاوره خرید
+              </a>
             </li>
 
             <li className={style.footerItem}>
-              <a href="" className={style.link}>پیگیری سفارش</a>
+              <a href="" className={style.link}>
+                پیگیری سفارش
+              </a>
             </li>
 
             <li className={style.footerItem}>
-              <a href="" className={style.link}>پرداخت اقساطی</a>
+              <a href="" className={style.link}>
+                پرداخت اقساطی
+              </a>
             </li>
 
             <li className={style.footerItem}>
-              <a href="" className={style.link}>گارانتی و خدمات</a>
+              <a href="" className={style.link}>
+                گارانتی و خدمات
+              </a>
             </li>
 
             <li className={style.footerItem}>
-              <a href="" className={style.link}>سوالات متداول</a>
+              <a href="" className={style.link}>
+                سوالات متداول
+              </a>
             </li>
           </ul>
         </div>

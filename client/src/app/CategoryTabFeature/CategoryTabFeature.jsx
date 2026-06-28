@@ -1,59 +1,135 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import { useEffect, useMemo, useState, useRef } from "react";
 import style from "./CategoryTabFeature.module.css";
 import Card from "@/app/CardPage/Card";
+import { api } from "../config";
+import { MEDIA_URL } from "@/app/config";
+import Image from "next/image";
 
 const FALLBACK_IMAGE = "/image-infosection/IMG_SEGMENT_20260513_115454.png";
 
 function mapProductToCard(item) {
-  const mainImageObject = item?.images?.find((img) => img.type === true);
-  const displayImage = mainImageObject?.file || FALLBACK_IMAGE;
+  const imagePath =
+    item.images?.find((img) => img.is_main)?.image || item.images?.[0]?.image;
 
   return {
-    id: item?.id,
-    image: displayImage,
-    title: item?.name || "",
-    description: item?.descriptions || "",
-    price: item?.sell_price ?? "0",
-    status: item?.status || "notactive",
-    category_child_id: item?.category_child_id ?? null,
+    id: item.id,
+    image: imagePath ? `${MEDIA_URL}${imagePath}` : FALLBACK_IMAGE,
+    title: item.name,
+    description: item.descriptions,
+    price: item.sell_price,
+    status: item.status,
+    category: item.category,
+    category_child_id: item.category_child_id,
   };
 }
 
-export default function CategoryTabFeature({ Tab = [], products = [] }) {
-  const [categoryId, setCategoryId] = useState(() => Tab?.[0]?.id ?? null);
-  const [loading] = useState(false);
+export default function CategoryTabFeature({
+  Tab = [],
+  products = [],
+  setProducts,
+}) {
+  const [categoryId, setCategoryId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(4);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    if (Tab?.length && !Tab.some((item) => item.id === categoryId)) {
-      setCategoryId(Tab[0].id);
+    const handleResize = () => {
+      if (window.innerWidth < 540) setVisible(2);
+      else if (window.innerWidth < 900) setVisible(3);
+      else setVisible(4);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const actualVisible = Math.min(visible, Tab.length);
+  const needsSlider = Tab.length > actualVisible;
+
+  const extendedTabs = needsSlider
+    ? [...Tab, ...Tab.slice(0, actualVisible)]
+    : Tab;
+
+  const cardsWidth = 100 / actualVisible;
+  const translateValue = `translateX(${index * cardsWidth}%)`;
+
+  const nextSlide = () => {
+    if (!needsSlider) return;
+    setIndex((prev) => prev + 1);
+  };
+
+  const prevSlide = () => {
+    if (!needsSlider || index <= 0) return;
+    setIndex((prev) => prev - 1);
+  };
+
+  useEffect(() => {
+    if (!needsSlider) return;
+    if (index === Tab.length) {
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setIndex(0);
+      }, 400);
     }
-  }, [Tab, categoryId]);
+  }, [index, Tab.length, needsSlider]);
+
+  useEffect(() => {
+    if (!isTransitioning) {
+      requestAnimationFrame(() => setIsTransitioning(true));
+    }
+  }, [isTransitioning]);
+
+  useEffect(() => {
+    if (!Tab.length) return;
+    setCategoryId(Tab[0].id);
+    setIndex(0);
+  }, [Tab]);
+
+  useEffect(() => {
+    if (!categoryId) return;
+
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get(
+          `/api/catalog/product/child/${categoryId}/`,
+        );
+        const validProducts = (response.data || []).filter(
+          (item) => item.category !== null,
+        );
+
+        setProducts(validProducts);
+      } catch (err) {
+        console.log(err);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [categoryId]);
 
   const handleClick = (id) => {
     if (id === categoryId) return;
     setCategoryId(id);
   };
 
-  const filteredProducts = useMemo(() => {
-    if (!categoryId) return [];
-    return (products || []).filter(
-      (item) => item.category_child_id === categoryId,
-    );
-  }, [products, categoryId]);
-
-  const cardData = useMemo(() => {
-    return filteredProducts.map(mapProductToCard);
-  }, [filteredProducts]);
+  const cardData = useMemo(() => products.map(mapProductToCard), [products]);
 
   if (!Tab?.length) {
     return (
       <div className={style.box}>
-        <h2 className={style.title}>هیچ تبی وجود ندارد</h2>
+        <h2 className={style.title}>محصولی پیدا نشد</h2>
         <p className={style.description}>
-          برای نمایش محصولات، ابتدا باید تب‌ها (دسته‌های فرزند) تعریف شوند.
+          متأسفانه هیچ محصولی برای نمایش وجود ندارد. لطفاً کمی بعد دوباره تلاش
+          کنید یا فیلترهای جستجو را تغییر دهید.
         </p>
       </div>
     );
@@ -61,35 +137,93 @@ export default function CategoryTabFeature({ Tab = [], products = [] }) {
 
   return (
     <section className={style.wrapper}>
-      <div className={style.categoryTab}>
-        {Tab.map((item) => {
-          const isActive = item.id === categoryId;
-
-          return (
-            <div
-              key={item.id}
-              className={`${style.containerTab} ${
-                isActive ? style.activeTab : ""
-              }`}
-              onClick={() => handleClick(item.id)}
-              role="button"
-              tabIndex={0}
+      <div className={style.sliderShell}>
+        {needsSlider && (
+          <button
+            className={`${style.navBtn} ${style.prev}`}
+            onClick={prevSlide}
+            aria-label="Previous"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <div className={style.tab}>
-                <div className={style.imageWrap}>
-                  <Image
-                    className={style.imageTab}
-                    src={item.image || FALLBACK_IMAGE}
-                    alt={item.title || "category-tab"}
-                    width={92}
-                    height={92}
-                  />
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </button>
+        )}
+
+        <div className={style.sliderWrapper}>
+          <div
+            ref={containerRef}
+            className={style.cardsContainer}
+            style={{
+              transform: translateValue,
+              transition: isTransitioning
+                ? "transform 0.4s ease-in-out"
+                : "none",
+            }}
+          >
+            {extendedTabs.map((item, i) => {
+              const imageSrc = item.image
+                ? `${MEDIA_URL}${item.image}`
+                : FALLBACK_IMAGE;
+              return (
+                <div
+                  key={`${item.id}-${i}`}
+                  className={`${style.containerTab} ${item.id === categoryId ? style.activeTab : ""}`}
+                  style={{ flex: `0 0 ${cardsWidth}%` }}
+                  onClick={() => handleClick(item.id)}
+                >
+                  <div className={style.tab}>
+                    <div className={style.imageWrap}>
+                      <Image
+                        unoptimized
+                        className={style.imageTab}
+                        src={imageSrc}
+                        alt={item.title || "category-tab"}
+                        width={92}
+                        height={92}
+                      />
+                    </div>
+                    <p className={style.titleTab}>{item.title}</p>
+                  </div>
                 </div>
-                <p className={style.titleTab}>{item.title}</p>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+        </div>
+
+        {needsSlider && (
+          <button
+            className={`${style.navBtn} ${style.next}`}
+            onClick={nextSlide}
+            aria-label="Next"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M19 12H5" />
+              <path d="m12 19-7-7 7-7" />
+            </svg>
+          </button>
+        )}
       </div>
 
       {loading && <p className={style.loading}>در حال دریافت محصولات...</p>}

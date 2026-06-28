@@ -30,7 +30,6 @@ export default function Header() {
     return (
         <header className="fixed top-0 right-0 left-0 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg z-50">
             <div className="h-full px-4 md:px-6 flex justify-between items-center">
-                {/* Logo and Title */}
                 <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                         <svg
@@ -52,9 +51,7 @@ export default function Header() {
                     </h2>
                 </div>
 
-                {/* Header Info */}
                 <div className="flex items-center gap-4">
-                    {/* Date and Time */}
                     <div className="hidden md:flex items-center gap-2 text-white/90 text-sm">
                         <svg
                             className="w-4 h-4"
@@ -72,7 +69,6 @@ export default function Header() {
                         <span>{currentTime}</span>
                     </div>
 
-                    {/* Notification Icon */}
                     <button className="relative text-white hover:text-blue-200 transition-colors">
                         <svg
                             className="w-6 h-6"
@@ -90,7 +86,6 @@ export default function Header() {
                         <span className="absolute -top-1 -left-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                     </button>
 
-                    {/* User Menu Button (mobile) */}
                     <button className="md:hidden text-white">
                         <svg
                             className="w-6 h-6"

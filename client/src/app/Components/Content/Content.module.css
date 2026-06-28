@@ -1,39 +1,37 @@
 .contentSection {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   background: #000;
-  position: relative;
-  /* overflow: hidden; */
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  /* font-family: "iphone !important"; */
+  overflow: hidden;
 }
 
 .heroContent {
-  height: 83%;
   width: 100%;
+  max-width: 1500px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 24px;
+  padding: 80px 20px 40px;
 }
 
 .contentTitle {
-  color: #fff;
-  font-weight: 700;
-  text-align: center;
   font-size: 58px;
-  line-height: 1.05;
-  margin: 120px 0 14px 0;
-  color: #dadada;
+  font-weight: 700;
   color: #817b6d;
+  text-align: center;
+  margin-bottom: 25px;
+  line-height: 1.1;
 }
 
 .VideoContainer {
-  width: 75%;
-  max-width: 920px;
+  width: min(78vw, 920px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .Video {
@@ -44,35 +42,72 @@
 }
 
 
+@media (max-width:1200px){
 
-
-@media (min-width: 768px) {
-  .heroVideoContainer {
-    width: 83%;
-    max-width: 1100px;
+  .contentTitle{
+    font-size:50px;
   }
 
-  .heroTitle {
-    font-size: 58px;
+  .VideoContainer{
+    width:min(82vw,850px);
   }
+
 }
 
-@media (max-width: 759px) {
-  .heroContent {
-    padding-top: 48px;
+
+@media (max-width:992px){
+
+  .heroContent{
+    padding:70px 20px 35px;
   }
 
-  .heroTitle {
-    font-size: 40px;
-    margin-bottom: 18px;
+  .contentTitle{
+    font-size:44px;
+    margin-bottom:20px;
   }
 
-  .heroVideoContainer {
-    width: 90%;
-    max-width: 100%;
+  .VideoContainer{
+    width:90%;
   }
 
-  .heroPriceInfo {
-    font-size: 18px;
+}
+
+
+@media (max-width:760px){
+
+  .contentSection{
+    min-height:100svh;
   }
+
+  .heroContent{
+    padding:55px 16px 30px;
+  }
+
+  .contentTitle{
+    font-size:34px;
+    margin-bottom:18px;
+  }
+
+  .VideoContainer{
+    width:100%;
+  }
+
+}
+
+
+@media (max-width:480px){
+
+  .heroContent{
+    padding:45px 12px 20px;
+  }
+
+  .contentTitle{
+    font-size:28px;
+    margin-bottom:14px;
+  }
+
+  .VideoContainer{
+    width:100%;
+  }
+
 }

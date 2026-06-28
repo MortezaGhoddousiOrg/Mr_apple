@@ -6,41 +6,29 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/Context";
 import Image from "next/image";
 
-export default function Service({
-  data = [],
-  title,
-  button,
-  onMoreClick,
-  setNotif,
-}) {
+export default function Service({ data = [], title, button, onMoreClick }) {
   const [index, setIndex] = useState(0);
   const [visibleCards, setVisibleCards] = useState(4);
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const gap = 20;
 
-  // const {
-  //   addedItems,
-  //   setAddedItems,
-  //   productBuy,
-  //   setProductBuy,
-  //   userId,
-  //   setUserId,
-  // } = useAuth();
+  const { addToCart, productbuy, setNotif } = useAuth();
 
-  const { addToCart, productbuy } = useAuth();
-
-
-  const Active = data.filter((item) => item.status == "active");
+  const Active = React.useMemo(
+    () => data.filter((item) => item.status === "active" && item.category !== null && item.category !== undefined),
+    [data],
+  );
 
   const router = useRouter();
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 600) {
         setVisibleCards(1);
-      } else if (window.innerWidth < 800) {
+      } else if (window.innerWidth < 900) {
         setVisibleCards(2);
-      } else if (window.innerWidth < 1024) {
+      } else if (window.innerWidth < 1200) {
         setVisibleCards(3);
       } else {
         setVisibleCards(4);
@@ -74,94 +62,24 @@ export default function Service({
 
   const handleTouchEnd = (e) => {
     touchEndX.current = e.changedTouches[0].screenX;
-    handleTouchtrue();
-  };
-
-  const handleTouchtrue = () => {
-    if (touchStartX.current - touchEndX.current > 150) {
-      prevSlide();
-    }
-
-    if (touchEndX.current - touchStartX.current > 150) {
-      nextSlide();
-    }
+    if (touchStartX.current - touchEndX.current > 50) nextSlide();
+    if (touchEndX.current - touchStartX.current > 50) prevSlide();
   };
 
   const translateValue = `translateX(${index * (100 / visibleCards)}%) translateX(${index * gap}px)`;
 
-  // const [addedItems, setAddedItems] = useState([]);
-
-  // const handleAddToCart = (item) => {
-  //   setProductBuy((prev) => {
-  //     const product = prev.find((p) => p.id === item.id);
-
-  //     if (product) {
-  //       return prev.map((p) =>
-  //         p.id === item.id ? { ...p, pro: p.pro + 1 } : p,
-  //       );
-  //     }
-
-  //     return [...prev, { ...item, pro: 1 }];
-  //   });
-  //   setAddedItems((prev) =>
-  //     prev.includes(item.id) ? prev : [...prev, item.id],
-  //   );
-  // };
-
-  // const handleAddToCart = async (item) => {
-  //   const isAlreadyAdded = productBuy.some((p) => p.id === item.id);
-  //   if (isAlreadyAdded) return;
-
-  //   if (userId) {
-  //     try {
-  //       const res = await api.post("/api/orders/cart/add", {
-  //         userId,
-  //         productId: item.id,
-  //       });
-  //       console.log(res.data);
-  //     } catch (err) {
-  //       console.error(err);
-  //       return;
-  //     }
-  //   }
-  // };
-
-//   const handleAddToCart = async (item) => {
-//   try {
-//     await addToCart(item);
-//   } catch (err) {
-//     // console.error(err);
-//   }
-// };
-
- const isInCart = (id) => {
-    return productbuy?.some((p) => p.id === id);
-  };
+  const isInCart = (id) => productbuy?.some((p) => (p.product_id || p.id) === id);
 
   const handleAddToCart = async (item) => {
+    if (isInCart(item.id)) {
+      setNotif({ id: Date.now(), message: "این محصول قبلاً به سبد خرید اضافه شده است", type: "warning" });
+      return;
+    }
     try {
-      if (isInCart(item.id)) return;
-
-      await addToCart({
-        id: item.id,
-        title: item.title,
-        price: item.price,
-        image: item.image,
-        description: item.description,
-      });
-
-        // setNotif({
-        //   message: "محصول با موفقیت به سبد خرید اضافه شد",
-        //   type: "success",
-        // });
-      
-    } catch (err) {
-        // setNotif({
-        //   message: "افزودن محصول به سبد خرید با خطا مواجه شد",
-        //   type: "error",
-        // });
-      
-      // console.error(err);
+      await addToCart(item);
+      setNotif({ id: Date.now(), message: "محصول با موفقیت به سبد خرید اضافه شد", type: "success" });
+    } catch {
+      setNotif({ id: Date.now(), message: "خطا در افزودن محصول", type: "error" });
     }
   };
 
@@ -185,23 +103,13 @@ export default function Service({
 
       <div className={styles.sliderContainer}>
         <button
-          className={`${styles.navBtn} ${styles.right}`}
+          className={`${styles.navBtn} ${styles.navBtnRight}`}
           onClick={prevSlide}
           disabled={index === 0}
+          aria-label="قبلی"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M5 12h14"></path>
-            <path d="m12 5 7 7-7 7"></path>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
           </svg>
         </button>
 
@@ -219,14 +127,14 @@ export default function Service({
           >
             {Active.map((item) => {
               const added = isInCart(item.id);
-
               return (
                 <div
                   className={styles.serviceCard}
                   key={item.id}
-                  style={{ flex: `0 0 ${100 / visibleCards}%` }}
+                  style={{ flex: `0 0 calc(${100 / visibleCards}% - ${gap * (visibleCards - 1) / visibleCards}px)` }}
                 >
                   <Image
+                    unoptimized
                     className={styles.serviceImage}
                     src={item.image}
                     alt={item.title}
@@ -235,9 +143,7 @@ export default function Service({
                     onClick={() => router.push(`/ProductDetail/${item.id}`)}
                   />
                   <p className={styles.serviceTitle}>{item.title}</p>
-                  <h2 className={styles.serviceDescription}>
-                    {item.description}
-                  </h2>
+                  <h2 className={styles.serviceDescription}>{item.description}</h2>
                   <p className={styles.servicePrice}>
                     {parseInt(item.price)?.toLocaleString("fa-IR")} تومان
                   </p>
@@ -248,14 +154,7 @@ export default function Service({
                     {added ? (
                       <>
                         به سبد خرید اضافه شد
-                        <svg
-                          className={styles.svg}
-                          viewBox="0 0 24 24"
-                          fill="white"
-                          width="18"
-                          height="18"
-                          style={{ marginLeft: "8px" }}
-                        >
+                        <svg className={styles.svg} viewBox="0 0 24 24" fill="white" width="16" height="16">
                           <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
                         </svg>
                       </>
@@ -267,43 +166,31 @@ export default function Service({
               );
             })}
 
-            <div>
-              <div className={styles.serviceCardLast}>
-                <div className={styles.serviceCardLastDiv}>
-                  <h2>{title}</h2>
-                  <p>برای نمایش بیشتر کلیک کنید</p>
-                </div>
-                {button && (
-                  <button
-                    className={styles.serviceCardLastButton}
-                    onClick={onMoreClick}
-                  >
-                    {button}
-                  </button>
-                )}
+            <div
+              className={styles.serviceCardLast}
+              style={{ flex: `0 0 calc(${100 / visibleCards}% - ${gap * (visibleCards - 1) / visibleCards}px)` }}
+            >
+              <div className={styles.serviceCardLastDiv}>
+                <h2>{title}</h2>
+                <p>برای نمایش بیشتر کلیک کنید</p>
               </div>
+              {button && (
+                <button className={styles.serviceCardLastButton} onClick={onMoreClick}>
+                  {button}
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         <button
-          className={`${styles.navBtn} ${styles.left}`}
+          className={`${styles.navBtn} ${styles.navBtnLeft}`}
           onClick={nextSlide}
           disabled={index >= Active.length + 1 - visibleCards}
+          aria-label="بعدی"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5"></path>
-            <path d="m12 19-7-7 7-7"></path>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5" /><path d="m12 19-7-7 7-7" />
           </svg>
         </button>
       </div>

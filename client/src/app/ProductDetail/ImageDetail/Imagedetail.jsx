@@ -1,12 +1,20 @@
+// Imagedetail.jsx
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import styles from "./Imagedetail.module.css";
 
-export default function Imagedetail({
-  images = [],
-  discountPercent = 0,
-}) {
+// لودر سفارشی برای تصاویر
+const customLoader = ({ src, width, quality }) => {
+  // کیفیت پیش‌فرض 75
+  const q = quality || 75;
+  // می‌توانی پارامترهای اضافی مثل کیفیت رو به آدرس اضافه کنی
+  return `${src}?w=${width}&q=${q}`;
+};
+
+export default function Imagedetail({ images = [], discountPercent = 0 }) {
   const gallery = useMemo(
     () => (Array.isArray(images) ? images.filter(Boolean) : []),
     [images],
@@ -29,9 +37,13 @@ export default function Imagedetail({
       if (e.key === "Escape") {
         setIsOpen(false);
       } else if (e.key === "ArrowRight") {
-        setSelectedIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1));
+        setSelectedIndex((prev) =>
+          prev === 0 ? gallery.length - 1 : prev - 1,
+        );
       } else if (e.key === "ArrowLeft") {
-        setSelectedIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1));
+        setSelectedIndex((prev) =>
+          prev === gallery.length - 1 ? 0 : prev + 1,
+        );
       }
     };
 
@@ -74,16 +86,21 @@ export default function Imagedetail({
             <div className={styles.discountBadge}>{discountPercent}٪</div>
           )}
 
-          <img
-            src={currentImage}
-            alt="product"
-            className={styles.mainImage}
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-            draggable={false}
-            onClick={openLightbox}
-          />
+          <div className={styles.mainImageWrapper}>
+            <Image
+              loader={customLoader}
+              src={currentImage}
+              alt="product"
+              width={600}
+              height={600}
+              className={styles.mainImage}
+              priority
+              quality={85}
+              draggable={false}
+              onClick={openLightbox}
+              style={{ cursor: "pointer", objectFit: "contain" }}
+            />
+          </div>
         </div>
 
         {gallery.length > 1 && (
@@ -98,14 +115,19 @@ export default function Imagedetail({
                 onClick={() => setSelectedIndex(index)}
                 aria-label={`تصویر ${index + 1}`}
               >
-                <img
-                  src={img}
-                  alt={`thumbnail-${index + 1}`}
-                  className={styles.thumbImage}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                  draggable={false}
-                />
+                <div className={styles.thumbImageWrapper}>
+                  <Image
+                    loader={customLoader}
+                    src={img}
+                    alt={`thumbnail-${index + 1}`}
+                    width={80}
+                    height={80}
+                    className={styles.thumbImage}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    draggable={false}
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
               </button>
             ))}
           </div>
@@ -131,7 +153,7 @@ export default function Imagedetail({
                 onClick={goPrev}
                 aria-label="تصویر قبلی"
               >
-                ‹
+                ›
               </button>
 
               <button
@@ -140,7 +162,7 @@ export default function Imagedetail({
                 onClick={goNext}
                 aria-label="تصویر بعدی"
               >
-                ›
+                ‹
               </button>
             </>
           )}
@@ -149,15 +171,24 @@ export default function Imagedetail({
             className={styles.lightboxContent}
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={currentImage}
-              alt="fullscreen-product"
-              className={styles.lightboxImage}
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-              draggable={false}
-            />
+            <div className={styles.lightboxImageWrapper}>
+              <Image
+                loader={customLoader}
+                src={currentImage}
+                alt="fullscreen-product"
+                width={1200}
+                height={1200}
+                className={styles.lightboxImage}
+                priority
+                quality={95}
+                draggable={false}
+                style={{
+                  objectFit: "contain",
+                  maxWidth: "90vw",
+                  maxHeight: "90vh",
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

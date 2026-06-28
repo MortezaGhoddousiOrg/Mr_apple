@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../Context/Context";
-
 import OrdersList from "@/app/PanelUser/OrderList/page";
 import ProfileSettings from "@/app/PanelUser/ProfileSetting/page";
 import Logout from "@/app/PanelUser/Logout/page";
@@ -12,24 +11,13 @@ import Logout from "@/app/PanelUser/Logout/page";
 export default function PanelUser() {
   const [activeTab, setActiveTab] = useState("orders");
   const router = useRouter();
-  // const [panelUser, setPanelUser] = useState();
   const { isLoggedIn, authLoading, dataForm } = useAuth();
 
   useEffect(() => {
-    if (authLoading) return;
-
     if (!isLoggedIn) {
-      router.replace("/Login");
+      router.push("/");
     }
   }, [isLoggedIn, authLoading, router]);
-
-  if (authLoading) {
-    return <div>در حال بارگذاری...</div>;
-  }
-
-  if (!isLoggedIn) {
-    return null;
-  }
 
   const menuItems = [
     { id: "orders", title: "سفارش‌های من" },
@@ -45,19 +33,32 @@ export default function PanelUser() {
         return <ProfileSettings />;
       case "logout":
         return <Logout />;
+      default:
+        return null;
     }
   };
 
   return (
     <section className={styles.panelWrapper}>
       <div className={styles.panelContainer}>
-        {/* سایدبار سمت راست */}
         <aside className={styles.sidebar}>
+          <button
+            className={styles.backButton}
+            type="button"
+            onClick={() => router.push("/")}
+          >
+            برگشت به خانه
+          </button>
+
           <div className={styles.containerProfile}>
             <img src="/image-about/images (3).jfif" alt="profile" />
-            <p>
-              {dataForm.firstname} {dataForm.lastname}
-            </p>
+            {dataForm.firstname && dataForm.lastname !== "" ? (
+              <p>
+                {dataForm.firstname} {dataForm.lastname}
+              </p>
+            ) : (
+              <p>username</p>
+            )}
           </div>
           <div className={styles.sidebarHeader}>
             <h1 className={styles.sidebarTitle}>پنل کاربری</h1>
@@ -69,7 +70,9 @@ export default function PanelUser() {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`${styles.menuItem} ${activeTab === item.id ? styles.menuItemActive : ""}`}
+                className={`${styles.menuItem} ${
+                  activeTab === item.id ? styles.menuItemActive : ""
+                }`}
               >
                 <span className={styles.menuItemBullet}></span>
                 <span>{item.title}</span>
@@ -78,7 +81,6 @@ export default function PanelUser() {
           </nav>
         </aside>
 
-        {/* محتوای اصلی */}
         <main className={styles.content}>{renderContent()}</main>
       </div>
     </section>

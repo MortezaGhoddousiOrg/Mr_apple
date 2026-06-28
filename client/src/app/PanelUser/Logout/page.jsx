@@ -3,18 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/Context";
+import { api } from "@/app/config";
 import styles from "./page.module.css";
 
 export default function Logout() {
   const [showModal, setShowModal] = useState(false);
 
-  const { logout } = useAuth();
+  const { logout, setIsLoggedIn, setNotif } = useAuth();
   const router = useRouter();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+  try {
+    await api.get("/api/auth/logout/");
     logout();
+    setIsLoggedIn(false);
     router.replace("/");
-  };
+    setNotif({ id: Date.now(), message: "با موفقیت از حساب خود خارج شدید", type: "success" });
+  } catch (err) {
+    setNotif({ id: Date.now(), message: "خطا در خروج ، لطفا دوباره امتحان کنید", type: "error" });
+  }
+};
 
   return (
     <>

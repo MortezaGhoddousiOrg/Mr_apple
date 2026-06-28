@@ -1,14 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "@/app/PanelUser/ProfileSetting/page.module.css";
 import { useAuth } from "@/app/Context/Context";
 
 export default function ProfileSettings() {
-
   const [isEditing, setIsEditing] = useState(false);
 
-  const { dataForm, setDataForm, saveOrUpdateUser, initialData } = useAuth();
+  const {
+    dataForm,
+    setDataForm,
+    saveOrUpdateUser,
+    initialData,
+    setNotif,
+    validateForm,
+  } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,14 +24,35 @@ export default function ProfileSettings() {
   const handleSave = async (e) => {
     e.preventDefault();
 
+    const error = validateForm();
+
+    if (error) {
+      setNotif({
+        id: Date.now(),
+        message: error,
+        type: "error",
+      });
+
+      return;
+    }
+
     try {
       await saveOrUpdateUser(dataForm);
-
       setIsEditing(false);
+      setNotif({
+        id: Date.now(),
+        message: "اطلاعات با موفقیت ویرایش شد",
+        type: "success",
+      });
     } catch (err) {
       console.error(err);
-      // setNotif
+      setNotif({
+        id: Date.now(),
+        message: "خطا در ویرایش اطلاعات ، لطفا دوباره امتحان کنید",
+        type: "error",
+      });
     }
+    console.log("Profile Render:", dataForm);
   };
 
   const handleEdit = () => {
@@ -43,11 +70,11 @@ export default function ProfileSettings() {
     return <div className={styles.card}>در حال بارگذاری...</div>;
   }
 
-    return (
+  return (
     <div className={styles.card}>
       <div className={styles.cardHeader}>
         <h2 className={styles.title}>اطلاعات حساب</h2>
-        
+
         {!isEditing && (
           <button onClick={handleEdit} className={styles.editLinkBtn}>
             ویرایش اطلاعات
@@ -67,7 +94,6 @@ export default function ProfileSettings() {
                 value={dataForm.firstname || ""}
                 onChange={handleChange}
                 placeholder="نام"
-                required
               />
             </div>
 
@@ -80,11 +106,10 @@ export default function ProfileSettings() {
                 value={dataForm.lastname || ""}
                 onChange={handleChange}
                 placeholder="نام خانوادگی"
-                required
               />
             </div>
           </div>
-          
+
           <div className={styles.formGrid}>
             <div className={styles.formGroup}>
               <label className={styles.label}>تلفن</label>
@@ -95,7 +120,6 @@ export default function ProfileSettings() {
                 value={dataForm.phone || ""}
                 onChange={handleChange}
                 placeholder="09xxxxxxxxx"
-                required
               />
             </div>
 
@@ -108,7 +132,6 @@ export default function ProfileSettings() {
                 value={dataForm.postal_code || ""}
                 onChange={handleChange}
                 placeholder="کد پستی"
-                required
               />
             </div>
           </div>
@@ -131,7 +154,6 @@ export default function ProfileSettings() {
               ذخیره اطلاعات
             </button>
 
-            {/* ✅ ninja: دکمه لغو همیشه نمایش داده شود اگر در حال ادیت هستیم */}
             <button
               type="button"
               onClick={handleCancel}
@@ -147,7 +169,7 @@ export default function ProfileSettings() {
             <div className={styles.infoItem}>
               <span>نام و نام خانوادگی</span>
               <p>
-                {dataForm.firstname} {dataForm.lastname}
+                {dataForm.firstname || "ثبت نشده "} {dataForm.lastname}
               </p>
             </div>
 
@@ -158,12 +180,14 @@ export default function ProfileSettings() {
 
             <div className={styles.infoItem}>
               <span>کد پستی</span>
-              <p className={styles.ltrText}>{dataForm.postal_code}</p>
+              <p className={styles.ltrText}>
+                {dataForm.postal_code || "ثبت نشده"}
+              </p>
             </div>
 
             <div className={styles.infoItemFull}>
               <span>آدرس دقیق</span>
-              <p className={styles.ltrText}>{dataForm.address}</p>
+              <p className={styles.ltrText}>{dataForm.address || "ثبت نشده"}</p>
             </div>
           </div>
         </div>

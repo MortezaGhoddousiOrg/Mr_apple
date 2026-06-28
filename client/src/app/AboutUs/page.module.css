@@ -206,7 +206,7 @@
 
 @media (max-width: 1024px) {
   .memberCard {
-    grid-template-columns: repeat(2, 1fr); /* تغییر به ۲ ستونه در تبلت */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -214,38 +214,110 @@
   .aboutHeader {
     flex-direction: column;
     text-align: center;
-    padding: 100px 24px 60px;
-    gap: 20px;
+    padding: 80px 24px 20px;
+    gap: 10px;
+    height: auto;
+    min-height: 100vh;
+    justify-content: center;
   }
 
   .heroContent {
     width: 100%;
-  }
-
-  .heroImageWrapper {
-    width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 0;
   }
 
   .aboutTitle {
-    font-size: 38px;
+    font-size: clamp(32px, 6vw, 38px);
+    margin-bottom: 12px;
   }
 
   .aboutDescription {
     text-align: center;
     font-size: 15px;
-  }
-
-  .heroImage {
-    transform: scale(1); /* اندازه نرمال تصویر در موبایل */
-    max-height: 250px;
+    max-width: 100%;
+    margin-bottom: 16px;
   }
 
   .heroFeatures {
     justify-content: center;
+    gap: 14px;
+  }
+
+  .heroFeatureItem {
+    font-size: 14px;
+  }
+
+  .heroImageWrapper {
+    width: 100%;
+    margin-bottom: 0;
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    position: relative;
+    min-height: auto;
+    padding: 0;
+  }
+
+  .heroImage {
+    transform: scale(1.8);
+    max-height: 400px;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain;
+    position: relative;
+    left: auto;
+    margin: 0 -2vw;
   }
 
   .memberCard {
-    grid-template-columns: 1fr; /* تک ستونه شدن کارت‌ها در موبایل */
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .aboutHeader {
+    padding: 60px 16px 10px;
+    gap: 5px;
+    min-height: 72vh;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  .aboutTitle {
+    font-size: clamp(26px, 7vw, 30px);
+    margin-bottom: 8px;
+  }
+
+  .aboutDescription {
+    font-size: 14px;
+    line-height: 1.9;
+    margin-bottom: 12px;
+  }
+
+  .heroFeatures {
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .heroFeatureItem {
+    font-size: 13px;
+  }
+
+  .heroImageWrapper {
+    min-height: auto;
+    padding: 0;
+    margin: 0;
+    align-items: flex-end;
+  }
+
+  .heroImage {
+    transform: scale(1.8);
+    max-height: 320px;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: contain;
+    margin: 0 -2vw;
   }
 }
