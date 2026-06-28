@@ -153,7 +153,7 @@ export default function Imagedetail({ images = [], discountPercent = 0 }) {
                 onClick={goPrev}
                 aria-label="تصویر قبلی"
               >
-                ›
+                  ›
               </button>
 
               <button
@@ -162,7 +162,7 @@ export default function Imagedetail({ images = [], discountPercent = 0 }) {
                 onClick={goNext}
                 aria-label="تصویر بعدی"
               >
-                ‹
+                  ‹
               </button>
             </>
           )}
