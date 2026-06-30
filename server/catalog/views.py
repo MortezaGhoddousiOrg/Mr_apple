@@ -46,6 +46,7 @@ def product_home_list(request):
 
 #   PRODUCT IMAGE UPLOAD
 class UploadProductImage(APIView):
+    authentication_classes = [AdminJWTAuthentication]
     permission_classes = [IsAdminUser]
 
     def post(self, request):
@@ -73,6 +74,7 @@ class UploadProductImage(APIView):
 
 #   DELETE PRODUCT IMAGE
 class DeleteProductImage(APIView):
+    authentication_classes = [AdminJWTAuthentication]
     permission_classes = [IsAdminUser]
 
     def delete(self, request, image_id):
