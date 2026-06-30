@@ -28,24 +28,37 @@ export default function Header() {
   const totalCount =
     productbuy?.reduce((sum, item) => sum + (item.qty || 1), 0) || 0;
 
+  // افکت منوی اصلی (افقی) با استفاده از ResizeObserver برای حل باگ جابجایی حباب
   useEffect(() => {
     const nav = navRef.current;
     const slider = sliderRef.current;
     if (!nav || !slider) return;
 
-    const activeItem = nav.querySelector(`[data-active="true"]`);
-    if (!activeItem) {
-      slider.style.width = "0px";
-      return;
-    }
+    const updateSlider = () => {
+      const activeItem = nav.querySelector(`[data-active="true"]`);
+      if (!activeItem) {
+        slider.style.width = "0px";
+        return;
+      }
 
-    const navRect = nav.getBoundingClientRect();
-    const itemRect = activeItem.getBoundingClientRect();
+      const navRect = nav.getBoundingClientRect();
+      const itemRect = activeItem.getBoundingClientRect();
 
-    slider.style.width = `${itemRect.width}px`;
-    slider.style.transform = `translateX(${itemRect.left - navRect.left}px)`;
+      slider.style.width = `${itemRect.width}px`;
+      slider.style.transform = `translateX(${itemRect.left - navRect.left}px)`;
+    };
+
+    updateSlider();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateSlider();
+    });
+    resizeObserver.observe(nav);
+
+    return () => resizeObserver.disconnect();
   }, [pathname, isMenuOpen]);
 
+  // افکت منوی موبایل (عمودی)
   useEffect(() => {
     if (!isMenuOpen) return;
 
@@ -69,22 +82,34 @@ export default function Header() {
     return () => clearTimeout(timeout);
   }, [pathname, isMenuOpen]);
 
+  // افکت بخش آیکون‌ها (پروفایل و سبد خرید) با استفاده از ResizeObserver
   useEffect(() => {
     const nav = imgNavRef.current;
     const slider = imgSliderRef.current;
     if (!nav || !slider) return;
 
-    const activeItem = nav.querySelector(`[data-active="true"]`);
-    if (!activeItem) {
-      slider.style.width = "0px";
-      return;
-    }
+    const updateImgSlider = () => {
+      const activeItem = nav.querySelector(`[data-active="true"]`);
+      if (!activeItem) {
+        slider.style.width = "0px";
+        return;
+      }
 
-    const navRect = nav.getBoundingClientRect();
-    const itemRect = activeItem.getBoundingClientRect();
+      const navRect = nav.getBoundingClientRect();
+      const itemRect = activeItem.getBoundingClientRect();
 
-    slider.style.width = `${itemRect.width}px`;
-    slider.style.transform = `translateX(${itemRect.left - navRect.left}px)`;
+      slider.style.width = `${itemRect.width}px`;
+      slider.style.transform = `translateX(${itemRect.left - navRect.left}px)`;
+    };
+
+    updateImgSlider();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateImgSlider();
+    });
+    resizeObserver.observe(nav);
+
+    return () => resizeObserver.disconnect();
   }, [pathname, isLoggedIn]);
 
   useEffect(() => {
