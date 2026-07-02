@@ -35,6 +35,7 @@ function AccordionBody({ isActive, children }) {
 }
 
 export default function Contactus() {
+  const { setNotif } = useAuth();
   const [active, setActive] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const infoSectionRef = useRef(null);
@@ -85,22 +86,33 @@ export default function Contactus() {
     const { username, phone, subject, message } = formData;
     const phoneRegex = /^09\d{9}$/;
 
-    if (username.trim() === "")
-      return setNotif({ message: "نام را وارد کنید", type: "error" });
-    if (!phoneRegex.test(phone))
-      return setNotif({ message: "شماره موبایل معتبر نیست", type: "error" });
-    if (message.trim() === "")
-      return setNotif({ message: "پیام خود را وارد کنید", type: "error" });
+    // ✅ اعتبارسنجی با setNotif
+    if (username.trim() === "") {
+      setNotif({ id: Date.now(), message: "لطفاً نام خود را وارد کنید", type: "error" });
+      return;
+    }
+    if (!phoneRegex.test(phone)) {
+      setNotif({ id: Date.now(), message: "شماره موبایل معتبر نیست (مثال: 09123456789)", type: "error" });
+      return;
+    }
+    if (subject.trim() === "") {
+      setNotif({ id: Date.now(), message: "لطفاً موضوع پیام را انتخاب کنید", type: "error" });
+      return;
+    }
+    if (message.trim() === "") {
+      setNotif({ id: Date.now(), message: "لطفاً متن پیام را وارد کنید", type: "error" });
+      return;
+    }
 
     const dataFormToSend = { username, phone, subject, message, createdAt: new Date() };
 
     try {
       await axios.post("/api/user/", dataFormToSend);
-      setNotif({ message: "پیام شما با موفقیت ارسال شد", type: "success" });
+      setNotif({ id: Date.now(), message: "پیام شما با موفقیت ارسال شد", type: "success" });
       setFormData({ username: "", phone: "", subject: "", message: "" });
       setOpenModal(false);
     } catch {
-      setNotif({ message: "خطا در ارسال لطفا دوباره امتحان کنید", type: "error" });
+      setNotif({ id: Date.now(), message: "خطا در ارسال پیام، لطفاً دوباره امتحان کنید", type: "error" });
     }
   };
 
@@ -233,7 +245,6 @@ export default function Contactus() {
                 <input
                   type="text"
                   name="username"
-                  required
                   value={formData.username}
                   onChange={handleChangeForm}
                   placeholder=" "
@@ -244,7 +255,6 @@ export default function Contactus() {
                 <input
                   type="tel"
                   name="phone"
-                  required
                   value={formData.phone}
                   onChange={handleChangeForm}
                   placeholder=" "
@@ -264,12 +274,10 @@ export default function Contactus() {
                   <option>مشکل در ارسال کالا</option>
                   <option>انتقاد و پیشنهاد</option>
                 </select>
-                {/* <label>موضوع</label> */}
               </div>
               <div className={style.inputGroup}>
                 <textarea
                   name="message"
-                  required
                   value={formData.message}
                   onChange={handleChangeForm}
                   placeholder=" "

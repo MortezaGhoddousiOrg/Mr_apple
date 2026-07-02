@@ -1,16 +1,9 @@
 @import "tailwindcss";
 
-/* @font-face {
-  font-family: "iphone";
-  src: url(/SanFranciscoFont-master/SanFranciscoFont-master/SanFranciscoDisplay-Medium.otf);
-} */
-
 @font-face {
   font-family: "iphone";
-  /* src: url("/Font Apple/sf-pro-text-regular.woff2") format("woff2"); */
   src: url(/public/Font\ Apple/sf-pro-text-regular);
 }
-
 
 @font-face {
   font-family: "vazir";
@@ -22,21 +15,12 @@
   --foreground: #171717;
 }
 
-/* @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-} */
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
 }
-
-
 
 :root {
   --greyDark: #333333;
@@ -46,9 +30,6 @@
   --white: #f5f6f6;
   --blue: #0f73b3;
   --text: #777777;
-
-  /* --blue: #0071e3; */
-  /* --a: #2997ff; */
 }
 
 * {
@@ -56,52 +37,28 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  font-family: "vazir";
 }
 
 body {
-  /* background: var(--background); */
-  /* color: var(--foreground); */
-  /* font-family: Arial, Helvetica, sans-serif; */
   background-color: var(--white);
   background-color: #3b3b3b;
-  
   background-color: black;
-  /* background-color: white; */
   background-color: white;
   background-color: var(--white);
-  
 }
 
-
 .btnGlass {
-   /* border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 100%);
-  color: #ffffff;
-  font-family: "vazir", sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  overflow: hidden;
-  backdrop-filter: blur(1.5px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-
-  box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
-    inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);
-
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); */
-
-
-
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.155) 0%, rgba(255, 255, 255, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.155) 0%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
   font-family: "vazir", sans-serif;
   backdrop-filter: blur(1.5px);
 
-  box-shadow: 
+  box-shadow:
     0 8px 32px 0 rgba(0, 0, 0, 0.3),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
     inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);

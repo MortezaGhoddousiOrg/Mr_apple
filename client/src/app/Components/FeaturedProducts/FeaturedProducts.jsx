@@ -89,10 +89,10 @@ export default function FeaturedProduct() {
   if (featuredItems.length == 0) {
     return (
       <div className={style.box}>
-        <h2 className={style.title}>محصولی پیدا نشد</h2>
+        <h2 className={style.title}>دسته بندی پیدا نشد</h2>
         <p className={style.description}>
-          متأسفانه هیچ محصولی برای نمایش وجود ندارد. لطفاً کمی بعد دوباره تلاش
-          کنید یا فیلترهای جستجو را تغییر دهید.
+          متأسفانه هیچ دسته بندی برای نمایش وجود ندارد. لطفاً کمی بعد دوباره
+          تلاش کنید
         </p>
       </div>
     );

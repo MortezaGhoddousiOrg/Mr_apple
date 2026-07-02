@@ -1,36 +1,101 @@
 .bodyCode {
   width: 100%;
-  height: 200px;
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .boxContainer {
-  height: 300px;
+  width: 100%;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 50px;
+  gap: 40px;
   color: white;
 }
 
 .boxCodeContainer {
+  width: 100%;
   display: flex;
   flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
   gap: 20px;
-  width: 100%;
-  
+  flex-wrap: wrap;
 }
 
 .boxCodeInput {
-  background-color: white;
-  color: #020204;
   width: 60px;
   height: 60px;
-  font-size: 24px;
-  border-radius: 8px;
+  background: #fff;
+  color: #020204;
+  border: none;
+  border-radius: 10px;
+  outline: none;
   text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.boxCodeInput:focus {
+  border: 2px solid #006a9c;
+  box-shadow: 0 0 8px rgba(0, 106, 156, 0.3);
+}
+
+
+@media (max-width: 768px) {
+  .boxContainer {
+    gap: 30px;
+  }
+
+  .boxCodeContainer {
+    gap: 12px;
+  }
+
+  .boxCodeInput {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .bodyCode {
+    padding: 15px;
+  }
+
+  .boxContainer {
+    gap: 25px;
+  }
+
+  .boxCodeContainer {
+    gap: 8px;
+  }
+
+  .boxCodeInput {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+    border-radius: 8px;
+  }
+}
+
+
+@media (max-width: 360px) {
+  .boxCodeContainer {
+    gap: 6px;
+  }
+
+  .boxCodeInput {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
 }

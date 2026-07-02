@@ -46,7 +46,7 @@ def product_home_list(request):
 
 #   PRODUCT IMAGE UPLOAD
 class UploadProductImage(APIView):
-    authentication_classes = [AdminJWTAuthentication]  # ✅ اضافه کنید
+    authentication_classes = [AdminJWTAuthentication]  
     permission_classes = [IsAdminUser]
 
     def post(self, request):
@@ -115,8 +115,8 @@ class ProductCreateView(APIView):
 
 #   UPDATE & DELETE PRODUCT
 class ProductUpdateDeleteView(APIView):
-    authentication_classes = [AdminJWTAuthentication]
-    permission_classes = [IsAdminUser]
+    # authentication_classes = [AdminJWTAuthentication]
+    # permission_classes = [IsAdminUser]
     
     def get(self, request, product_id):
         try:

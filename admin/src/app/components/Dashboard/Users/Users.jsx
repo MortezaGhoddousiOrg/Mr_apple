@@ -78,7 +78,6 @@ function Users() {
   const confirmDelete = async () => {
     setEditLoading(true);
     try {
-      // ✅ اصلاح: اضافه کردن / به انتهای آدرس
       await api.delete(`/api/accounts/user/${selectedUser.id}/`);
       setNotif({
         id: Date.now(),
@@ -197,7 +196,6 @@ function Users() {
           />
         </div>
 
-        {/* دسکتاپ */}
         <div className="hidden lg:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
@@ -311,7 +309,6 @@ function Users() {
           </table>
         </div>
 
-        {/* موبایل */}
         <div className="lg:hidden space-y-4">
           {currentUsers.map((user) => (
             <div
@@ -367,7 +364,6 @@ function Users() {
           ))}
         </div>
 
-        {/* پیجینیشن */}
         {totalPages > 1 && (
           <div className="flex justify-center gap-2 mt-8">
             <button
@@ -397,7 +393,6 @@ function Users() {
           </div>
         )}
 
-        {/* مودال حذف */}
         {showDeleteModal && selectedUser && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl max-w-md w-full p-6 text-center">

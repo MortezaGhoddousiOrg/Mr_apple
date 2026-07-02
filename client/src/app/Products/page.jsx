@@ -16,7 +16,6 @@ export default function Products({ setNotif }) {
     const axioshome = async () => {
       try {
         const response = await api.get("/api/catalog/product/");
-        console.log(response.data);
         setProduct(response.data);
       } catch (err) {
         console.log(err);
@@ -147,6 +146,7 @@ export default function Products({ setNotif }) {
                 title: item.name,
                 description: item.descriptions,
                 price: item.sell_price,
+                category: item.category,
                 status: item.status,
               }))}
             />

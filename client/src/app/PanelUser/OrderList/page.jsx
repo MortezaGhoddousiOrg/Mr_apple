@@ -8,16 +8,15 @@ import { useRouter } from "next/navigation";
 export default function OrdersList() {
   const [orders, setOrders] = useState([]);
   const router = useRouter();
+  
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await api.get("/api/orders/my-orders/");
-        console.log(res.data);
-
         setOrders(res.data);
       } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error(error);
       }
     };
 
@@ -53,25 +52,23 @@ export default function OrdersList() {
   };
 
   if (orders.length === 0) {
-  return (
-    <div className={styles.card}>
-      <div className={styles.emptyBox}>
-        <h3>📦 هنوز سفارشی ثبت نکرده‌اید.</h3>
+    return (
+      <div className={styles.card}>
+        <div className={styles.emptyBox}>
+          <h3>📦 هنوز سفارشی ثبت نکرده‌اید.</h3>
 
-        <p>
-          می‌توانید از بین محصولات فروشگاه، سفارش خود را ثبت کنید.
-        </p>
+          <p>می‌توانید از بین محصولات فروشگاه، سفارش خود را ثبت کنید.</p>
 
-        <button
-          className={styles.shopButton}
-          onClick={() => router.push("/Products")}
-        >
-          مشاهده محصولات
-        </button>
+          <button
+            className={styles.shopButton}
+            onClick={() => router.push("/Products")}
+          >
+            مشاهده محصولات
+          </button>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
     <div className={styles.card}>
@@ -81,7 +78,10 @@ export default function OrdersList() {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>کد سفارش</th>
+              <th>ردیف</th>
+              <th>کد محصول </th>
+              <th>نام محصول </th>
+              <th>تعداد</th>
               <th>تاریخ</th>
               <th>وضعیت</th>
               <th>مبلغ</th>
@@ -89,28 +89,37 @@ export default function OrdersList() {
           </thead>
 
           <tbody>
-            {orders.map((order) => (
-              <tr key={order.id}>
-                <td>{order.id}</td>
+            {orders.map((order) => {
+              const item = order.items?.[0];
 
-                <td>
-                  {new Date(order.created_at).toLocaleDateString("fa-IR")}
-                </td>
+              if (!item) return null;
 
-                <td>
-                  <span
-                    className={`${styles.badge} ${styles[order.status] || ""}`}
-                  >
-                    {getStatusLabel(order.status)}
-                  </span>
-                </td>
+              return (
+                <tr key={order.id}>
+                  <td>{order.id}</td>
+                  <td>{item.product_code}</td>
+                  <td>{item.product_name}</td>
+                  <td>{item.quantity}</td>
 
-                <td className={styles.price}>
-                  {Number(order.total_amount).toLocaleString()}
-                  <span className={styles.unit}> تومان</span>
-                </td>
-              </tr>
-            ))}
+                  <td>
+                    {new Date(order.created_at).toLocaleDateString("fa-IR")}
+                  </td>
+
+                  <td>
+                    <span
+                      className={`${styles.badge} ${styles[order.status] || ""}`}
+                    >
+                      {getStatusLabel(order.status)}
+                    </span>
+                  </td>
+
+                  <td className={styles.price}>
+                    {Number(order.total_amount).toLocaleString()}
+                    <span className={styles.unit}> تومان</span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

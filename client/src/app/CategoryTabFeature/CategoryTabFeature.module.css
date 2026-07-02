@@ -137,6 +137,7 @@
   text-align: center;
   margin-top: 24px;
   box-shadow: 0 20px 50px rgba(15,23,42,0.06);
+  font-family: "vazir";
 }
  
 .title { margin: 0; font-size: 20px; font-weight: 700; color: #111827; }

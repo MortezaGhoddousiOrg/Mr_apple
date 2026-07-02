@@ -30,7 +30,6 @@ export default function AddCategory({ onBack, refresh, editData }) {
     };
     fetchParents();
 
-    // اگه در حال ویرایش هستیم و تصویر وجود داره، پیش‌نمایش رو نشون بده
     if (editData?.image) {
       setPreview(`http://127.0.0.1:4000${editData.image}`);
     }
@@ -49,7 +48,6 @@ export default function AddCategory({ onBack, refresh, editData }) {
     setLoading(true);
     try {
       if (editData) {
-        // ویرایش
         if (type === "parent") {
           if (image) {
             const formData = new FormData();
@@ -62,7 +60,6 @@ export default function AddCategory({ onBack, refresh, editData }) {
             await api.put(`/api/category/parent/${editData.id}/`, { title });
           }
         } else {
-          // ویرایش دسته‌بندی فرعی (با قابلیت آپلود تصویر)
           if (image) {
             const formData = new FormData();
             formData.append("title", title);
@@ -80,7 +77,6 @@ export default function AddCategory({ onBack, refresh, editData }) {
           type: "success",
         });
       } else {
-        // افزودن جدید
         if (type === "parent") {
           const formData = new FormData();
           formData.append("title", title);
@@ -89,7 +85,6 @@ export default function AddCategory({ onBack, refresh, editData }) {
             headers: { "Content-Type": "multipart/form-data" },
           });
         } else {
-          // افزودن دسته‌بندی فرعی (با قابلیت آپلود تصویر)
           const formData = new FormData();
           formData.append("title", title);
           formData.append("parent_id", parseInt(parentId));
@@ -120,25 +115,27 @@ export default function AddCategory({ onBack, refresh, editData }) {
   };
 
   return (
-    <section className="max-w-3xl mx-auto p-6">
+    <section className="max-w-3xl mx-auto p-4 sm:p-6">
       <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
-        <div className="border-b border-gray-200 px-8 py-6 bg-gray-50">
-          <h1 className="text-3xl font-semibold text-black">
+        <div className="border-b border-gray-200 px-4 sm:px-8 py-4 sm:py-6 bg-gray-50">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-black">
             {editData ? "ویرایش دسته‌بندی" : "افزودن دسته‌بندی جدید"}
           </h1>
-          <p className="text-gray-500 mt-2">اطلاعات دسته‌بندی را وارد کنید.</p>
+          <p className="text-gray-500 text-sm sm:text-base mt-1 sm:mt-2">
+            اطلاعات دسته‌بندی را وارد کنید.
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
           {/* Type */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-black">
+            <label className="block mb-1 sm:mb-2 text-sm font-medium text-black">
               نوع دسته‌بندی
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
-              className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-black outline-none transition-all focus:border-black focus:ring-4 focus:ring-gray-200"
+              className="w-full h-10 sm:h-12 px-3 sm:px-4 rounded-xl border border-gray-300 bg-white text-black outline-none transition-all focus:border-black focus:ring-4 focus:ring-gray-200 text-sm sm:text-base"
               disabled={!!editData}
             >
               <option value="parent">دسته‌بندی اصلی</option>
@@ -146,16 +143,15 @@ export default function AddCategory({ onBack, refresh, editData }) {
             </select>
           </div>
 
-          {/* Parent Select (برای فرعی) */}
           {type === "child" && (
             <div>
-              <label className="block mb-2 text-sm font-medium text-black">
+              <label className="block mb-1 sm:mb-2 text-sm font-medium text-black">
                 دسته‌بندی اصلی <span className="text-red-500">*</span>
               </label>
               <select
                 value={parentId}
                 onChange={(e) => setParentId(e.target.value)}
-                className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-black outline-none transition-all focus:border-black focus:ring-4 focus:ring-gray-200"
+                className="w-full h-10 sm:h-12 px-3 sm:px-4 rounded-xl border border-gray-300 bg-white text-black outline-none transition-all focus:border-black focus:ring-4 focus:ring-gray-200 text-sm sm:text-base"
                 required={type === "child" && !editData}
               >
                 <option value="">انتخاب کنید</option>
@@ -168,9 +164,8 @@ export default function AddCategory({ onBack, refresh, editData }) {
             </div>
           )}
 
-          {/* Image Upload (برای هر دو نوع) */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-black">
+            <label className="block mb-1 sm:mb-2 text-sm font-medium text-black">
               تصویر دسته‌بندی
               {editData && editData.image && !image && (
                 <span className="text-xs text-gray-500 mr-2">
@@ -178,27 +173,25 @@ export default function AddCategory({ onBack, refresh, editData }) {
                 </span>
               )}
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6 hover:border-black transition-all">
-              {/* پیش‌نمایش تصویر فعلی */}
+            <div className="border-2 border-dashed border-gray-300 rounded-2xl p-4 sm:p-6 hover:border-black transition-all">
               {preview && !image && (
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-2">تصویر فعلی:</p>
+                <div className="mb-3 sm:mb-4 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">تصویر فعلی:</p>
                   <img
                     src={preview}
                     alt="پیش‌نمایش"
-                    className="w-24 h-24 object-cover rounded-lg"
+                    className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover rounded-lg"
                   />
                 </div>
               )}
 
-              {/* پیش‌نمایش تصویر جدید */}
               {image && (
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-2">تصویر جدید:</p>
+                <div className="mb-3 sm:mb-4 p-3 bg-gray-50 rounded-lg">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">تصویر جدید:</p>
                   <img
                     src={preview}
                     alt="پیش‌نمایش جدید"
-                    className="w-24 h-24 object-cover rounded-lg"
+                    className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover rounded-lg"
                   />
                 </div>
               )}
@@ -207,17 +200,16 @@ export default function AddCategory({ onBack, refresh, editData }) {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="block w-full text-black file:mr-4 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-black file:text-white file:cursor-pointer cursor-pointer"
+                className="block w-full text-sm sm:text-base text-black file:mr-2 sm:file:mr-4 file:px-3 sm:file:px-4 file:py-1.5 sm:file:py-2 file:rounded-lg file:border-0 file:bg-black file:text-white file:cursor-pointer cursor-pointer"
               />
-              <p className="mt-2 text-xs text-gray-400">
+              <p className="mt-1 sm:mt-2 text-xs text-gray-400">
                 فرمت‌های مجاز: JPEG, PNG, WebP
               </p>
             </div>
           </div>
 
-          {/* Title */}
           <div>
-            <label className="block mb-2 text-sm font-medium text-black">
+            <label className="block mb-1 sm:mb-2 text-sm font-medium text-black">
               عنوان دسته‌بندی <span className="text-red-500">*</span>
             </label>
             <input
@@ -226,16 +218,15 @@ export default function AddCategory({ onBack, refresh, editData }) {
               onChange={(e) => setTitle(e.target.value)}
               required
               placeholder="مثال: آیفون"
-              className="w-full h-12 px-4 rounded-xl border border-gray-300 bg-white text-black placeholder:text-gray-400 outline-none transition-all focus:border-black focus:ring-4 focus:ring-gray-200"
+              className="w-full h-10 sm:h-12 px-3 sm:px-4 rounded-xl border border-gray-300 bg-white text-black placeholder:text-gray-400 outline-none transition-all focus:border-black focus:ring-4 focus:ring-gray-200 text-sm sm:text-base"
             />
           </div>
 
-          {/* Buttons */}
-          <div className="flex gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 h-12 rounded-xl bg-black text-white font-medium transition-all hover:scale-[1.02] hover:bg-gray-900 disabled:opacity-50"
+              className="w-full sm:flex-1 h-10 sm:h-12 rounded-xl bg-black text-white font-medium transition-all hover:scale-[1.02] hover:bg-gray-900 disabled:opacity-50 text-sm sm:text-base"
             >
               {loading
                 ? "در حال ذخیره..."
@@ -246,7 +237,7 @@ export default function AddCategory({ onBack, refresh, editData }) {
             <button
               type="button"
               onClick={onBack}
-              className="flex-1 h-12 rounded-xl border border-gray-300 bg-white text-black font-medium transition-all hover:bg-gray-100"
+              className="w-full sm:flex-1 h-10 sm:h-12 rounded-xl border border-gray-300 bg-white text-black font-medium transition-all hover:bg-gray-100 text-sm sm:text-base"
             >
               بازگشت
             </button>

@@ -12,7 +12,7 @@ export default function Card({ product = [] }) {
 
   const { productbuy, addToCart, setNotif } = useAuth();
 
-  const activeProducts = product.filter((item) => item.status === "active");
+  const activeProducts = product.filter((item) => item.status === "active" && item.category);
 
   const isInCart = (id) => {
     return productbuy?.some((p) => (p.product_id || p.id) === id);

@@ -27,6 +27,9 @@
 .containerProfile img {
   width: 100px;
   height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e5e7eb;
 }
 
 .sidebar {
@@ -77,16 +80,19 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
+  font-family: "vazir";
+  font-size: 14px;
 }
 
 .menuItem:hover {
   background: #f9fafb;
-  color: #0f73b3;
+  color: #006a9c;
 }
 
 .menuItemActive {
   background: #e0f2fe !important;
-  color: #0f73b3 !important;
+  color: #006a9c !important;
   font-weight: 600;
 }
 
@@ -98,7 +104,7 @@
 }
 
 .menuItemActive .menuItemBullet {
-  background: var(--blue);
+  background: #006a9c;
 }
 
 .content {
@@ -109,11 +115,47 @@
   padding: 30px;
 }
 
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 20px;
+  background: #006a9c;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: "vazir", sans-serif;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 106, 156, 0.3);
+}
+
+.backButton:hover {
+  background: #005282;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 106, 156, 0.4);
+}
+
+.backButton:active {
+  transform: translateY(0px);
+}
+
 @media (max-width: 900px) {
   .panelContainer {
     flex-direction: column;
   }
   .sidebar {
     width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .backButton {
+    padding: 10px 16px;
+    font-size: 14px;
   }
 }

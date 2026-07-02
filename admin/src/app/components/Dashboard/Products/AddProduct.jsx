@@ -37,7 +37,6 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
     fetchCategories();
   }, []);
 
-  // اگر حالت ویرایش بود، دیتا رو پر کن
   useEffect(() => {
     if (mode === "edit" && initialData) {
       setFormData({
@@ -71,14 +70,12 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         setFeatures(featuresArray);
       }
 
-      // تنظیم تصاویر هنگام ویرایش
       if (initialData.images && initialData.images.length > 0) {
         const mainImg = initialData.images.find((img) => img.is_main === true);
         const galleryImgs = initialData.images.filter(
           (img) => img.is_main !== true,
         );
 
-        // تصویر اصلی
         if (mainImg) {
           setMainImage({
             id: mainImg.id,
@@ -88,7 +85,6 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
           });
         }
 
-        // تصاویر گالری
         if (galleryImgs.length > 0) {
           const existingGalleryImages = galleryImgs.map((img) => ({
             id: img.id,
@@ -601,7 +597,6 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
             </div>
           </div>
 
-          {/* تصویر اصلی */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
             <h2 className="text-lg font-semibold text-gray-900 pb-2 border-b border-gray-100">
               تصویر اصلی{" "}
@@ -666,7 +661,6 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
             </div>
           </div>
 
-          {/* تصاویر گالری */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
             <h2 className="text-lg font-semibold text-gray-900 pb-2 border-b border-gray-100">
               تصاویر گالری

@@ -24,12 +24,9 @@ export default function Login({ setNotif }) {
       }
     };
     logoutFromBackend();
-
-    // ✅ پاک کردن کوکی admin_access_token از مرورگر
     document.cookie =
       "admin_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 
-    // ✅ پاک کردن localStorage
     localStorage.removeItem("admin");
     localStorage.removeItem("isAuthenticated");
   }, []);

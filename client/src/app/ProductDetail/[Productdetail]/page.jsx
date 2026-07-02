@@ -8,7 +8,7 @@ import Image from "next/image";
 import styles from "./page.module.css";
 import Imagedetail from "@/app/ProductDetail/ImageDetail/Imagedetail";
 import { useAuth } from "@/app/Context/Context";
-import { api } from "@/app/config";
+import { api, MEDIA_URL } from "@/app/config";
 
 function toPersianDigits(value) {
   if (value === null || value === undefined) return "";
@@ -22,7 +22,6 @@ function formatPriceFa(price) {
   return toPersianDigits(n.toLocaleString("en-US"));
 }
 
-// ✅ تابع محاسبه قیمت نهایی با تخفیف درصدی
 function calcDiscountedPrice(sellPrice, discountPercent) {
   const price = Number(sellPrice);
   const percent = Number(discountPercent);
@@ -36,7 +35,6 @@ function calcDiscountedPrice(sellPrice, discountPercent) {
   return Math.max(0, finalPrice);
 }
 
-// ✅ تابع محاسبه درصد تخفیف برای نمایش
 function calcDiscountPercent(discountPercent) {
   const percent = Number(discountPercent);
   if (isNaN(percent) || percent <= 0) return 0;
@@ -63,7 +61,6 @@ export default function Productdetail() {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        // ✅ اصلاح: حذف /public/ از آدرس
         const response = await api.get(`/api/catalog/product/${id}/`);
         setProduct(response.data);
         setError(null);
@@ -79,24 +76,22 @@ export default function Productdetail() {
     fetchProduct();
   }, [id]);
 
-  // گالری تصاویر
   const galleryImages = useMemo(() => {
     if (!product?.images || !Array.isArray(product.images)) return [];
 
     const imagesList = product.images
       .filter((img) => img?.image)
-      .map((img) => `http://127.0.0.1:4000${img.image}`);
+      .map((img) => `${MEDIA_URL}${img.image}`);
 
     const mainImage = product.images.find((img) => img.is_main === true);
     if (mainImage) {
-      const mainUrl = `http://127.0.0.1:4000${mainImage.image}`;
+      const mainUrl = `${MEDIA_URL}${mainImage.image}`;
       const others = imagesList.filter((url) => url !== mainUrl);
       return [mainUrl, ...others];
     }
     return imagesList;
   }, [product]);
 
-  // تبدیل feature از object به array
   const featureArray = useMemo(() => {
     if (!product?.feature) return [];
     if (Array.isArray(product.feature)) return product.feature;
@@ -109,19 +104,16 @@ export default function Productdetail() {
     return [];
   }, [product]);
 
-  // ✅ قیمت نهایی بعد از اعمال تخفیف
   const discountedPrice = useMemo(
     () => calcDiscountedPrice(product?.sell_price, product?.discount),
     [product?.sell_price, product?.discount],
   );
 
-  // ✅ بررسی وجود تخفیف
   const hasDiscount = useMemo(() => {
     const percent = Number(product?.discount);
     return !isNaN(percent) && percent > 0;
   }, [product?.discount]);
 
-  // ✅ درصد تخفیف برای نمایش
   const discountPercent = useMemo(
     () => calcDiscountPercent(product?.discount),
     [product?.discount],

@@ -22,8 +22,7 @@ export default function ServiceSpecial({
   const router = useRouter();
 
   const { productbuy, addToCart, setNotif } = useAuth();
-
-  const Active = data.filter((item) => item.status === "active");
+  const Active = data.filter((item) => item.status === "active" && item.category);
 
   const isInCart = (id) => {
     return productbuy?.some((p) => (p.product_id || p.id) === id);
@@ -94,8 +93,8 @@ export default function ServiceSpecial({
   const handleTouchEnd = (e) => {
     touchEndX.current = e.changedTouches[0].screenX;
 
-    if (touchStartX.current - touchEndX.current > 150) prevSlide();
-    if (touchEndX.current - touchStartX.current > 150) nextSlide();
+    if (touchStartX.current - touchEndX.current > 50) prevSlide();
+    if (touchEndX.current - touchStartX.current > 50) nextSlide();
   };
 
   const translateValue = `translateX(${index * (100 / visibleCards)}%) translateX(${index * gap}px)`;

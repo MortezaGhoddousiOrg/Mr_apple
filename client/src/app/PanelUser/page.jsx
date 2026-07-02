@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../Context/Context";
-
 import OrdersList from "@/app/PanelUser/OrderList/page";
 import ProfileSettings from "@/app/PanelUser/ProfileSetting/page";
 import Logout from "@/app/PanelUser/Logout/page";
@@ -34,6 +33,8 @@ export default function PanelUser() {
         return <ProfileSettings />;
       case "logout":
         return <Logout />;
+      default:
+        return null;
     }
   };
 
@@ -41,6 +42,14 @@ export default function PanelUser() {
     <section className={styles.panelWrapper}>
       <div className={styles.panelContainer}>
         <aside className={styles.sidebar}>
+          <button
+            className={styles.backButton}
+            type="button"
+            onClick={() => router.push("/")}
+          >
+            برگشت به خانه
+          </button>
+
           <div className={styles.containerProfile}>
             <img src="/image-about/images (3).jfif" alt="profile" />
             {dataForm.firstname && dataForm.lastname !== "" ? (
@@ -61,7 +70,9 @@ export default function PanelUser() {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`${styles.menuItem} ${activeTab === item.id ? styles.menuItemActive : ""}`}
+                className={`${styles.menuItem} ${
+                  activeTab === item.id ? styles.menuItemActive : ""
+                }`}
               >
                 <span className={styles.menuItemBullet}></span>
                 <span>{item.title}</span>

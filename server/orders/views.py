@@ -205,8 +205,8 @@ class CreateOrder(APIView):
             order = Orders.objects.create(
                 user_id=user_id,
                 total_amount=total_amount,
-                status="pending",
-                product_status="pending"
+                status="failed",
+                product_status="failed"
             )
 
             for item in cart_items:
@@ -220,7 +220,7 @@ class CreateOrder(APIView):
             payment = Payments.objects.create(
                 order_id=order.id,
                 gateway="Zarinpal",
-                status="pending"
+                status="failed"
             )
 
         # --- Gateway call outside transaction so DB isn't rolled back on failure ---
@@ -501,13 +501,15 @@ class AdminOrderListView(APIView):
                     "lastname": order.user.lastname,
                     "phone": order.user.phone,
                     "email": order.user.email,
+                    "postal_code": order.user.postal_code,
+                    "address": order.user.address,
                 },
                 "items": items,
                 "total_amount": order.total_amount,
                 "total_quantity": total_quantity,
                 "status": order.status,
                 "product_status": order.product_status,
-                "payment_status": order.payments.last().status if order.payments.exists() else "pending",
+                "payment_status": order.payments.last().status if order.payments.exists() else "failed",
                 "payment_method": "online",
                 "shipping_address": {
                     "postal_code": getattr(order, "shipping_postal_code", None),

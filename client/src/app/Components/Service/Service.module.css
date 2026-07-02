@@ -6,8 +6,8 @@
   justify-content: center;
   font-family: "vazir";
   margin-top: 100px;
+  margin-bottom: 120px;
   user-select: none;
-  transition: all 0.3s ease;
 }
 
 .servicesHeader {
@@ -16,35 +16,32 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 20px;
-  transition: all 1s ease;
 }
-
 
 .iconTitle {
-  font-size: 16px;
+  font-size: 18px;
   margin-right: 50px;
 }
-
 
 .sliderContainer {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.3s ease;
+  gap: 0;
+  padding: 0 50px;
 }
 
 .servicesSlider {
   overflow: hidden;
-  width: 90%;
+  width: 100%;
 }
 
-
-.servicesAll{
-    display:flex;
-    align-items: stretch;
-    gap:20px;
-    width:100%;
+.servicesAll {
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  width: 100%;
 }
 
 .serviceCard {
@@ -53,18 +50,16 @@
   justify-content: space-between;
   align-items: start;
   height: 430px;
-  width: 250px;
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(18px);
   background-color: white;
   border: 1px solid rgba(255, 255, 255, 0.18);
-  padding: 0 1.5vw;
+  padding: 0 16px;
   border-radius: 24px;
   transition: all 0.3s ease-out;
-  flex-shrink:0;
-    min-width:0;
-    width:auto;
-    box-sizing:border-box;
+  flex-shrink: 0;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .serviceCardLast {
@@ -72,67 +67,53 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 50px;
+  gap: 30px;
   border-radius: 24px;
-  height: auto;
-  width: 250px;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  background: linear-gradient(
-    135deg,
-    rgb(0, 0, 0) 0%,
-    rgba(0, 10, 14, 0.694) 100%
-  );
+  background: linear-gradient(135deg, rgb(0, 0, 0) 0%, rgba(0, 10, 14, 0.694) 100%);
   color: #ffffff;
   font-family: "vazir", sans-serif;
   font-size: 16px;
   font-weight: 500;
   backdrop-filter: blur(1.5px);
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    min-width:0;
-    box-sizing:border-box;
-    padding:25px;
-
+  flex-shrink: 0;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 25px;
 }
 
 .serviceCardLastDiv {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transition: all 0.3s ease;
+  gap: 8px;
   font-size: 14px;
+  text-align: center;
 }
 
 .serviceCardLastButton {
-  width: 50%;
+  width: 60%;
   padding: 8px 12px;
   font-family: "vazir";
-  border-radius: 20px;
- border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.155) 0%, rgba(255, 255, 255, 0.2) 100%);
   color: #ffffff;
-  font-family: "vazir", sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  overflow: hidden;
   backdrop-filter: blur(1.5px);
-
-  box-shadow: 
+  box-shadow:
     0 8px 32px 0 rgba(0, 0, 0, 0.3),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
     inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);
-
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  color: white;
 }
+
 .serviceCardLastButton:hover {
   transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.45);
-  box-shadow: 
-    0 12px 40px 0 rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 10px 0 rgba(255, 255, 255, 0.1);
 }
 
 .serviceImage {
@@ -146,8 +127,8 @@
 .serviceTitle {
   display: inline-flex;
   align-self: flex-start;
-  padding: 5px 10px;
-  margin: 0 0 12px 0;
+  padding: 4px 10px;
+  margin: 0 0 10px 0;
   border-radius: 999px;
   background: rgba(243, 244, 246, 0.95);
   color: #6b7280;
@@ -155,7 +136,6 @@
   font-weight: 500;
   line-height: 1.5;
 }
-
 
 .serviceDescription {
   font-size: 14px;
@@ -165,96 +145,33 @@
 .servicePrice {
   align-self: end;
   margin-left: 5px;
+  font-size: 14px;
 }
 
 .serviceBtn {
   align-self: center;
   padding: 10px 20px;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 999px;
   margin: 10px 0;
   font-family: "vazir";
   cursor: pointer;
-  color: white;
-  background-color: #0f73b3;
-  font-size: 15px;
-
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.2) 100%
-  );
-  color: #ffffff;
-  font-family: "vazir", sans-serif;
-  font-size: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 100%);
+  color: var(--blue);
+  font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
   overflow: hidden;
   backdrop-filter: blur(1.5px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-
   box-shadow:
     0 8px 32px 0 rgba(81, 81, 81, 0.3),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
     inset 0 -2px 6px 0 rgba(101, 101, 101, 0.2);
-
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-  color: var(--blue);
-}
-
-.serviceBtn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 5%;
-  width: 90%;
-  height: 45%;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  border-radius: 999px;
-  transition: all 0.4s ease;
 }
 
 .serviceBtn:hover {
   transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.45);
-  box-shadow:
-    0 12px 40px 0 rgba(61, 61, 61, 0.45),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 10px 0 rgba(0, 0, 0, 0.1);
-}
-
-
-.navBtn {
-  position: absolute;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  font-size: 16px;
-  background: #d2d2d2;
-  color: black;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 50%;
-  z-index: 10;
-}
-
-.navBtn.left {
-  left: 1.5%;
-}
-
-.navBtn.right {
-  right: 1%;
-}
-
-.navBtn:disabled {
-  display: none;
 }
 
 .serviceBtnGreen {
@@ -262,12 +179,46 @@
   color: white !important;
   display: flex;
   align-items: center;
-  padding: 10px;
+  gap: 6px;
 }
 
 .svg {
-  margin-top: 5px;
-  margin-right: 3px;
+  flex-shrink: 0;
+}
+
+.navBtn {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  background: #e5e5e5;
+  color: #333;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.2s ease;
+}
+
+.navBtn:hover {
+  background: #d0d0d0;
+}
+
+.navBtnRight {
+  margin-left: 8px;
+  order: -1;
+}
+
+.navBtnLeft {
+  margin-right: 8px;
+  order: 1;
+}
+
+.navBtn:disabled {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .box {
@@ -284,6 +235,7 @@
   background: #fafafa;
   text-align: center;
   margin-top: 50px;
+  font-family: "vazir";
 }
 
 .title {
@@ -301,516 +253,123 @@
   color: #6b7280;
 }
 
-@media (min-width: 250px) and (max-width: 400px) {
-  .iconTitle {
-    font-size: 20px;
-  }
-
-  .servicesSlider {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 78%;
-  }
-
-  .servicesAll {
-    width: 95%;
-  }
-
-  .serviceCard {
-    height: 480px;
-    justify-content: space-around;
-  }
-
-  .serviceCardLastDiv {
-    font-size: 20px;
-  }
-
-  .serviceCardLastButton {
-    font-size: 20px;
-  }
-
-  .serviceImage {
-    height: 200px;
-  }
-
-  .serviceTitle {
-    font-size: 14px;
-  }
-
-  .serviceDescription {
-    font-size: 16px;
-  }
-
-  .servicePrice {
-    font-size: 16px;
-  }
-
-  .serviceBtn {
-    font-size: 16px;
+@media (max-width: 600px) {
+  .sliderContainer {
+    padding: 0 40px;
   }
 
   .navBtn {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .navBtn.left {
-    left: 0.5%;
-  }
-
-  .navBtn.right {
-    right: 0.5%;
-  }
-}
-
-@media (min-width: 400px) and (max-width: 600px) {
-  .iconTitle {
-    font-size: 20px;
-  }
-
-  .servicesSlider {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 70%;
-  }
-
-  .servicesAll {
-    width: 95%;
+    width: 32px;
+    height: 32px;
   }
 
   .serviceCard {
-    height: 480px;
+    height: auto;
+    min-height: 400px;
     justify-content: space-around;
-  }
-
-  .serviceCardLastDiv {
-    font-size: 20px;
-  }
-
-  .serviceCardLastButton {
-    font-size: 20px;
-  }
-
-  .serviceImage {
-    height: 200px;
-  }
-
-  .serviceTitle {
-    font-size: 14px;
-  }
-
-  .serviceDescription {
-    font-size: 16px;
-  }
-
-  .servicePrice {
-    font-size: 16px;
-  }
-
-  .serviceBtn {
-    font-size: 16px;
-  }
-
-  .navBtn {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .navBtn.left {
-    left: 3%;
-  }
-
-  .navBtn.right {
-    right: 3%;
-  }
-}
-
-
-@media (min-width: 600px) and (max-width: 800px) {
-  .iconTitle {
-    font-size: 22px;
-  }
-
-  .servicesSlider {
-    display: flex;
-    align-items: center;
-    width: 85%;
-  }
-
-  .servicesAll {
-    width: 97%;
-  }
-
-  .serviceCard {
-    height: 450px;
-    justify-content: space-around;
-  }
-
-  .serviceCardLastDiv {
-    font-size: 20px;
-  }
-
-  .serviceCardLastButton {
-    font-size: 20px;
-  }
-
-  .serviceImage {
-    height: 200px;
-  }
-
-  .serviceTitle {
-    font-size: 14px;
-  }
-
-  .serviceDescription {
-    font-size: 16px;
-  }
-
-  .servicePrice {
-    font-size: 16px;
-  }
-
-  .serviceBtn {
-    font-size: 16px;
-  }
-
-  .navBtn {
-    width: 30px;
-    height: 30px;
-    font-size: 16px;
-  }
-
-  .navBtn.left {
-    left: 2%;
-  }
-
-  .navBtn.right {
-    right: 2%;
-  }
-}
-
-@media (min-width: 800px) and (max-width: 1000px) {
-  .iconTitle {
-    font-size: 22px;
-  }
-
-  .servicesSlider {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-  }
-
-  .servicesAll {
-    width: 95%;
-  }
-
-  .serviceCard {
-    height: 450px;
-    justify-content: space-around;
-  }
-
-  .serviceCardLastDiv {
-    font-size: 14px;
-  }
-
-  .serviceCardLastButton {
-    font-size: 14px;
+    padding: 0 14px;
   }
 
   .serviceImage {
     height: 180px;
   }
 
-  .serviceTitle {
-    font-size: 12px;
-  }
-
   .serviceDescription {
-    font-size: 14px;
-  }
-
-  .servicePrice {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .serviceBtn {
-    font-size: 14px;
+    font-size: 13px;
+    padding: 9px 14px;
   }
 
-  .navBtn {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
+  .serviceCardLast {
+    min-height: 400px;
   }
 
-  .navBtn.left {
-    left: 1%;
-  }
-
-  .navBtn.right {
-    right: 1%;
+  .iconTitle {
+    font-size: 16px;
+    margin-right: 12px;
   }
 }
 
-
-@media (min-width: 1200px) and (max-width: 1400px) {
-  .iconTitle {
-    font-size: 24px;
-  }
-
-  .servicesSlider {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-  }
-
-  .servicesAll {
-    width: 94.7%;
-  }
-
-  .serviceCard {
-    height: 500px;
-    justify-content: space-around;
-  }
-
-  .serviceCardLastDiv {
-    font-size: 16px;
-  }
-
-  .serviceCardLastButton {
-    font-size: 16px;
-  }
-
-  .serviceImage {
-    height: 220px;
-  }
-
-  .serviceTitle {
-    font-size: 14px;
-  }
-
-  .serviceDescription {
-    font-size: 16px;
-  }
-
-  .servicePrice {
-    font-size: 16px;
-  }
-
-  .serviceBtn {
-    font-size: 16px;
+@media (min-width: 600px) and (max-width: 900px) {
+  .sliderContainer {
+    padding: 0 44px;
   }
 
   .navBtn {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .serviceCard {
+    height: auto;
+    min-height: 420px;
+    justify-content: space-around;
+  }
+
+  .serviceImage {
+    height: 180px;
+  }
+
+  .iconTitle {
+    font-size: 17px;
+    margin-right: 20px;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1200px) {
+  .sliderContainer {
+    padding: 0 46px;
+  }
+
+  .serviceCard {
+    height: 440px;
+  }
+
+  .iconTitle {
     font-size: 18px;
   }
-
-  .navBtn.left {
-    left: 1%;
-  }
-
-  .navBtn.right {
-    right: 1%;
-  }
 }
 
-@media (min-width: 1400px) and (max-width: 1600px) {
-  .iconTitle {
-    font-size: 26px;
-  }
-
-  .servicesSlider {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-  }
-
-  .servicesAll {
-    width: 95%;
-  }
-
+@media (min-width: 1200px) and (max-width: 1600px) {
   .serviceCard {
-    height: 600px;
-    justify-content: space-around;
-  }
-
-  .serviceCardLastDiv {
-    font-size: 20px;
-  }
-
-  .serviceCardLastButton {
-    font-size: 20px;
+    height: 460px;
   }
 
   .serviceImage {
-    height: 250px;
-  }
-
-  .serviceTitle {
-    font-size: 18px;
-  }
-
-  .serviceDescription {
-    font-size: 20px;
-  }
-
-  .servicePrice {
-    font-size: 20px;
-  }
-
-  .serviceBtn {
-    font-size: 20px;
-  }
-
-  .navBtn {
-    width: 50px;
-    height: 50px;
-    font-size: 22px;
+    height: 200px;
   }
 }
 
-
-@media (min-width: 1600px) and (max-width: 1800px) {
-  .iconTitle {
-    font-size: 28px;
-  }
-
-  .servicesSlider {
-    display: flex;
-    justify-content: start;
-    align-items: center;
-  }
-
-  .servicesAll {
-    width: 95%;
-  }
-
+@media (min-width: 1600px) {
   .serviceCard {
-    height: 600px;
-    justify-content: space-around;
-  }
-
-  .serviceCardLastDiv {
-    font-size: 22px;
-  }
-
-  .serviceCardLastButton {
-    font-size: 22px;
+    height: 520px;
   }
 
   .serviceImage {
-    height: 280px;
-  }
-
-  .serviceTitle {
-    font-size: 20px;
+    height: 230px;
   }
 
   .serviceDescription {
-    font-size: 22px;
+    font-size: 16px;
   }
 
   .servicePrice {
-    font-size: 22px;
+    font-size: 16px;
   }
 
   .serviceBtn {
-    font-size: 22px;
+    font-size: 16px;
   }
 
   .navBtn {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
+    width: 44px;
+    height: 44px;
   }
 
-  .navBtn.left {
-    left: 1.5%;
-  }
-
-  .navBtn.right {
-    right: 0.75%;
-  }
-}
-
-
-@media (min-width: 1800px) {
   .iconTitle {
-    font-size: 28px;
-  }
-
-  .servicesSlider {
-    display: flex;
-    align-items: center;
-  }
-
-  .servicesAll {
-    width: 96.5%;
-  }
-
-  .serviceCard {
-    height: 600px;
-    justify-content: space-around;
-  }
-
-  .serviceCardLastDiv {
     font-size: 22px;
-  }
-
-  .serviceCardLastButton {
-    font-size: 22px;
-  }
-
-  .serviceImage {
-    height: 280px;
-  }
-
-  .serviceTitle {
-    font-size: 20px;
-  }
-
-  .serviceDescription {
-    font-size: 22px;
-  }
-
-  .servicePrice {
-    font-size: 22px;
-  }
-
-  .serviceBtn {
-    font-size: 22px;
-  }
-
-  .navBtn {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-  }
-
-  .navBtn.left {
-    left: 1%;
-  }
-
-  .navBtn.right {
-    right: 1%;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

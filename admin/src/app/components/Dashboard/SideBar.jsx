@@ -10,7 +10,7 @@ import Users from "./Users/Users";
 import Orders from "./Orders/Orders";
 import Category from "./Category/Category";
  
-export default function SideBar({ setRendered }) {
+export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
   const router = useRouter();
   const [activeItem, setActiveItem] = useState("داشبورد");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -52,6 +52,11 @@ export default function SideBar({ setRendered }) {
       default:
         setRendered(<Dashboard />);
     }
+    
+    // بستن سایدبار در موبایل (کمتر از 768px)
+    if (window.innerWidth < 768) {
+      closeSidebar();
+    }
   };
  
   const handleLogout = async () => {
@@ -78,8 +83,17 @@ export default function SideBar({ setRendered }) {
  
   return (
     <>
-      <aside className="fixed right-0 top-16 h-[calc(100vh-4rem)] w-64 bg-gradient-to-b from-gray-900 to-gray-800 shadow-xl z-50 flex flex-col">
-        {/* User Profile Section */}
+      <aside
+        className={`
+          fixed right-0 top-16 h-[calc(100vh-4rem)] 
+          bg-gradient-to-b from-gray-900 to-gray-800 shadow-xl z-50 
+          flex flex-col transition-all duration-300 ease-in-out
+          w-72
+          md:translate-x-0
+          ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
+        `}
+      >
+        {/* پروفایل */}
         <div className="flex flex-col items-center py-4 px-4 border-b border-gray-700 flex-shrink-0">
           <div className="relative">
             <Image
@@ -99,7 +113,6 @@ export default function SideBar({ setRendered }) {
           </p>
         </div>
  
-        {/* Navigation Menu — scrollable middle area */}
         <nav className="flex-1 overflow-y-auto mt-4 px-3 min-h-0">
           <ul className="space-y-1 pb-2">
             {list_items.map((li, idx) => (
@@ -127,7 +140,6 @@ export default function SideBar({ setRendered }) {
           </ul>
         </nav>
  
-        {/* Footer — always visible at bottom, never overlaps nav */}
         <div className="flex-shrink-0 p-4 border-t border-gray-700">
           <button
             onClick={() => setShowLogoutModal(true)}
@@ -152,11 +164,18 @@ export default function SideBar({ setRendered }) {
         </div>
       </aside>
  
+      {/* ✅ اوورلی - فقط تا 768px */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+ 
       {/* مودال خروج */}
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 text-center">
-            {/* آیکون */}
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="w-8 h-8 text-red-500"
@@ -173,15 +192,12 @@ export default function SideBar({ setRendered }) {
               </svg>
             </div>
  
-            {/* عنوان */}
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               خروج از پنل کاربری
             </h3>
  
-            {/* متن */}
             <p className="text-gray-500 mb-6">آیا از خروج خود مطمئن هستید؟</p>
  
-            {/* دکمه‌ها */}
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}

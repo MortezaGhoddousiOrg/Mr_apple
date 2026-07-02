@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Fragment } from "react";
 import Image from "next/image";
-import { api } from "@/app/config";
+import { api, MEDIA_URL } from "@/app/config";
 import Button from "../../Button";
 import AddProduct from "./AddProduct";
 import { useNotification } from "@/app/Context/NotificationContext";
@@ -10,6 +10,7 @@ import { useNotification } from "@/app/Context/NotificationContext";
 function Products() {
   const { setNotif } = useNotification();
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showAddProduct, setShowAddProduct] = useState(false);
@@ -20,10 +21,22 @@ function Products() {
   const [editLoading, setEditLoading] = useState(false);
   const productsPerPage = 20;
 
+  const fetchCategories = async () => {
+    try {
+      const childResponse = await api.get("/api/category/child/");
+      const parentResponse = await api.get("/api/category/parent/");
+      const allCategories = [...childResponse.data, ...parentResponse.data];
+      setCategories(allCategories);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await api.get("/api/catalog/product/");
+      console.log("📦 Products data:", response.data);
       setProducts(response.data);
     } catch (err) {
       setError("خطا در دریافت لیست محصولات");
@@ -34,6 +47,7 @@ function Products() {
   };
 
   useEffect(() => {
+    fetchCategories();
     fetchProducts();
   }, []);
 
@@ -121,8 +135,8 @@ function Products() {
   const getMainImage = (images) => {
     if (!images || images.length === 0) return null;
     const main = images.find((img) => img.is_main === true);
-    if (main) return `http://127.0.0.1:4000${main.image}`;
-    if (images[0]) return `http://127.0.0.1:4000${images[0].image}`;
+    if (main) return `${MEDIA_URL}${main.image}`;
+    if (images[0]) return `${MEDIA_URL}${images[0].image}`;
     return null;
   };
 
@@ -145,6 +159,29 @@ function Products() {
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("fa-IR").format(price);
+  };
+
+  const getCategoryDisplay = (product) => {
+    if (product.category && typeof product.category === "object") {
+      if (product.category.parent) {
+        return `${product.category.parent.title} / ${product.category.title}`;
+      }
+      return product.category.title || "-";
+    }
+
+    if (product.category_child_id && categories.length > 0) {
+      const category = categories.find(
+        (c) => c.id === product.category_child_id,
+      );
+      if (category) {
+        if (category.parent) {
+          return `${category.parent.title} / ${category.title}`;
+        }
+        return category.title || "-";
+      }
+    }
+
+    return "-";
   };
 
   if (loading) {
@@ -265,11 +302,7 @@ function Products() {
                       {getStatusBadge(product.status)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {product.category?.parent?.title || ""}{" "}
-                      {product.category?.parent?.title &&
-                        product.category?.title &&
-                        "/"}{" "}
-                      {product.category?.title || "-"}
+                      {getCategoryDisplay(product)}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">

@@ -1,25 +1,18 @@
 "use client";
 
-import Login from "@/app/Login/Login";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Login from "@/app/Login/Login";
 
 export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    const local = localStorage.getItem("admin");
-
-    if (local) {
-        router.push("/dashboard");
-    } else {
-        router.push("/");
+    const admin = localStorage.getItem("admin");
+    if (admin) {
+      router.push("/dashboard");
     }
   }, []);
 
-  return (
-    <div>
-      <Login />
-    </div>
-  );
+  return <Login />;
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-export default function Header() {
+export default function Header({ toggleSidebar, isSidebarOpen }) {
     const [currentTime, setCurrentTime] = useState("");
 
     useEffect(() => {
@@ -29,12 +29,41 @@ export default function Header() {
 
     return (
         <header className="fixed top-0 right-0 left-0 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg z-50">
-            <div className="h-full px-4 md:px-6 flex justify-between items-center">
-                {/* Logo and Title */}
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+            <div className="h-full px-3 sm:px-4 md:px-6 flex justify-between items-center">
+                <div className="flex items-center gap-2 sm:gap-3">
+                    {/* ✅ دکمه همبرگر - تا 768px */}
+                    <button
+                        onClick={toggleSidebar}
+                        className="md:hidden text-white hover:text-blue-200 transition-colors p-1"
+                        aria-label="Toggle sidebar"
+                    >
                         <svg
-                            className="w-6 h-6 text-blue-600"
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            {isSidebarOpen ? (
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            ) : (
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
+                            )}
+                        </svg>
+                    </button>
+
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg
+                            className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -47,17 +76,15 @@ export default function Header() {
                             />
                         </svg>
                     </div>
-                    <h2 className="text-white text-xl md:text-2xl font-bold tracking-tight">
-                        پنل مدیریت MR APPLE
+                    <h2 className="text-white text-base sm:text-xl md:text-2xl font-bold tracking-tight whitespace-nowrap">
+                        پنل مدیریت
                     </h2>
                 </div>
 
-                {/* Header Info */}
-                <div className="flex items-center gap-4">
-                    {/* Date and Time */}
-                    <div className="hidden md:flex items-center gap-2 text-white/90 text-sm">
+                <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="hidden sm:flex items-center gap-2 text-white/90 text-xs md:text-sm">
                         <svg
-                            className="w-4 h-4"
+                            className="w-3 h-3 md:w-4 md:h-4"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -69,13 +96,15 @@ export default function Header() {
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                             />
                         </svg>
-                        <span>{currentTime}</span>
+                        <span className="hidden md:inline">{currentTime}</span>
+                        <span className="md:hidden text-xs">
+                            {currentTime.split("|")[1] || ""}
+                        </span>
                     </div>
 
-                    {/* Notification Icon */}
                     <button className="relative text-white hover:text-blue-200 transition-colors">
                         <svg
-                            className="w-6 h-6"
+                            className="w-5 h-5 sm:w-6 sm:h-6"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -88,23 +117,6 @@ export default function Header() {
                             />
                         </svg>
                         <span className="absolute -top-1 -left-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                    </button>
-
-                    {/* User Menu Button (mobile) */}
-                    <button className="md:hidden text-white">
-                        <svg
-                            className="w-6 h-6"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M4 6h16M4 12h16M4 18h16"
-                            />
-                        </svg>
                     </button>
                 </div>
             </div>
