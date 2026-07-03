@@ -407,6 +407,7 @@
   .categoryBox {
     max-width: 100%;
     margin-left: 40px;
+    margin-top: 80px;
   }
 
   .categoryEyebrow {
@@ -442,13 +443,13 @@
 
   .categoryImageContainer {
     min-height: 180px;
-    bottom: -70px;
+    bottom: -120px;
   }
 
   .categoryImage {
     width: min(100%, 240px);
     max-height: 24vh;
-    transform: scale(1.7);
+    transform: scale(1.8);
   }
 
   .imageOrb {

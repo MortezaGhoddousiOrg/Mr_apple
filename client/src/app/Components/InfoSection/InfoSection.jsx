@@ -12,7 +12,7 @@ const infoSectionsData = [
     description: "آماده اجرای پروژه‌های سنگین و پردازش‌های حرفه‌ای.",
     imageSrc: "/image-infosection/IMG_SEGMENT_20260513_144204.png",
     buyLink: "/ProductDetail/1",
-    moreLink: "/Category/iPad",
+    moreLink: "/Category/مک بوک",
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const infoSectionsData = [
       "طراحی هوشمند و عملکرد پایدار برای کار، سرگرمی و ارتباطات روزانه.",
     imageSrc: "/image-infosection/IMG_SEGMENT_20260513_144209.png",
     buyLink: "/ProductDetail/1",
-    moreLink: "/Category/iPhone",
+    moreLink: "/Category/موبایل",
   },
 ];
 
