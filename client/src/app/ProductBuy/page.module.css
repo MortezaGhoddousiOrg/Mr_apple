@@ -228,7 +228,6 @@
   background: #0b5a8d;
 }
 
-
 @media (max-width: 900px) {
   .mainContent {
     grid-template-columns: 1fr;
@@ -256,6 +255,8 @@
   }
   .controls {
     grid-column: 3 / 4;
+    justify-self: center;
+
     grid-row: 2 / 3;
     flex-direction: row;
     gap: 8px;

@@ -27,23 +27,30 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 relative">
       <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      
-      <SideBar 
-        setRendered={setRendered} 
+
+      <SideBar
+        setRendered={setRendered}
         isSidebarOpen={isSidebarOpen}
         closeSidebar={closeSidebar}
       />
 
-      <main className={`
-        pt-16 transition-all duration-300 ease-in-out
-        ${isSidebarOpen ? 'mr-72' : 'mr-0'}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+
+      <main
+        className={`
+        pt-16 transition-all duration-300 ease-in-out relative z-10
+        ${isSidebarOpen ? "mr-72" : "mr-0"}
         md:mr-72
-      `}>
-        <div className="p-3 sm:p-4 md:p-6">
-          {rendered}
-        </div>
+      `}
+      >
+        <div className="p-3 sm:p-4 md:p-6">{rendered}</div>
       </main>
     </div>
   );

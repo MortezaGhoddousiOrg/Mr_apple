@@ -22,6 +22,38 @@ export default function FeaturedProduct() {
     axioshome();
   }, []);
 
+  const startX = useRef(0);
+  const currentX = useRef(0);
+  const isDragging = useRef(false);
+
+  const handlePointerDown = (e) => {
+    isDragging.current = true;
+    startX.current = e.clientX;
+    currentX.current = e.clientX;
+  };
+
+  const handlePointerMove = (e) => {
+    if (!isDragging.current) return;
+    currentX.current = e.clientX;
+  };
+
+  const handlePointerUp = () => {
+    if (!isDragging.current) return;
+
+    isDragging.current = false;
+
+    const diff = currentX.current - startX.current;
+    const threshold = 50;
+
+    if (Math.abs(diff) < threshold) return;
+
+    if (diff > 0) {
+      nextSlide();
+    } else {
+      prevSlide();
+    }
+  };
+
   const [visible, setVisible] = useState(6);
   const [index, setIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(true);
@@ -130,6 +162,11 @@ export default function FeaturedProduct() {
             <div
               ref={containerRef}
               className={style.cardsContainer}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerLeave={handlePointerUp}
+              onPointerCancel={handlePointerUp}
               style={{
                 transform: translateValue,
                 transition: isTransitioning

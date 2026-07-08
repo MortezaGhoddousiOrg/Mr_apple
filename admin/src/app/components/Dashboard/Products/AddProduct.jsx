@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { api } from "@/app/config";
+import { api, MEDIA_URL } from "@/app/config";
 import Button from "../../Button";
 import { useNotification } from "@/app/Context/NotificationContext";
 
@@ -79,7 +79,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         if (mainImg) {
           setMainImage({
             id: mainImg.id,
-            preview: `http://127.0.0.1:4000${mainImg.image}`,
+            preview: `${MEDIA_URL}${mainImg.image}`,
             status: "success",
             isExisting: true,
           });
@@ -88,7 +88,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         if (galleryImgs.length > 0) {
           const existingGalleryImages = galleryImgs.map((img) => ({
             id: img.id,
-            preview: `http://127.0.0.1:4000${img.image}`,
+            preview: `${MEDIA_URL}${img.image}`,
             status: "success",
             isExisting: true,
           }));

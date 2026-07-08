@@ -141,7 +141,11 @@
   color: #6b7280;
 }
 
-/* --- Responsive --- */
+.cardsContainer {
+  touch-action: pan-y;
+  user-select: none;
+}
+
 @media (max-width: 1024px) {
   .sliderWrapper {
     padding-inline: 46px;

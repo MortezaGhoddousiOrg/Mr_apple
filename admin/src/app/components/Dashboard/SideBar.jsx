@@ -1,5 +1,5 @@
 "use client";
- 
+
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -9,13 +9,13 @@ import Products from "./Products/Products";
 import Users from "./Users/Users";
 import Orders from "./Orders/Orders";
 import Category from "./Category/Category";
- 
+
 export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
   const router = useRouter();
   const [activeItem, setActiveItem] = useState("داشبورد");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [loading, setLoading] = useState(false);
- 
+
   const list_items = [
     { name: "داشبورد", icon: "📊" },
     { name: "محصولات", icon: "📦" },
@@ -23,16 +23,16 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
     { name: "سفارشات", icon: "🛒" },
     { name: "دسته‌بندی‌ها", icon: "🗂️" },
   ];
- 
+
   const user = {
     firstname: "مدیر",
     lastname: "سیستم",
     role: "مدیر ارشد",
   };
- 
+
   const handleClick = (item) => {
     setActiveItem(item);
- 
+
     switch (item) {
       case "داشبورد":
         setRendered(<Dashboard />);
@@ -52,13 +52,12 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
       default:
         setRendered(<Dashboard />);
     }
-    
-    // بستن سایدبار در موبایل (کمتر از 768px)
+
     if (window.innerWidth < 768) {
       closeSidebar();
     }
   };
- 
+
   const handleLogout = async () => {
     setLoading(true);
     try {
@@ -68,19 +67,19 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
     } finally {
       localStorage.removeItem("admin");
       localStorage.removeItem("isAuthenticated");
- 
+
       document.cookie =
         "admin_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie =
         "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
- 
+
       setLoading(false);
       setShowLogoutModal(false);
- 
+
       router.push("/");
     }
   };
- 
+
   return (
     <>
       <aside
@@ -90,10 +89,9 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
           flex flex-col transition-all duration-300 ease-in-out
           w-72
           md:translate-x-0
-          ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}
+          ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}
         `}
       >
-        {/* پروفایل */}
         <div className="flex flex-col items-center py-4 px-4 border-b border-gray-700 flex-shrink-0">
           <div className="relative">
             <Image
@@ -112,7 +110,7 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
             {user.role}
           </p>
         </div>
- 
+
         <nav className="flex-1 overflow-y-auto mt-4 px-3 min-h-0">
           <ul className="space-y-1 pb-2">
             {list_items.map((li, idx) => (
@@ -139,7 +137,7 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
             ))}
           </ul>
         </nav>
- 
+
         <div className="flex-shrink-0 p-4 border-t border-gray-700">
           <button
             onClick={() => setShowLogoutModal(true)}
@@ -163,16 +161,7 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
           </button>
         </div>
       </aside>
- 
-      {/* ✅ اوورلی - فقط تا 768px */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={closeSidebar}
-        />
-      )}
- 
-      {/* مودال خروج */}
+
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 text-center">
@@ -191,13 +180,13 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
                 />
               </svg>
             </div>
- 
+
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               خروج از پنل کاربری
             </h3>
- 
+
             <p className="text-gray-500 mb-6">آیا از خروج خود مطمئن هستید؟</p>
- 
+
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}

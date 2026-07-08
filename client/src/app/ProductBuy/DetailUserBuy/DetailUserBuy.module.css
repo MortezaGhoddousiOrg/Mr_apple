@@ -25,10 +25,9 @@
 } 
 
 @keyframes fadeoverlay {
-  from{opacity: 0;}
-  to{opacity: 1;}
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-
 
 .header {
   padding: 16px 18px;
@@ -93,7 +92,7 @@
   top: 7px;
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--blue);
+  color: #0f73b3;
   margin-top: 6px;
   transition: 0.3s ease;
 }
@@ -116,7 +115,6 @@
   top: -25px;
   font-size: 0.8rem;
 }
-
 
 .containerTextarea:focus-within .label,
 .containerTextarea.filled .label {
@@ -155,8 +153,6 @@
   transform: translateY(1px);
 }
 
-
-
 @media (max-width: 768px) {
   .modal {
     height: 85vh;
@@ -174,6 +170,18 @@
     padding: 9px 11px;
     font-size: 12px;
   }
+  
+  .label {
+    top: 9px;
+    margin-top: 0;
+  }
+  .container:focus-within .label,
+  .container.filled .label,
+  .containerTextarea:focus-within .label,
+  .containerTextarea.filled .label {
+    top: -22px;
+  }
+
   .submitBtn {
     padding: 10px 14px;
     font-size: 13px;
@@ -183,7 +191,6 @@
   }
 }
 
-/* موبایل‌ها */
 @media (max-width: 480px) {
   .modal {
     height: 90vh;
@@ -197,6 +204,10 @@
     padding: 10px;
     gap: 8px;
   }
+  .info {
+    grid-template-columns: 1fr;
+    gap: 25px; 
+  }
   .title {
     font-size: 16px;
   }
@@ -205,6 +216,19 @@
     padding: 8px 10px;
     font-size: 11px;
   }
+
+  .label {
+    top: 9px;
+    margin-top: 0;
+  }
+  
+  .container:focus-within .label,
+  .container.filled .label,
+  .containerTextarea:focus-within .label,
+  .containerTextarea.filled .label {
+    top: -20px;
+  }
+
   .submitBtn {
     margin-top: 10px;
     padding: 10px 12px;

@@ -82,7 +82,7 @@ export default function Login() {
           <form className={style.loginFirst} onSubmit={handleSubmit} noValidate>
             <div className={style.loginInput}>
               <input
-                type="text"
+                type="tel"
                 name="phone"
                 value={loginData.phone}
                 onChange={handleChange}

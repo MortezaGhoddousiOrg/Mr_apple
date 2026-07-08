@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { api } from "@/app/config";
+import { api, MEDIA_URL } from "@/app/config"; 
 import { useNotification } from "@/app/Context/NotificationContext";
 
 export default function AddCategory({ onBack, refresh, editData }) {
@@ -31,7 +31,7 @@ export default function AddCategory({ onBack, refresh, editData }) {
     fetchParents();
 
     if (editData?.image) {
-      setPreview(`http://127.0.0.1:4000${editData.image}`);
+      setPreview(`${MEDIA_URL}${editData.image}`);
     }
   }, [editData, setNotif]);
 
@@ -126,7 +126,10 @@ export default function AddCategory({ onBack, refresh, editData }) {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6"
+        >
           {/* Type */}
           <div>
             <label className="block mb-1 sm:mb-2 text-sm font-medium text-black">
@@ -176,7 +179,9 @@ export default function AddCategory({ onBack, refresh, editData }) {
             <div className="border-2 border-dashed border-gray-300 rounded-2xl p-4 sm:p-6 hover:border-black transition-all">
               {preview && !image && (
                 <div className="mb-3 sm:mb-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">تصویر فعلی:</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
+                    تصویر فعلی:
+                  </p>
                   <img
                     src={preview}
                     alt="پیش‌نمایش"
@@ -187,7 +192,9 @@ export default function AddCategory({ onBack, refresh, editData }) {
 
               {image && (
                 <div className="mb-3 sm:mb-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">تصویر جدید:</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
+                    تصویر جدید:
+                  </p>
                   <img
                     src={preview}
                     alt="پیش‌نمایش جدید"

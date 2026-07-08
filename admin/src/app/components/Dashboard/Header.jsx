@@ -31,7 +31,6 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
         <header className="fixed top-0 right-0 left-0 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg z-50">
             <div className="h-full px-3 sm:px-4 md:px-6 flex justify-between items-center">
                 <div className="flex items-center gap-2 sm:gap-3">
-                    {/* ✅ دکمه همبرگر - تا 768px */}
                     <button
                         onClick={toggleSidebar}
                         className="md:hidden text-white hover:text-blue-200 transition-colors p-1"

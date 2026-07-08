@@ -396,7 +396,6 @@ function Orders() {
                 </div>
               </div>
 
-              {/* اطلاعات */}
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                 <div>
                   <p className="text-gray-400 text-xs mb-0.5">کاربر</p>
@@ -453,8 +452,20 @@ function Orders() {
       </section>
 
       {showDetailModal && selectedOrder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowDetailModal(false)}
+        >
+          <div
+            className="bg-white rounded-2xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth:
+                window.innerWidth >= 770 ? "700px" : "calc(100% - 1.5rem)",
+              marginRight: window.innerWidth >= 770 ? "288px" : "0px",
+              width: window.innerWidth < 770 ? "95%" : "auto",
+            }}
+          >
             <div className="sticky top-0 bg-white border-b border-gray-100 p-4 flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900">
                 جزییات سفارش {selectedOrder.order_number}
@@ -466,7 +477,7 @@ function Orders() {
                 ✕
               </button>
             </div>
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
               <div className="bg-gray-50 rounded-xl p-4">
                 <h3 className="font-semibold text-gray-900 mb-3">
                   اطلاعات کاربر
@@ -485,16 +496,16 @@ function Orders() {
                       {selectedOrder.user?.phone}
                     </span>
                   </div>
-                  <div className="col-span-2">
+                  <div className="sm:col-span-1">
                     <span className="text-gray-500">آدرس:</span>{" "}
-                    <span className="text-gray-900">
+                    <span className="text-gray-900 break-words">
                       {selectedOrder.shipping_address?.address ||
                         selectedOrder.user?.address ||
                         selectedOrder.address ||
                         "—"}
                     </span>
                   </div>
-                  <div className="col-span-2">
+                  <div className="sm:col-span-1">
                     <span className="text-gray-500">کد پستی:</span>{" "}
                     <span className="text-gray-900">
                       {selectedOrder.shipping_address?.postal_code ||
@@ -506,6 +517,7 @@ function Orders() {
                 </div>
               </div>
 
+              {/* محصولات */}
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">
                   محصولات سفارش
@@ -529,41 +541,54 @@ function Orders() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {selectedOrder.items?.map((item, idx) => (
-                        <tr key={idx}>
-                          <td className="px-4 py-3">
-                            <div className="font-medium text-gray-900">
-                              {item.product_name}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {item.product_code}
-                            </div>
-                          </td>
-                          <td className="px-4 py-3 text-center text-gray-900">
-                            {item.quantity}
-                          </td>
-                          <td className="px-4 py-3 text-left text-gray-900">
-                            {formatPrice(item.price)} تومان
-                          </td>
-                          <td className="px-4 py-3 text-left text-gray-900">
-                            {formatPrice(item.total_price)} تومان
+                      {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                        selectedOrder.items.map((item, idx) => (
+                          <tr key={idx}>
+                            <td className="px-4 py-3">
+                              <div className="font-medium text-gray-900">
+                                {item.product_name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {item.product_code}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-center text-gray-900">
+                              {item.quantity}
+                            </td>
+                            <td className="px-4 py-3 text-left text-gray-900">
+                              {formatPrice(item.price)} تومان
+                            </td>
+                            <td className="px-4 py-3 text-left text-gray-900">
+                              {formatPrice(item.total_price)} تومان
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan="4"
+                            className="px-4 py-6 text-center text-gray-500"
+                          >
+                            هیچ محصولی برای این سفارش یافت نشد
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
-                    <tfoot className="bg-gray-50">
-                      <tr>
-                        <td
-                          colSpan="3"
-                          className="px-4 py-3 text-left font-semibold text-gray-900"
-                        >
-                          مجموع:
-                        </td>
-                        <td className="px-4 py-3 text-left font-bold text-gray-900">
-                          {formatPrice(selectedOrder.total_amount)} تومان
-                        </td>
-                      </tr>
-                    </tfoot>
+                    {selectedOrder.items && selectedOrder.items.length > 0 && (
+                      <tfoot className="bg-gray-50">
+                        <tr>
+                          <td
+                            colSpan="3"
+                            className="px-4 py-3 text-left font-semibold text-gray-900"
+                          >
+                            مجموع:
+                          </td>
+                          <td className="px-4 py-3 text-left font-bold text-gray-900">
+                            {formatPrice(selectedOrder.total_amount)} تومان
+                          </td>
+                        </tr>
+                      </tfoot>
+                    )}
                   </table>
                 </div>
               </div>

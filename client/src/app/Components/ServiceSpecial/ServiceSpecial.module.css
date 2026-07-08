@@ -60,18 +60,17 @@
 .servicesHeader {
   display: flex;
   justify-content: center;
-  color: white;
   align-items: center;
-  gap: 10px;
+  color: white;
   margin-bottom: 20px;
   transition: all 1s ease;
   font-size: 48px;
   cursor: pointer;
+  text-align: end;
 }
 
 .iconTitle {
   font-size: 36px;
-  margin-right: 50px;
 }
 
 .sliderContainer {
