@@ -130,7 +130,6 @@ export default function AddCategory({ onBack, refresh, editData }) {
           onSubmit={handleSubmit}
           className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6"
         >
-          {/* Type */}
           <div>
             <label className="block mb-1 sm:mb-2 text-sm font-medium text-black">
               نوع دسته‌بندی

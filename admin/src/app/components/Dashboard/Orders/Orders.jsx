@@ -92,7 +92,11 @@ function Orders() {
     setLoading(true);
     try {
       const response = await api.get("/api/orders/admin/");
-      setOrders(response.data);
+      // ✅ مرتب‌سازی: جدیدترین سفارش اول
+      const sortedOrders = response.data.sort((a, b) => {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+      setOrders(sortedOrders);
     } catch (err) {
       setNotif({
         id: Date.now(),
@@ -460,8 +464,7 @@ function Orders() {
             className="bg-white rounded-2xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl"
             onClick={(e) => e.stopPropagation()}
             style={{
-              maxWidth:
-                window.innerWidth >= 770 ? "700px" : "calc(100% - 1.5rem)",
+              maxWidth: window.innerWidth >= 770 ? "700px" : "calc(100% - 1.5rem)",
               marginRight: window.innerWidth >= 770 ? "288px" : "0px",
               width: window.innerWidth < 770 ? "95%" : "auto",
             }}
@@ -517,7 +520,6 @@ function Orders() {
                 </div>
               </div>
 
-              {/* محصولات */}
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">
                   محصولات سفارش
@@ -669,4 +671,4 @@ function Orders() {
   );
 }
 
-export default Orders;
+export default Orders;  

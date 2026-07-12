@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { api } from "@/app/config";
+import { api, MEDIA_URL } from "@/app/config";
 import AddCategory from "./AddCategory";
 import { useNotification } from "@/app/Context/NotificationContext";
 
@@ -185,7 +185,7 @@ export default function Category() {
                             <td className="px-6 py-4">
                               {p.image ? (
                                 <img
-                                  src={`${process.env.NEXT_PUBLIC_API_URL}${p.image}`}
+                                  src={`${MEDIA_URL}${p.image}`}
                                   alt={p.title}
                                   className="w-10 h-10 rounded-lg object-cover border border-gray-200"
                                 />
@@ -262,7 +262,7 @@ export default function Category() {
                         <div className="flex items-center gap-3 mb-3">
                           {p.image ? (
                             <img
-                              src={`${process.env.NEXT_PUBLIC_API_URL}${p.image}`}
+                              src={`${MEDIA_URL}${p.image}`}
                               alt={p.title}
                               className="w-12 h-12 rounded-xl object-cover border border-gray-200"
                             />
@@ -288,7 +288,9 @@ export default function Category() {
                             ویرایش
                           </button>
                           <button
-                            onClick={() => openDeleteModal(p.id, "parent", p.title)}
+                            onClick={() =>
+                              openDeleteModal(p.id, "parent", p.title)
+                            }
                             className="flex-1 bg-red-50 text-red-600 py-2 rounded-xl text-sm font-medium"
                           >
                             حذف
@@ -347,7 +349,7 @@ export default function Category() {
                             <td className="px-6 py-4">
                               {c.image ? (
                                 <img
-                                  src={`${process.env.NEXT_PUBLIC_API_URL}${c.image}`}
+                                  src={`${MEDIA_URL}${c.image}`}
                                   alt={c.title}
                                   className="w-10 h-10 rounded-lg object-cover border border-gray-200"
                                 />
@@ -429,7 +431,7 @@ export default function Category() {
                         <div className="flex items-center gap-3 mb-3">
                           {c.image ? (
                             <img
-                              src={`${process.env.NEXT_PUBLIC_API_URL}${c.image}`}
+                              src={`${MEDIA_URL}${c.image}`}
                               alt={c.title}
                               className="w-12 h-12 rounded-xl object-cover border border-gray-200"
                             />
@@ -455,7 +457,9 @@ export default function Category() {
                             ویرایش
                           </button>
                           <button
-                            onClick={() => openDeleteModal(c.id, "child", c.title)}
+                            onClick={() =>
+                              openDeleteModal(c.id, "child", c.title)
+                            }
                             className="flex-1 bg-red-50 text-red-600 py-2 rounded-xl text-sm font-medium"
                           >
                             حذف
