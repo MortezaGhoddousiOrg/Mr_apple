@@ -13,6 +13,7 @@ export default function Login() {
   const [code, setCode] = useState(false);
 
   const { sendCode, isLoggedIn, authLoading, setNotif } = useAuth();
+  
 
  useEffect(() => {
   if (authLoading) return;
@@ -51,7 +52,6 @@ export default function Login() {
       const phone = loginData.phone;
 
       const res = await sendCode(phone);
-      console.log(res);
       
       setNotif({ id: Date.now(), message: "کد تایید برای شما ارسال شد", type: "success" });
       setCode(true);
@@ -82,7 +82,7 @@ export default function Login() {
           <form className={style.loginFirst} onSubmit={handleSubmit} noValidate>
             <div className={style.loginInput}>
               <input
-                type="text"
+                type="tel"
                 name="phone"
                 value={loginData.phone}
                 onChange={handleChange}

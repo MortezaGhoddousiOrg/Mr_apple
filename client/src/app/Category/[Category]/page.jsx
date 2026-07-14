@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import style from "@/app/Category/[Category]/page.module.css";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { api } from "@/app/config";
 import CategoryTabFeature from "@/app/CategoryTabFeature/CategoryTabFeature";
+import { useAuth } from "@/app/Context/Context";
 
 export default function Category() {
   const params = useParams();
@@ -15,6 +16,9 @@ export default function Category() {
     : "";
 
   const [categoryChild, setCategoryChild] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const { setNotif } = useAuth();
 
   const [product, setProduct] = useState([]);
 
@@ -33,6 +37,8 @@ export default function Category() {
         if (filteredChildren.length > 0) {
           const firstChild = filteredChildren[0];
 
+          setSelectedCategory(firstChild);
+
           const productResponse = await api.get(
             `/api/catalog/product/child/${firstChild.id}/`,
           );
@@ -46,7 +52,11 @@ export default function Category() {
           setProduct([]);
         }
       } catch (err) {
-        console.log(err);
+        setNotif({
+          id: Date.now(),
+          message: "حطا در دریافت اطلاعات",
+          type: "error",
+        });
       }
     };
 
@@ -54,16 +64,6 @@ export default function Category() {
       fetchCategory();
     }
   }, [CategoryName]);
-
-  const filtered = useMemo(() => {
-    if (!CategoryName) return [];
-
-    return product.filter(
-      (item) => item.category?.parent?.title?.trim() === CategoryName.trim(),
-    );
-  }, [CategoryName, product]);
-
-  const heroData = product?.[0];
 
   if (!CategoryName || String(CategoryName).trim().length === 0) {
     return (
@@ -88,11 +88,12 @@ export default function Category() {
             <span className={style.categoryEyebrow}>Premium Collection</span>
 
             <h1 className={style.categoryTitle}>
-              {heroData?.category?.parent?.title || "دسته بندی خالی است "}
+              {selectedCategory?.parent?.title || "دسته بندی خالی است "}
             </h1>
 
             <p className={style.categoryDescription}>
-              {heroData?.descriptions || "برای این دسته بندی محصولی وجود ندارد"}
+              {selectedCategory?.descriptions ||
+                "برای این دسته بندی محصولی وجود ندارد"}
             </p>
 
             <div className={style.categoryFeatures}>
@@ -170,6 +171,7 @@ export default function Category() {
             Tab={categoryChild}
             products={product}
             setProducts={setProduct}
+            setSelectedCategory={setSelectedCategory}
           />
         </section>
       </aside>

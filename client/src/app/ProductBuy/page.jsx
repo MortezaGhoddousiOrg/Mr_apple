@@ -118,8 +118,6 @@ export default function ProductBuy() {
 
   const totalCount =
     productbuy?.reduce((sum, item) => sum + (item.cart_quantity || 1), 0) || 0;
-  console.log(productbuy);
-
   return (
     <div className={styles.container}>
       <div className={styles.mainContent}>

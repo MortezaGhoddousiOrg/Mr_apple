@@ -1,22 +1,44 @@
 "use client";
 
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import styles from "@/app/ContentBox/Contentbox.module.css";
 
 export default function Contentbox() {
   const [isOpen, setIsOpen] = useState(false);
+  
+  const boxRef = useRef(null);
+  const buttonRef = useRef(null);
 
   const phoneNumber = "0519-100-1631";
   const address = "مشهد، برج آبان، طبقه منفی ۱، مستر اپل";
   const instagramLink = "https://www.instagram.com/apple_store_iran_official/";
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        boxRef.current && !boxRef.current.contains(event.target) &&
+        buttonRef.current && !buttonRef.current.contains(event.target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
     <>
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            ref={boxRef}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -109,10 +131,11 @@ export default function Contentbox() {
       </AnimatePresence>
 
       <motion.button
+        ref={buttonRef}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className={`${styles.toggleButton} btnGlass`}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((prev) => !prev)}
         aria-label={isOpen ? "بستن" : "تماس"}
       >
         {isOpen ? (

@@ -43,7 +43,7 @@ export default function Footer() {
               className={style.brandLogo}
               onClick={() => router.push("/")}
             />
-            <h2 className={style.brand}>MR•APPLE</h2>
+            <h2 className={style.brand}>MR APPLE</h2>
           </div>
 
           <p className={style.brandText}>

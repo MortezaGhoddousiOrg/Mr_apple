@@ -17,14 +17,14 @@ export default function ServiceSpecial({
 
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
-  const gap = 20;
+  const gap = 16;
 
   const router = useRouter();
 
   const { productbuy, addToCart, setNotif } = useAuth();
-console.log("data:", data);
-console.log("length:", data.length);
-  const Active = data.filter((item) => item.status === "active" && item.category);
+  const Active = data.filter(
+    (item) => item.status === "active" && item.category,
+  );
 
   const isInCart = (id) => {
     return productbuy?.some((p) => (p.product_id || p.id) === id);
@@ -73,8 +73,8 @@ console.log("length:", data.length);
   }, []);
 
   useEffect(() => {
-    if (index > Active.length - visibleCards) {
-      setIndex(Math.max(Active.length - visibleCards, 0));
+    if (index > Active.length + 1 - visibleCards) {
+      setIndex(Math.max(Active.length + 1 - visibleCards, 0));
     }
   }, [visibleCards, Active.length]);
 
@@ -95,11 +95,11 @@ console.log("length:", data.length);
   const handleTouchEnd = (e) => {
     touchEndX.current = e.changedTouches[0].screenX;
 
-    if (touchStartX.current - touchEndX.current > 150) prevSlide();
-    if (touchEndX.current - touchStartX.current > 150) nextSlide();
+    if (touchStartX.current - touchEndX.current > 50) prevSlide();
+    if (touchEndX.current - touchStartX.current > 50) nextSlide();
   };
 
-  const translateValue = `translateX(${index * (100 / visibleCards)}%) translateX(${index * gap}px)`;
+  const translateValue = `translateX(calc(${index * (100 / visibleCards)}% + ${index * (gap / visibleCards)}px))`;
 
   if (Active.length === 0) {
     return (
@@ -158,12 +158,27 @@ console.log("length:", data.length);
               {Active.map((item) => {
                 const added = isInCart(item.id);
 
+                const hasDiscount = Number(item.discount) > 0;
+
+                const finalPrice = hasDiscount
+                  ? Number(item.price) * (1 - Number(item.discount) / 100)
+                  : Number(item.price);
+
                 return (
                   <div
                     className={styles.serviceCard}
                     key={item.id}
-                    style={{ flex: `0 0 ${100 / visibleCards}%` }}
+                    style={{
+                      flex: `0 0 calc(${100 / visibleCards}% - ${
+                        (gap * (visibleCards - 1)) / visibleCards
+                      }px)`,
+                    }}
                   >
+                    {hasDiscount && (
+                      <div className={styles.discountBadge}>
+                        {Number(item.discount)}٪ تخفیف
+                      </div>
+                    )}
                     <Image
                       unoptimized
                       className={styles.serviceImage}
@@ -180,9 +195,17 @@ console.log("length:", data.length);
                       {item.description}
                     </h2>
 
-                    <p className={styles.servicePrice}>
-                      {parseInt(item.price)?.toLocaleString("fa-IR")} تومان
-                    </p>
+                    <div className={styles.servicePrice}>
+                      {hasDiscount && (
+                        <span className={styles.oldPrice}>
+                          {Number(item.price).toLocaleString("fa-IR")} تومان
+                        </span>
+                      )}
+
+                      <span className={styles.newPrice}>
+                        {finalPrice.toLocaleString("fa-IR")} تومان
+                      </span>
+                    </div>
 
                     <button
                       className={`${styles.serviceBtn} ${
@@ -213,22 +236,26 @@ console.log("length:", data.length);
               })}
 
               <div
-              className={styles.serviceCardLast}
-              style={{ flex: `0 0 ${100 / visibleCards}%` }}
-            >
-              <div className={styles.serviceCardLastDiv}>
-                <h2>{title}</h2>
-                <p>برای نمایش بیشتر کلیک کنید</p>
+                className={styles.serviceCardLast}
+                style={{
+                  flex: `0 0 calc(${100 / visibleCards}% - ${
+                    (gap * (visibleCards - 1)) / visibleCards
+                  }px)`,
+                }}
+              >
+                <div className={styles.serviceCardLastDiv}>
+                  <h2>{title}</h2>
+                  <p>برای نمایش بیشتر کلیک کنید</p>
+                </div>
+                {button && (
+                  <button
+                    className={styles.serviceCardLastButton}
+                    onClick={onMoreClick}
+                  >
+                    {button}
+                  </button>
+                )}
               </div>
-              {button && (
-                <button
-                  className={styles.serviceCardLastButton}
-                  onClick={onMoreClick}
-                >
-                  {button}
-                </button>
-              )}
-            </div>
             </div>
           </div>
 

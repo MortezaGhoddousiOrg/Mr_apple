@@ -15,6 +15,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const router = useRouter();
+  
 
   const navRef = useRef(null);
   const sliderRef = useRef(null);
@@ -131,6 +132,12 @@ export default function Header() {
 
   return (
     <>
+      {/* بک‌دراپ برای بسته شدن منو با کلیک خارج از آن */}
+      <div
+        className={`${style.backdrop} ${isMenuOpen ? style.show : ""}`}
+        onClick={() => setIsMenuOpen(false)}
+      ></div>
+
       <header className={style.header}>
         <div className={style.navContainer}>
           <div className={style.logo}>

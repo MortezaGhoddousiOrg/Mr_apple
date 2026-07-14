@@ -23,14 +23,13 @@
   margin-right: 50px;
 }
 
-/* ── Slider Layout ── */
 .sliderContainer {
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 0;
-  padding: 0 50px; /* فضا برای دکمه‌ها */
+  padding: 0 50px;
 }
 
 .servicesSlider {
@@ -45,7 +44,6 @@
   width: 100%;
 }
 
-/* ── Cards ── */
 .serviceCard {
   display: flex;
   flex-direction: column;
@@ -72,7 +70,11 @@
   gap: 30px;
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  background: linear-gradient(135deg, rgb(0, 0, 0) 0%, rgba(0, 10, 14, 0.694) 100%);
+  background: linear-gradient(
+    135deg,
+    rgb(0, 0, 0) 0%,
+    rgba(0, 10, 14, 0.694) 100%
+  );
   color: #ffffff;
   font-family: "vazir", sans-serif;
   font-size: 16px;
@@ -100,7 +102,11 @@
   font-family: "vazir";
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.155) 0%, rgba(255, 255, 255, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.155) 0%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
   color: #ffffff;
   font-size: 14px;
   font-weight: 500;
@@ -118,7 +124,6 @@
   border-color: rgba(255, 255, 255, 0.45);
 }
 
-/* ── Card Content ── */
 .serviceImage {
   width: 100%;
   height: 180px;
@@ -143,12 +148,10 @@
 .serviceDescription {
   font-size: 14px;
   width: 100%;
-}
-
-.servicePrice {
-  align-self: end;
-  margin-left: 5px;
-  font-size: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .serviceBtn {
@@ -159,7 +162,11 @@
   margin: 10px 0;
   font-family: "vazir";
   cursor: pointer;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
   color: var(--blue);
   font-size: 14px;
   font-weight: 500;
@@ -189,7 +196,6 @@
   flex-shrink: 0;
 }
 
-/* ── Nav Buttons ── */
 .navBtn {
   flex-shrink: 0;
   display: flex;
@@ -212,12 +218,12 @@
 
 .navBtnRight {
   margin-left: 8px;
-  order: -1; /* راست در RTL */
+  order: -1;
 }
 
 .navBtnLeft {
   margin-right: 8px;
-  order: 1; /* چپ در RTL */
+  order: 1;
 }
 
 .navBtn:disabled {
@@ -225,7 +231,6 @@
   pointer-events: none;
 }
 
-/* ── Empty State ── */
 .box {
   width: 100%;
   min-height: 280px;
@@ -258,11 +263,39 @@
   color: #6b7280;
 }
 
-/* ══════════════════════════════
-   RESPONSIVE
-══════════════════════════════ */
+.discountBadge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #ef4444;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 10;
+}
 
-/* موبایل کوچک */
+.servicePrice {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.oldPrice {
+  font-size: 13px;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.newPrice {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+}
+
 @media (max-width: 600px) {
   .sliderContainer {
     padding: 0 40px;
@@ -303,7 +336,6 @@
   }
 }
 
-/* تبلت */
 @media (min-width: 600px) and (max-width: 900px) {
   .sliderContainer {
     padding: 0 44px;
@@ -330,7 +362,6 @@
   }
 }
 
-/* تبلت بزرگ */
 @media (min-width: 900px) and (max-width: 1200px) {
   .sliderContainer {
     padding: 0 46px;
@@ -345,7 +376,6 @@
   }
 }
 
-/* دسکتاپ معمولی */
 @media (min-width: 1200px) and (max-width: 1600px) {
   .serviceCard {
     height: 460px;
@@ -356,7 +386,6 @@
   }
 }
 
-/* دسکتاپ بزرگ */
 @media (min-width: 1600px) {
   .serviceCard {
     height: 520px;

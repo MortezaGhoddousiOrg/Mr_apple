@@ -1,6 +1,6 @@
 .bodyCode {
   width: 100%;
-  min-height: 100vh;
+  min-height: auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,8 +15,16 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 40px;
-  color: white;
+  gap: 30px;
+  margin: 0 auto;
+}
+
+.boxContainer h2 {
+  color: #ffffff; 
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
 }
 
 .boxCodeContainer {
@@ -25,40 +33,40 @@
   flex-direction: row-reverse;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
   flex-wrap: wrap;
 }
 
 .boxCodeInput {
   width: 60px;
   height: 60px;
-  background: #fff;
+  background: #f9fafb;
+  border: 1px solid #d1d5db; 
   color: #020204;
-  border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   outline: none;
   text-align: center;
   font-size: 24px;
   font-weight: bold;
-  transition: 0.3s;
+  transition: all 0.3s ease;
 }
 
 .boxCodeInput:focus {
-  border: 2px solid #006a9c;
-  box-shadow: 0 0 8px rgba(0, 106, 156, 0.3);
+  border-color: #0f73b3;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(15, 115, 179, 0.15);
 }
-
-/* ---------- Tablet ---------- */
 
 @media (max-width: 768px) {
   .boxContainer {
-    gap: 30px;
+    gap: 20px;
   }
-
+  .boxContainer h2 {
+    font-size: 20px;
+  }
   .boxCodeContainer {
     gap: 12px;
   }
-
   .boxCodeInput {
     width: 50px;
     height: 50px;
@@ -66,39 +74,35 @@
   }
 }
 
-/* ---------- Mobile ---------- */
-
 @media (max-width: 480px) {
   .bodyCode {
-    padding: 15px;
+    padding: 10px;
   }
-
   .boxContainer {
-    gap: 25px;
+    gap: 15px;
   }
-
+  .boxContainer h2 {
+    font-size: 18px;
+  }
   .boxCodeContainer {
     gap: 8px;
   }
-
   .boxCodeInput {
     width: 42px;
     height: 42px;
     font-size: 18px;
-    border-radius: 8px;
+    border-radius: 10px;
   }
 }
-
-/* ---------- Small Mobile ---------- */
 
 @media (max-width: 360px) {
   .boxCodeContainer {
     gap: 6px;
   }
-
   .boxCodeInput {
     width: 38px;
     height: 38px;
     font-size: 16px;
+    border-radius: 8px;
   }
 }

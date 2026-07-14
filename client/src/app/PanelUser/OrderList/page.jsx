@@ -8,16 +8,14 @@ import { useRouter } from "next/navigation";
 export default function OrdersList() {
   const [orders, setOrders] = useState([]);
   const router = useRouter();
-
+  
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const res = await api.get("/api/orders/my-orders/");
-        console.log("نیننبینینی", res.data);
-
         setOrders(res.data);
       } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error(error);
       }
     };
 
@@ -28,25 +26,18 @@ export default function OrdersList() {
     switch (status) {
       case "pending":
         return "در انتظار";
-
       case "processing":
         return "در حال پردازش";
-
       case "shipped":
         return "ارسال شده";
-
       case "delivered":
         return "تحویل داده شده";
-
       case "cancelled":
         return "لغو شده";
-
       case "paid":
         return "پرداخت شده";
-
       case "failed":
         return "ناموفق";
-
       default:
         return status;
     }
@@ -57,9 +48,7 @@ export default function OrdersList() {
       <div className={styles.card}>
         <div className={styles.emptyBox}>
           <h3>📦 هنوز سفارشی ثبت نکرده‌اید.</h3>
-
           <p>می‌توانید از بین محصولات فروشگاه، سفارش خود را ثبت کنید.</p>
-
           <button
             className={styles.shopButton}
             onClick={() => router.push("/Products")}

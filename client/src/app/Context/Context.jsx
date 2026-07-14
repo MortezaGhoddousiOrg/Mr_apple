@@ -10,6 +10,7 @@ export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [productbuy, setProductBuy] = useState([]);
   const [notif, setNotif] = useState(null);
+  
   const [dataForm, setDataForm] = useState({
     firstname: "",
     lastname: "",
@@ -55,7 +56,6 @@ export function AuthProvider({ children }) {
     }
   };
  
-  // ✅ همیشه PUT میزنه — بک‌اند فیلدهای نبود رو نگه میداره
   const saveOrUpdateUser = async (updatedData) => {
     try {
       const res = await api.put("/api/auth/me/", updatedData);
@@ -71,7 +71,6 @@ export function AuthProvider({ children }) {
     return res.data;
   };
  
-  // ✅ cart_quantity → quantity (طبق API doc)
   const verifyCode = async (phone, code) => {
     await api.post("/api/auth/verify-code/", { phone, code });
  
@@ -103,7 +102,6 @@ export function AuthProvider({ children }) {
     }
   };
  
-  // ✅ cart_quantity → quantity
   const addToCart = async (item) => {
     try {
       if (isLoggedIn) {
@@ -130,7 +128,6 @@ export function AuthProvider({ children }) {
     }
   };
  
-  // ✅ cart_quantity → quantity
   const syncLocalCartToServer = async () => {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (!cart.length) return;

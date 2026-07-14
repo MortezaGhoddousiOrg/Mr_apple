@@ -1,5 +1,3 @@
-/* page.module.css */
-
 .panelWrapper {
   width: 100%;
   min-height: 80vh;
@@ -117,7 +115,6 @@
   padding: 30px;
 }
 
-/* دکمه برگشت با رنگ #006a9c */
 .backButton {
   display: flex;
   align-items: center;

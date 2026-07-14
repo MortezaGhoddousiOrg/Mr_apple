@@ -23,11 +23,13 @@
 .card h1 {
   color: white;
   margin-bottom: 15px;
+  font-size: 24px;
 }
 
 .card p {
   color: #bdbdbd;
   line-height: 1.8;
+  font-size: 15px;
 }
 
 .logoutBtn {
@@ -39,11 +41,18 @@
   background: #e53935;
   color: white;
   cursor: pointer;
+  font-size: 15px;
+  font-family: inherit;
   border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 
     0 8px 32px 0 rgba(0, 0, 0, 0.3),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
     inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.logoutBtn:active {
+  transform: scale(0.98);
 }
 
 .overlay {
@@ -55,10 +64,11 @@
   justify-content: center;
   align-items: center;
   z-index: 99;
+  padding: 15px;
 }
 
 .modal {
-  width: 90%;
+  width: 100%;
   max-width: 420px;
   border-radius: 20px;
   padding: 24px;
@@ -70,16 +80,18 @@
     0 8px 32px 0 rgba(0, 0, 0, 0.3),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
     inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .modal h3 {
   color: white;
   margin-bottom: 12px;
+  font-size: 20px;
 }
 
 .modal p {
   color: #bdbdbd;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .actions {
@@ -95,22 +107,81 @@
   border: none;
   border-radius: 12px;
   cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
   border: 1px solid rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(1.5px);
   box-shadow: 
     0 8px 32px 0 rgba(0, 0, 0, 0.3),
     inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
     inset 0 -2px 6px 0 rgba(0, 0, 0, 0.2);
-  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: all 0.3s ease;
+}
+
+.cancelBtn:active,
+.confirmBtn:active {
+  transform: scale(0.98);
 }
 
 .cancelBtn {
   background: #2d2d2d;
   color: white;
-  
 }
 
 .confirmBtn {
   background: #e53935;
   color: white;
+}
+
+
+@media (max-width: 768px) {
+  .card {
+    padding: 25px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 15px;
+  }
+  
+  .card {
+    padding: 20px 15px;
+  }
+
+  .card h1 {
+    font-size: 20px;
+  }
+
+  .card p {
+    font-size: 13px;
+  }
+
+  .logoutBtn {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .modal {
+    padding: 20px 15px;
+  }
+
+  .modal h3 {
+    font-size: 18px;
+  }
+
+  .modal p {
+    font-size: 13px;
+  }
+
+  .actions {
+    flex-direction: column; 
+    gap: 10px;
+  }
+
+  .cancelBtn,
+  .confirmBtn {
+    width: 100%;
+    padding: 12px;
+  }
 }

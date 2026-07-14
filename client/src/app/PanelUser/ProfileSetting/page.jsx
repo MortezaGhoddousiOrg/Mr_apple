@@ -6,6 +6,7 @@ import { useAuth } from "@/app/Context/Context";
 
 export default function ProfileSettings() {
   const [isEditing, setIsEditing] = useState(false);
+  
 
   const {
     dataForm,
@@ -52,7 +53,6 @@ export default function ProfileSettings() {
         type: "error",
       });
     }
-    console.log("Profile Render:", dataForm);
   };
 
   const handleEdit = () => {
@@ -145,7 +145,6 @@ export default function ProfileSettings() {
               value={dataForm.address || ""}
               onChange={handleChange}
               placeholder="آدرس..."
-              required
             />
           </div>
 

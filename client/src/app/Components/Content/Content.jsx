@@ -28,7 +28,6 @@ export default function Content() {
             className={style.Video}
             autoPlay
             muted
-            // loop
             playsInline
             preload="auto"
             key={videoSrc}

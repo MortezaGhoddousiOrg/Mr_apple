@@ -80,7 +80,7 @@
   position: fixed;
   top: 44px;
   right: -100%;
-  width: 240px;
+  width: 200px; /* <--- عرض باکس برای کمتر باز شدن در اینجا کاهش یافت */
   height: 100vh;
   background: rgba(10, 10, 10, 0.92);
   backdrop-filter: blur(20px);
@@ -257,7 +257,7 @@
   opacity: 0;
   visibility: hidden;
   transition: 0.3s;
-  z-index: 998;
+  z-index: 998; /* در لایه‌ای پشتِ header (999) و mobileNav (1000) قرار می‌گیرد */
 }
 .show {
   opacity: 1;
