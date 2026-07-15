@@ -9,10 +9,13 @@ const FALLBACK_IMAGE = "/image-infosection/IMG_SEGMENT_20260513_115454.png";
 
 export default function Card({ product = [] }) {
   const router = useRouter();
-
+  console.log(product);
+  
   const { productbuy, addToCart, setNotif } = useAuth();
 
-  const activeProducts = product.filter((item) => item.status === "active" && item.category);
+  const activeProducts = product.filter(
+    (item) => item.status === "active" && item.category,
+  );
 
   const isInCart = (id) => {
     return productbuy?.some((p) => (p.product_id || p.id) === id);
@@ -63,8 +66,19 @@ export default function Card({ product = [] }) {
         {activeProducts.map((item) => {
           const added = isInCart(item.id);
 
+          const hasDiscount = Number(item.discount) > 0;
+
+          const finalPrice = hasDiscount
+            ? Number(item.price) * (1 - Number(item.discount) / 100)
+            : Number(item.price);
+
           return (
             <div className={style.serviceCard} key={item.id}>
+              {hasDiscount && (
+                <div className={style.discountBadge}>
+                  {Number(item.discount)}٪ تخفیف
+                </div>
+              )}
               <div className={style.imageBox}>
                 <Image
                   unoptimized
@@ -89,9 +103,17 @@ export default function Card({ product = [] }) {
               </div>
 
               <div className={style.footerCard}>
-                <p className={style.servicePrice}>
-                  {Number(item.price || 0).toLocaleString("fa-IR")} تومان
-                </p>
+                <div className={style.servicePrice}>
+                  {hasDiscount && (
+                    <span className={style.oldPrice}>
+                      {Number(item.price).toLocaleString("fa-IR")} تومان
+                    </span>
+                  )}
+
+                  <span className={style.newPrice}>
+                    {finalPrice.toLocaleString("fa-IR")} تومان
+                  </span>
+                </div>
 
                 <button
                   className={`${style.serviceBtn} ${

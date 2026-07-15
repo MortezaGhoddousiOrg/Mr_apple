@@ -22,6 +22,7 @@ function mapProductToCard(item) {
     status: item.status,
     category: item.category,
     category_child_id: item.category_child_id,
+    discount: item.discount,
   };
 }
 
