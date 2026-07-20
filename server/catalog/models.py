@@ -9,6 +9,7 @@ class Products(models.Model):
     discount = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     quantity = models.IntegerField()
     descriptions = models.TextField(null=True, blank=True)
+    more_description = models.TextField(null=True, blank=True)
     feature = models.JSONField(null=True, blank=True)
     status = models.CharField(max_length=50, default='active')
     category_id = models.ForeignKey(

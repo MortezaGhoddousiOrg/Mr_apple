@@ -5,11 +5,14 @@ from django.core.files.storage import default_storage
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny
 
 from authuser.authentication import AdminJWTAuthentication
 from .models import Products, ProductImages
 from .serializers import ProductSerializer, ProductImageSerializer
 from rest_framework.permissions import IsAdminUser
+from django.db.models import Q
+
 
 
 #   PRODUCT LIST 
@@ -186,3 +189,23 @@ class ProductUpdateDeleteView(APIView):
         return Response({
             "message": "Product deleted successfully"
         }, status=200)
+        
+        
+class ProductSearchView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        q = request.GET.get("q", "").strip()
+
+        if not q:
+            return Response({"error": "q parameter is required"}, status=400)
+
+        products = Products.objects.filter(
+            Q(name__icontains=q) |
+            Q(product_code__icontains=q) |
+            Q(descriptions__icontains=q) |
+            Q(more_description__icontains=q)
+        )
+
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data, status=200)

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'catalog.apps.CatalogConfig',
     'category',
     'authuser',
+    'education',
 ]
 
 MIDDLEWARE = [
