@@ -12,7 +12,8 @@ from .models import Products, ProductImages
 from .serializers import ProductSerializer, ProductImageSerializer
 from rest_framework.permissions import IsAdminUser
 from django.db.models import Q
-
+from category.models import Category
+from category.serializers import CategorySerializer
 
 
 #   PRODUCT LIST 
@@ -209,3 +210,34 @@ class ProductSearchView(APIView):
 
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data, status=200)
+
+
+class AdminSearchView(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        q = request.GET.get("q", "").strip()
+
+        if not q:
+            return Response({"error": "q parameter is required"}, status=400)
+
+        # PRODUCTS SEARCH
+        products = Products.objects.filter(
+            Q(name__icontains=q) |
+            Q(descriptions__icontains=q) |
+            Q(more_description__icontains=q)
+        )
+        products_data = ProductSerializer(products, many=True).data
+
+        # CATEGORY SEARCH
+        categories = Category.objects.filter(
+            Q(name__icontains=q) |
+            Q(description__icontains=q)
+        )
+        categories_data = CategorySerializer(categories, many=True).data
+
+        return Response({
+            "products": products_data,
+            "categories": categories_data,
+        }, status=200)

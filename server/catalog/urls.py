@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    AdminSearchView,
     ProductSearchView,
     product_list,
     product_by_child,
@@ -32,4 +33,7 @@ urlpatterns = [
     
     # SEARCH
     path("products/search/", ProductSearchView.as_view()),
+    
+    #adminsearch
+    path("admin/search/", AdminSearchView.as_view()),
 ]
