@@ -6,6 +6,7 @@ from .views import (
     TutorialListView,
     TutorialDetailView,
     TutorialAdminView,
+    UploadEducationImage,
 )
 
 urlpatterns = [
@@ -20,4 +21,5 @@ urlpatterns = [
     path("admin/news/<int:item_id>/", NewsAdminView.as_view()),
     path("admin/tutorials/", TutorialAdminView.as_view()),
     path("admin/tutorials/<int:item_id>/", TutorialAdminView.as_view()),
+    path("admin/upload-image/", UploadEducationImage.as_view()),
 ]

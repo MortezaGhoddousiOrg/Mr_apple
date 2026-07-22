@@ -33,3 +33,13 @@ class Tutorial(models.Model):
 
     def __str__(self):
         return self.title
+
+class EducationImages(models.Model):
+    image = models.CharField(max_length=500)  # فقط آدرس
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "education_images"
+
+    def __str__(self):
+        return self.image

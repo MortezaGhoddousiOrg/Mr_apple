@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
 
 from authuser.authentication import AdminJWTAuthentication
-from .models import News, Tutorial
-from .serializers import NewsSerializer, TutorialSerializer
+from .models import EducationImages, News, Tutorial
+from .serializers import EducationImageSerializer, NewsSerializer, TutorialSerializer
 
 
 # ------------------ PUBLIC NEWS ------------------
@@ -141,3 +141,21 @@ class TutorialAdminView(APIView):
 
         item.delete()
         return Response({"message": "Tutorial deleted"}, status=200)
+
+
+class UploadEducationImage(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        image_url = request.data.get("image")
+
+        if not image_url:
+            return Response({"error": "image field is required"}, status=400)
+
+        img = EducationImages.objects.create(image=image_url)
+
+        return Response({
+            "message": "Image saved",
+            "data": EducationImageSerializer(img).data
+        }, status=201)

@@ -28,3 +28,10 @@ class TutorialSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+        
+class EducationImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EducationImages
+        fields = ["id", "image", "created_at"]
+
+
