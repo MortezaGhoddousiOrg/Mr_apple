@@ -12,7 +12,8 @@ export default function Contentbox() {
 
   const phoneNumber = "0519-100-1631";
   const address = "مشهد، برج آبان، طبقه منفی ۱، مستر اپل";
-  const instagramLink = "https://www.instagram.com/apple_store_iran_official/";
+  const instagramLink = "https://www.instagram.com/pezhman_gorgani_apple/";
+  const instagramUsername = "pezhman_gorgani_apple";
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -123,7 +124,10 @@ export default function Contentbox() {
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                 </svg>
-                <span>اینستاگرام</span>
+                <div className={styles.instagramTextWrapper}>
+                  <span>اینستاگرام</span>
+                  <span className={styles.instagramSubText}>{instagramUsername}</span>
+                </div>
               </a>
             </div>
           </motion.div>

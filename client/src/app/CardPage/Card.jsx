@@ -9,7 +9,6 @@ const FALLBACK_IMAGE = "/image-infosection/IMG_SEGMENT_20260513_115454.png";
 
 export default function Card({ product = [] }) {
   const router = useRouter();
-  console.log(product);
   
   const { productbuy, addToCart, setNotif } = useAuth();
 

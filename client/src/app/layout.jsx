@@ -5,6 +5,7 @@ import Footer from "@/app/Components/Footer/Footer";
 import { AuthProvider } from "@/app/Context/Context";
 import Contentbox from "./ContentBox/Contentbox";
 import Toast from "./ToastError/Toast";
+import ScrollManager from "@/app/ScrollManager/ScrollManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }) {
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
+          <ScrollManager />
           <Header />
           <Contentbox />
           <Toast />

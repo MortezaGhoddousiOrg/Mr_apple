@@ -63,6 +63,9 @@ export default function Home() {
 
   const specialProducts = productspecial
   .filter((item) => Number(item.discount) > 0)
+  .sort(
+    (a, b) => new Date(b.created_at) - new Date(a.created_at)
+  )
   .slice(0, 6)
   .map((item) => ({
     id: item.id,
