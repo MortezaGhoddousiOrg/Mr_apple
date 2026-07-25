@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import style from "@/app/Category/[Category]/page.module.css";
 import { useParams } from "next/navigation";
 import Image from "next/image";

@@ -64,8 +64,8 @@ class CategoryParentDetail(APIView):
 #   CATEGORY CHILD CRUD
 
 class CategoryChildList(APIView):
-    # authentication_classes = [AdminJWTAuthentication]
-    # permission_classes = [IsAdminUser]
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
     
     def get(self, request):
         children = CategoryChild.objects.all()

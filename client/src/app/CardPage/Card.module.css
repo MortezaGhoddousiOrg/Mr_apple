@@ -291,6 +291,39 @@
   color: #6b7280;
 }
 
+.discountBadge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #ef4444;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 10;
+}
+
+.servicePrice {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.oldPrice {
+  font-size: 13px;
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.newPrice {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111827;
+}
+
 @media (max-width: 1024px) {
   .Card {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

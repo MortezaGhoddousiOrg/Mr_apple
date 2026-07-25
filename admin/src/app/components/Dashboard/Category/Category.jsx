@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { api, MEDIA_URL } from "@/app/config";
 import AddCategory from "./AddCategory";
 import { useNotification } from "@/app/Context/NotificationContext";
@@ -184,11 +185,16 @@ export default function Category() {
                           >
                             <td className="px-6 py-4">
                               {p.image ? (
-                                <img
-                                  src={`${MEDIA_URL}${p.image}`}
-                                  alt={p.title}
-                                  className="w-10 h-10 rounded-lg object-cover border border-gray-200"
-                                />
+                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                  <Image
+                                    src={`${MEDIA_URL}${p.image}`}
+                                    alt={p.title}
+                                    width={40}
+                                    height={40}
+                                    className="w-full h-full object-cover"
+                                    unoptimized={true}
+                                  />
+                                </div>
                               ) : (
                                 <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
                                   📁
@@ -261,11 +267,16 @@ export default function Category() {
                       >
                         <div className="flex items-center gap-3 mb-3">
                           {p.image ? (
-                            <img
-                              src={`${MEDIA_URL}${p.image}`}
-                              alt={p.title}
-                              className="w-12 h-12 rounded-xl object-cover border border-gray-200"
-                            />
+                            <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200">
+                              <Image
+                                src={`${MEDIA_URL}${p.image}`}
+                                alt={p.title}
+                                width={48}
+                                height={48}
+                                className="w-full h-full object-cover"
+                                unoptimized={true}
+                              />
+                            </div>
                           ) : (
                             <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-2xl text-gray-400">
                               📁
@@ -348,11 +359,16 @@ export default function Category() {
                           >
                             <td className="px-6 py-4">
                               {c.image ? (
-                                <img
-                                  src={`${MEDIA_URL}${c.image}`}
-                                  alt={c.title}
-                                  className="w-10 h-10 rounded-lg object-cover border border-gray-200"
-                                />
+                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                  <Image
+                                    src={`${MEDIA_URL}${c.image}`}
+                                    alt={c.title}
+                                    width={40}
+                                    height={40}
+                                    className="w-full h-full object-cover"
+                                    unoptimized={true}
+                                  />
+                                </div>
                               ) : (
                                 <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
                                   📂
@@ -430,11 +446,16 @@ export default function Category() {
                       >
                         <div className="flex items-center gap-3 mb-3">
                           {c.image ? (
-                            <img
-                              src={`${MEDIA_URL}${c.image}`}
-                              alt={c.title}
-                              className="w-12 h-12 rounded-xl object-cover border border-gray-200"
-                            />
+                            <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200">
+                              <Image
+                                src={`${MEDIA_URL}${c.image}`}
+                                alt={c.title}
+                                width={48}
+                                height={48}
+                                className="w-full h-full object-cover"
+                                unoptimized={true}
+                              />
+                            </div>
                           ) : (
                             <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-2xl text-gray-400">
                               📂

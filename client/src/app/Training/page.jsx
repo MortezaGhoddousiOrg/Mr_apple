@@ -1,8 +1,11 @@
 "use client";
 
-import styles from "@/app/Training/page.module.css";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { useState } from "react";
+import { api, MEDIA_URL } from "@/app/config";
+import styles from "./page.module.css";
+import moment from "moment-jalaali";
 
 const fakePhones = [
   {
@@ -47,44 +50,6 @@ const fakePhones = [
   },
 ];
 
-const fakeNews = [
-  {
-    id: 1,
-    title: "معرفی آیفون جدید",
-    description:
-      "اپل در مراسم اخیر خود از نسل جدید آیفون با قابلیت‌های هوش مصنوعی رونمایی کرد.",
-    image: "/image-training/iphonesimg.jpg",
-    date: "۱۴۰۳/۰۳/۰۵",
-  },
-  {
-    id: 2,
-    title: "بروزرسانی iOS 18",
-    description:
-      "قابلیت‌های شخصی‌سازی جدید در راه است و رابط کاربری تغییرات گسترده‌ای را تجربه می‌کند.",
-    image: "/image-training/macbookfourteeninsch.jpg",
-    date: "۱۴۰۳/۰۳/۰۸",
-  },
-];
-
-const fakeTutorials = [
-  {
-    id: 1,
-    title: "چگونه باتری آیفون را سالم نگه داریم؟",
-    description:
-      "در این بخش به بررسی تنظیمات بهینه برای افزایش طول عمر باتری می‌پردازیم.",
-    image: "/image-training/iphonesimg.jpg",
-    date: "۱۴۰۳/۰۳/۱۰",
-  },
-  {
-    id: 2,
-    title: "استفاده حرفه‌ای از دوربین",
-    description:
-      "ترفندهایی برای عکاسی پرتره و تنظیم نور در شب با دوربین آیفون ۱۵ پرو.",
-    image: "/image-training/macbookfourteeninsch.jpg",
-    date: "۱۴۰۳/۰۳/۱۵",
-  },
-];
-
 const getValue = (str) => parseInt(str.replace(/[^0-9]/g, "")) || 0;
 
 const specLabels = {
@@ -125,8 +90,14 @@ const specRecommendations = {
 };
 
 export default function Training() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("اخبار");
   const tabs = ["اخبار", "آموزش", "مقایسه"];
+
+  const [news, setNews] = useState([]);
+  const [tutorials, setTutorials] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [phoneAId, setPhoneAId] = useState("iphone-15-pro");
   const [phoneBId, setPhoneBId] = useState("iphone-15");
@@ -137,15 +108,13 @@ export default function Training() {
   const specsToCompare = ["battery", "ram", "storage", "camera", "chip"];
 
   const betterThanB = specsToCompare.filter(
-    (key) => getValue(phoneA[key]) > getValue(phoneB[key]),
+    (key) => getValue(phoneA[key]) > getValue(phoneB[key])
   );
-
   const betterThanA = specsToCompare.filter(
-    (key) => getValue(phoneB[key]) > getValue(phoneA[key]),
+    (key) => getValue(phoneB[key]) > getValue(phoneA[key])
   );
-
   const equalSpecs = specsToCompare.filter(
-    (key) => getValue(phoneA[key]) === getValue(phoneB[key]),
+    (key) => getValue(phoneA[key]) === getValue(phoneB[key])
   );
 
   const getRecommendations = () => {
@@ -207,6 +176,61 @@ export default function Training() {
 
   const recommendations = getRecommendations();
 
+  // دریافت دیتا از بک‌اند
+  useEffect(() => {
+    const fetchArticles = async () => {
+      setLoading(true);
+      try {
+        const [newsRes, tutorialsRes] = await Promise.all([
+          api.get("/education/news/"),
+          api.get("/education/tutorials/"),
+        ]);
+        setNews(newsRes.data);
+        setTutorials(tutorialsRes.data);
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchArticles();
+  }, []);
+
+  // تبدیل تاریخ به شمسی
+  const formatDate = (date) => {
+    if (!date) return "---";
+    try {
+      const jDate = moment(date);
+      if (jDate.isValid()) {
+        return jDate.format("jYYYY/jMM/jDD");
+      }
+      return date;
+    } catch {
+      return date;
+    }
+  };
+
+  // دریافت لیست بر اساس تب فعال
+  const getItems = () => {
+    if (activeTab === "اخبار") return news;
+    if (activeTab === "آموزش") return tutorials;
+    return [];
+  };
+
+  const items = getItems();
+
+  // فیلتر بر اساس جستجو
+  const filteredItems = items.filter(
+    (item) =>
+      item.title?.includes(searchTerm) ||
+      item.description?.includes(searchTerm)
+  );
+
+  // رفتن به صفحه جزئیات
+  const handleCardClick = (id, type) => {
+    router.push(`/Training/${id}?type=${type}`);
+  };
+
   return (
     <div className={styles.page}>
       <header className={styles.trainingHeader}>
@@ -263,6 +287,8 @@ export default function Training() {
             className={styles.searchBar}
             type="text"
             placeholder="جستجو..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <nav className={styles.categories}>
             {tabs.map((tab) => (
@@ -307,25 +333,48 @@ export default function Training() {
         <main className={styles.contentArea}>
           {(activeTab === "اخبار" || activeTab === "آموزش") && (
             <div className={styles.newsGrid}>
-              {(activeTab === "اخبار" ? fakeNews : fakeTutorials).map(
-                (item) => (
-                  <div key={item.id} className={styles.newsCard}>
+              {loading ? (
+                <div className="text-center py-8 text-gray-500">
+                  در حال بارگذاری...
+                </div>
+              ) : filteredItems.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  {searchTerm ? "نتیجه‌ای یافت نشد" : "هیچ مقاله‌ای وجود ندارد"}
+                </div>
+              ) : (
+                filteredItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className={styles.newsCard}
+                    onClick={() => handleCardClick(item.id, item.type)}
+                  >
                     <div className={styles.newsContent}>
                       <h3 className={styles.newsTitle}>{item.title}</h3>
                       <p className={styles.newsDescription}>
                         {item.description}
                       </p>
-                      <span className={styles.newsDate}>{item.date}</span>
+                      <span className={styles.newsDate}>
+                        {formatDate(item.publish_date)}
+                      </span>
                     </div>
                     <div className={styles.newsImageWrapper}>
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className={styles.newsImage}
-                      />
+                      {item.image ? (
+                        <Image
+                          src={`${MEDIA_URL}${item.image}`}
+                          alt={item.title}
+                          width={220}
+                          height={140}
+                          className={styles.newsImage}
+                          unoptimized={true}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          📷
+                        </div>
+                      )}
                     </div>
                   </div>
-                ),
+                ))
               )}
             </div>
           )}
@@ -360,7 +409,7 @@ export default function Training() {
                               )}
                             </div>
                           </li>
-                        ),
+                        )
                       )}
                     </ul>
                   </div>

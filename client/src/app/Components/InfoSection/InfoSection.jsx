@@ -21,7 +21,7 @@ const infoSectionsData = [
       "طراحی هوشمند و عملکرد پایدار برای کار، سرگرمی و ارتباطات روزانه.",
     imageSrc: "/image-infosection/IMG_SEGMENT_20260513_144209.png",
     buyLink: "/ProductDetail/1",
-    moreLink: "/Category/موبایل",
+    moreLink: "/Category/آیفون",
   },
 ];
 

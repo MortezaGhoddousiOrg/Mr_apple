@@ -9,6 +9,7 @@ import Products from "./Products/Products";
 import Users from "./Users/Users";
 import Orders from "./Orders/Orders";
 import Category from "./Category/Category";
+import Education from "./Trinning/Education";
 
 export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
     { name: "کاربران", icon: "👥" },
     { name: "سفارشات", icon: "🛒" },
     { name: "دسته‌بندی‌ها", icon: "🗂️" },
+    { name: "مقالات", icon: "📰" }, 
   ];
 
   const user = {
@@ -49,6 +51,9 @@ export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
       case "دسته‌بندی‌ها":
         setRendered(<Category />);
         break;
+      case "مقالات":
+        setRendered(<Education />);
+        break;  
       default:
         setRendered(<Dashboard />);
     }

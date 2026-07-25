@@ -356,7 +356,6 @@ function Products() {
           </table>
         </div>
 
-        {/* ✅ بخش موبایل - اضافه شدن موجودی */}
         <div className="lg:hidden space-y-4">
           {currentProducts.map((product) => {
             const imageUrl = getMainImage(product.images);
@@ -395,7 +394,6 @@ function Products() {
                         {formatPrice(product.sell_price)} تومان
                       </span>
                     </div>
-                    {/* ✅ اضافه شدن موجودی در موبایل */}
                     <div className="mt-2 text-sm">
                       <span className="text-gray-500">موجودی: </span>
                       <span className={`font-medium ${product.quantity === 0 ? "text-red-500" : product.quantity < 5 ? "text-orange-500" : "text-gray-900"}`}>

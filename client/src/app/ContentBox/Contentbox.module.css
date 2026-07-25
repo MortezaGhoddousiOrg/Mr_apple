@@ -103,6 +103,18 @@
   transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+.instagramTextWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.instagramSubText {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+}
+
 .contactItem:hover {
   transform: translateY(-2px);
   border-color: rgba(255, 255, 255, 0.45);
@@ -196,6 +208,10 @@
     padding: 10px;
     font-size: 14px;
     border-radius: 14px;
+  }
+
+  .instagramSubText {
+    font-size: 11px;
   }
 
   .contactItem svg {

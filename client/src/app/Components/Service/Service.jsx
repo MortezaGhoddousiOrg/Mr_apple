@@ -16,7 +16,13 @@ export default function Service({ data = [], title, button, onMoreClick }) {
   const { addToCart, productbuy, setNotif } = useAuth();
 
   const Active = React.useMemo(
-    () => data.filter((item) => item.status === "active" && item.category !== null && item.category !== undefined),
+    () =>
+      data.filter(
+        (item) =>
+          item.status === "active" &&
+          item.category !== null &&
+          item.category !== undefined,
+      ),
     [data],
   );
 
@@ -41,12 +47,12 @@ export default function Service({ data = [], title, button, onMoreClick }) {
   }, []);
 
   useEffect(() => {
-    if (index > Active.length - visibleCards) {
-      setIndex(Math.max(Active.length - visibleCards, 0));
+    if (index > Active.length + 1 - visibleCards) {
+      setIndex(Math.max(Active.length + 1 - visibleCards, 0));
     }
   }, [visibleCards, Active.length]);
 
- const nextSlide = () => {
+  const nextSlide = () => {
     if (index >= Active.length + 1 - visibleCards) return;
     setIndex((prev) => prev + 1);
   };
@@ -67,20 +73,33 @@ export default function Service({ data = [], title, button, onMoreClick }) {
     if (touchEndX.current - touchStartX.current > 50) nextSlide();
   };
 
-  const translateValue = `translateX(${index * (100 / visibleCards)}%) translateX(${index * gap}px)`;
+  const translateValue = `translateX(calc(${index * (100 / visibleCards)}% + ${index * (gap / visibleCards)}px))`;
 
-  const isInCart = (id) => productbuy?.some((p) => (p.product_id || p.id) === id);
+  const isInCart = (id) =>
+    productbuy?.some((p) => (p.product_id || p.id) === id);
 
   const handleAddToCart = async (item) => {
     if (isInCart(item.id)) {
-      setNotif({ id: Date.now(), message: "این محصول قبلاً به سبد خرید اضافه شده است", type: "warning" });
+      setNotif({
+        id: Date.now(),
+        message: "این محصول قبلاً به سبد خرید اضافه شده است",
+        type: "warning",
+      });
       return;
     }
     try {
       await addToCart(item);
-      setNotif({ id: Date.now(), message: "محصول با موفقیت به سبد خرید اضافه شد", type: "success" });
+      setNotif({
+        id: Date.now(),
+        message: "محصول با موفقیت به سبد خرید اضافه شد",
+        type: "success",
+      });
     } catch {
-      setNotif({ id: Date.now(), message: "خطا در افزودن محصول", type: "error" });
+      setNotif({
+        id: Date.now(),
+        message: "خطا در افزودن محصول",
+        type: "error",
+      });
     }
   };
 
@@ -109,8 +128,19 @@ export default function Service({ data = [], title, button, onMoreClick }) {
           disabled={index === 0}
           aria-label="قبلی"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
           </svg>
         </button>
 
@@ -128,12 +158,26 @@ export default function Service({ data = [], title, button, onMoreClick }) {
           >
             {Active.map((item) => {
               const added = isInCart(item.id);
+
+              const hasDiscount = Number(item.discount) > 0;
+
+              const finalPrice = hasDiscount
+                ? Number(item.price) * (1 - Number(item.discount) / 100)
+                : Number(item.price);
+
               return (
                 <div
                   className={styles.serviceCard}
                   key={item.id}
-                  style={{ flex: `0 0 calc(${100 / visibleCards}% - ${gap * (visibleCards - 1) / visibleCards}px)` }}
+                  style={{
+                    flex: `0 0 calc(${100 / visibleCards}% - ${(gap * (visibleCards - 1)) / visibleCards}px)`,
+                  }}
                 >
+                  {hasDiscount && (
+                    <div className={styles.discountBadge}>
+                      {Number(item.discount)}٪ تخفیف
+                    </div>
+                  )}
                   <Image
                     unoptimized
                     className={styles.serviceImage}
@@ -144,10 +188,20 @@ export default function Service({ data = [], title, button, onMoreClick }) {
                     onClick={() => router.push(`/ProductDetail/${item.id}`)}
                   />
                   <p className={styles.serviceTitle}>{item.title}</p>
-                  <h2 className={styles.serviceDescription}>{item.description}</h2>
-                  <p className={styles.servicePrice}>
-                    {parseInt(item.price)?.toLocaleString("fa-IR")} تومان
-                  </p>
+                  <h2 className={styles.serviceDescription}>
+                    {item.description}
+                  </h2>
+                  <div className={styles.servicePrice}>
+                    {hasDiscount && (
+                      <span className={styles.oldPrice}>
+                        {Number(item.price).toLocaleString("fa-IR")} تومان
+                      </span>
+                    )}
+
+                    <span className={styles.newPrice}>
+                      {finalPrice.toLocaleString("fa-IR")} تومان
+                    </span>
+                  </div>
                   <button
                     className={`${styles.serviceBtn} ${added ? styles.serviceBtnGreen : ""}`}
                     onClick={() => handleAddToCart(item)}
@@ -155,7 +209,13 @@ export default function Service({ data = [], title, button, onMoreClick }) {
                     {added ? (
                       <>
                         به سبد خرید اضافه شد
-                        <svg className={styles.svg} viewBox="0 0 24 24" fill="white" width="16" height="16">
+                        <svg
+                          className={styles.svg}
+                          viewBox="0 0 24 24"
+                          fill="white"
+                          width="16"
+                          height="16"
+                        >
                           <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
                         </svg>
                       </>
@@ -169,14 +229,19 @@ export default function Service({ data = [], title, button, onMoreClick }) {
 
             <div
               className={styles.serviceCardLast}
-              style={{ flex: `0 0 calc(${100 / visibleCards}% - ${gap * (visibleCards - 1) / visibleCards}px)` }}
+              style={{
+                flex: `0 0 calc(${100 / visibleCards}% - ${(gap * (visibleCards - 1)) / visibleCards}px)`,
+              }}
             >
               <div className={styles.serviceCardLastDiv}>
                 <h2>{title}</h2>
                 <p>برای نمایش بیشتر کلیک کنید</p>
               </div>
               {button && (
-                <button className={styles.serviceCardLastButton} onClick={onMoreClick}>
+                <button
+                  className={styles.serviceCardLastButton}
+                  onClick={onMoreClick}
+                >
                   {button}
                 </button>
               )}
@@ -190,8 +255,19 @@ export default function Service({ data = [], title, button, onMoreClick }) {
           disabled={index >= Active.length + 1 - visibleCards}
           aria-label="بعدی"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5" /><path d="m12 19-7-7 7-7" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5" />
+            <path d="m12 19-7-7 7-7" />
           </svg>
         </button>
       </div>

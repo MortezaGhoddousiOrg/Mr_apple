@@ -183,7 +183,7 @@ export default function Contactus() {
                 <path d="M6.6 10.8c1.5 3 3.6 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.9.6.6 0 1 .4 1 1V21c0 .6-.4 1-1 1C10.1 22 2 13.9 2 3c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.4.2 2.7.6 3.9.1.4 0 .8-.3 1.1l-2.2 2.8z" />
               </svg>
             </div>
-            <span>051-12345678</span>
+            <span>051-91001631</span>
           </div>
 
           <div className={style.infoItem}>
@@ -192,7 +192,7 @@ export default function Contactus() {
                 <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
               </svg>
             </div>
-            <span>support@example.com</span>
+            <span>https://www.instagram.com/pezhman_gorgani_apple/</span>
           </div>
 
           <div className={style.infoItem}>
@@ -201,7 +201,7 @@ export default function Contactus() {
                 <path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7zm0 9.5c-1.4 0-2.5-1.1-2.5-2.5S10.6 6.5 12 6.5s2.5 1.1 2.5 2.5S13.4 11.5 12 11.5z" />
               </svg>
             </div>
-            <span>مشهد - خیابان مثال</span>
+            <span>مشهد - نبش هاشمیه 6 برج آبان طبقه منفی یک رو به رو پله برقی</span>
           </div>
 
           <div className={style.infoItem}>
@@ -211,7 +211,7 @@ export default function Contactus() {
                 <path d="M12 7v5l3 2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               </svg>
             </div>
-            <span>هر روز از ساعت ۹ الی ۲۲</span>
+            <span>هر روز از ساعت 10:30 الی ۲۲</span>
           </div>
         </div>
 

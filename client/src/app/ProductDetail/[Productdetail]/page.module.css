@@ -365,34 +365,6 @@
   line-height: 1.9;
 }
 
-.specGrid {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(17, 17, 17, 0.08);
-  border-radius: 22px;
-  overflow: hidden;
-}
-.specRow {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 14px 16px;
-  border-top: 1px solid rgba(17, 17, 17, 0.06);
-}
-.specRow:first-child {
-  border-top: none;
-}
-.specKey {
-  font-size: 13px;
-  color: rgba(17, 17, 17, 0.55);
-  font-weight: 850;
-}
-.specVal {
-  font-size: 13px;
-  color: #111;
-  font-weight: 850;
-  text-align: left;
-}
-
 .featureList {
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(17, 17, 17, 0.08);
@@ -428,56 +400,11 @@
   overflow-wrap: anywhere;
 }
 
-.featureGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-.featureCard {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(17, 17, 17, 0.08);
-  border-radius: 20px;
-  padding: 16px;
-  transition: 220ms ease;
-}
-.featureCard:hover {
-  transform: translateY(-3px);
-  border-color: rgba(17, 17, 17, 0.18);
-}
-.featureTitle {
-  font-size: 12px;
-  color: rgba(17, 17, 17, 0.55);
-  font-weight: 850;
-  margin-bottom: 6px;
-}
-.featureValue {
-  font-size: 15px;
-  color: #111;
-  font-weight: 900;
-}
-
-.boxGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-.boxItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 14px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(17, 17, 17, 0.08);
-  color: #111;
-  font-weight: 850;
-}
-.boxBullet {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #111;
-  opacity: 0.75;
+.emptyFeature {
+  padding: 24px 16px;
+  text-align: center;
+  color: rgba(17, 17, 17, 0.45);
+  font-size: 14px;
 }
 
 .commentForm {
@@ -571,11 +498,91 @@
   border-color: rgba(245, 179, 1, 0.45);
 }
 
-@media (max-width: 768px) {
-  .commentGrid {
-    grid-template-columns: 1fr;
-  }
+/* ========================================== */
+/* توضیحات بیشتر */
+/* ========================================== */
+.moreDescriptionBox {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(17, 17, 17, 0.08);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
+
+.moreDescriptionContent {
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(17, 17, 17, 0.06);
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.moreDescriptionContent:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(17, 17, 17, 0.12);
+}
+
+.moreDescriptionHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  min-width: 0; /* برای اینکه children بتونن جمع بشن */
+}
+
+.moreDescriptionIcon {
+  width: 18px;
+  height: 18px;
+  stroke: rgba(17, 17, 17, 0.5);
+  flex-shrink: 0;
+}
+
+.moreDescriptionTitle {
+  flex: 1;
+  min-width: 0; /* حیاتی: تو flex بدون این، آیتم از پدر بیرون می‌زنه */
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(17, 17, 17, 0.6);
+}
+
+.moreDescriptionChevron {
+  width: 18px;
+  height: 18px;
+  stroke: rgba(17, 17, 17, 0.4);
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.moreDescriptionText {
+  font-size: 14px;
+  line-height: 2;
+  color: rgba(17, 17, 17, 0.75);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere; /* شکستن کلمات طولانی/بی‌فاصله */
+  word-break: break-word;
+  max-width: 100%;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  padding-top: 4px;
+}
+
+.moreDescriptionText.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding-top: 0;
+}
+
+/* ========================================== */
+/* RESPONSIVE */
+/* ========================================== */
 
 @media (max-width: 1200px) {
   .heroGrid {
@@ -626,13 +633,38 @@
   .featureVal {
     text-align: right;
   }
-  .featureGrid {
-    grid-template-columns: 1fr;
-  }
-  .boxGrid {
-    grid-template-columns: 1fr;
-  }
   .highlightGrid {
     grid-template-columns: 1fr;
+  }
+  .commentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .moreDescriptionBox {
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+
+  .moreDescriptionContent {
+    padding: 10px 12px;
+  }
+
+  .moreDescriptionText {
+    font-size: 13px;
+    line-height: 1.9;
+  }
+
+  .moreDescriptionTitle {
+    font-size: 12px;
+  }
+
+  .moreDescriptionIcon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .moreDescriptionChevron {
+    width: 16px;
+    height: 16px;
   }
 }

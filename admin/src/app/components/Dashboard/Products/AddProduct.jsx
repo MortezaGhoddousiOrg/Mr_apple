@@ -17,6 +17,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
     quantity: "",
     discount: "0",
     descriptions: "",
+    more_descriptions: "",
     category_id: "",
     status: "active",
   });
@@ -29,6 +30,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
   const [newFeatureValue, setNewFeatureValue] = useState("");
   const [mainImage, setMainImage] = useState(null);
   const [galleryImages, setGalleryImages] = useState([]);
+  const [deletedGalleryImages, setDeletedGalleryImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState({});
@@ -53,6 +55,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         quantity: initialData.quantity?.toString() || "",
         discount: initialData.discount?.toString() || "0",
         descriptions: initialData.descriptions || "",
+        more_descriptions: initialData.more_descriptions || "",
         category_id: initialData.category_id?.toString() || "",
         status: initialData.status || "active",
       });
@@ -252,6 +255,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         preview: URL.createObjectURL(file),
         id: null,
         status: "pending",
+        isExisting: false,
       });
   };
 
@@ -262,6 +266,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
       preview: URL.createObjectURL(file),
       id: null,
       status: "pending",
+      isExisting: false,
     }));
     setGalleryImages((prev) => [...prev, ...newImages]);
   };
@@ -275,6 +280,9 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
   const removeGalleryImage = (index) => {
     const img = galleryImages[index];
     if (img.preview && !img.isExisting) URL.revokeObjectURL(img.preview);
+    if (img.isExisting && img.id) {
+      setDeletedGalleryImages((prev) => [...prev, img.id]);
+    }
     setGalleryImages((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -323,9 +331,32 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
     setLoading(true);
     try {
       const image_ids = [];
-      if (mainImage?.id && !mainImage.isExisting) image_ids.push(mainImage.id);
+      const deleted_image_ids = [...deletedGalleryImages];
+      let main_image_id = null;
+
+      // ✅ مدیریت عکس اصلی
+      if (mainImage) {
+        if (mainImage.id && !mainImage.isExisting) {
+          image_ids.push(mainImage.id);
+          main_image_id = mainImage.id;
+        } else if (mainImage.id && mainImage.isExisting) {
+          main_image_id = mainImage.id;
+        } else if (mainImage.file && !mainImage.id) {
+          setNotif({
+            id: Date.now(),
+            message: "لطفاً ابتدا عکس را آپلود کنید",
+            type: "error",
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
+      // ✅ مدیریت تصاویر گالری
       galleryImages.forEach((img) => {
-        if (img.id && !img.isExisting) image_ids.push(img.id);
+        if (img.id && !img.isExisting) {
+          image_ids.push(img.id);
+        }
       });
 
       const featureObj = {};
@@ -342,6 +373,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         category_id: parseInt(formData.category_id),
         discount: parseFloat(formData.discount) || 0,
         descriptions: formData.descriptions || "",
+        more_descriptions: formData.more_descriptions || "", // ✅ این خط باید باشه
         status: formData.status,
         feature: featureObj,
       };
@@ -349,6 +381,16 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
       if (image_ids.length > 0) {
         productData.image_ids = image_ids;
       }
+
+      if (deleted_image_ids.length > 0 && mode === "edit") {
+        productData.deleted_image_ids = deleted_image_ids;
+      }
+
+      if (main_image_id && mode === "edit") {
+        productData.main_image_id = main_image_id;
+      }
+
+      console.log("📤 Sending product data:", productData);
 
       if (mode === "edit" && initialData?.id) {
         await api.put(`/api/catalog/product/${initialData.id}/`, productData);
@@ -368,7 +410,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
 
       onBack();
     } catch (error) {
-      console.error(error);
+      console.error("❌ Submit Error:", error);
       let msg = mode === "edit" ? "خطا در ویرایش محصول" : "خطا در ایجاد محصول";
       if (error.response?.data) {
         if (typeof error.response.data === "object") {
@@ -594,6 +636,24 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
                 className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none resize-none text-gray-900"
                 placeholder="توضیحات کامل محصول..."
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                توضیحات بیشتر
+                <span className="text-gray-400 text-xs mr-1">(اختیاری)</span>
+              </label>
+              <textarea
+                name="more_descriptions"
+                value={formData.more_descriptions}
+                onChange={handleChange}
+                rows="3"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none resize-none text-gray-900"
+                placeholder="توضیحات تکمیلی و جزئیات بیشتر محصول..."
+              />
+              <p className="mt-1 text-xs text-gray-400">
+                این بخش برای توضیحات تکمیلی و اطلاعات بیشتر محصول استفاده می‌شود
+              </p>
             </div>
           </div>
 

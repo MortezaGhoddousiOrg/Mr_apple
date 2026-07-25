@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Head from "next/head";
 import Image from "next/image";
-import styles from "./page.module.css";
+import styles from "./page.module.css";  
 import Imagedetail from "@/app/ProductDetail/ImageDetail/Imagedetail";
 import { useAuth } from "@/app/Context/Context";
 import { api, MEDIA_URL } from "@/app/config";
@@ -48,6 +48,7 @@ export default function Productdetail() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
@@ -186,6 +187,10 @@ export default function Productdetail() {
     setCommentRate(5);
   };
 
+  const toggleDescription = () => {
+    setShowFullDescription(!showFullDescription);
+  };
+
   if (loading) {
     return (
       <div className={styles.pageShell}>
@@ -301,6 +306,47 @@ export default function Productdetail() {
                   )}
                 </button>
               </div>
+
+              {/* ✅ توضیحات بیشتر */}
+              {product?.more_description && (
+                <div className={styles.moreDescriptionBox}>
+                  <div 
+                    className={styles.moreDescriptionContent}
+                    onClick={toggleDescription}
+                  >
+                    <div className={styles.moreDescriptionHeader}>
+                      <svg 
+                        className={styles.moreDescriptionIcon} 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="M12 8v4"/>
+                        <path d="M12 16h.01"/>
+                      </svg>
+                      <span className={styles.moreDescriptionTitle}>توضیحات بیشتر</span>
+                      <svg 
+                        className={`${styles.moreDescriptionChevron} ${showFullDescription ? styles.chevronOpen : ''}`} 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </div>
+                    <div className={`${styles.moreDescriptionText} ${!showFullDescription ? styles.collapsed : ''}`}>
+                      {product.more_description}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -312,6 +358,30 @@ export default function Productdetail() {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className={`${styles.sectionBlock} ${styles.featureSection}`}>
+        <div className={styles.sectionHeadRow}>
+          <h2 className={styles.sectionTitle}>ویژگی‌ها</h2>
+          <p className={styles.sectionSubtitle}>
+            اطلاعات ثبت‌شده برای این محصول
+          </p>
+        </div>
+
+        <div className={styles.featureList}>
+          {featureArray.length > 0 ? (
+            featureArray.map((item, index) => (
+              <div key={`${item?.key}-${index}`} className={styles.featureRow}>
+                <span className={styles.featureKey}>{item?.key}</span>
+                <span className={styles.featureVal}>{item?.value}</span>
+              </div>
+            ))
+          ) : (
+            <div className={styles.emptyFeature}>
+              <p>ویژگی‌ای برای این محصول ثبت نشده است</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -341,24 +411,6 @@ export default function Productdetail() {
         </div>
       </section>
 
-      <section className={`${styles.sectionBlock} ${styles.featureSection}`}>
-        <div className={styles.sectionHeadRow}>
-          <h2 className={styles.sectionTitle}>ویژگی‌ها</h2>
-          <p className={styles.sectionSubtitle}>
-            اطلاعات ثبت‌شده برای این محصول
-          </p>
-        </div>
-
-        <div className={styles.featureList}>
-          {featureArray.map((item, index) => (
-            <div key={`${item?.key}-${index}`} className={styles.featureRow}>
-              <span className={styles.featureKey}>{item?.key}</span>
-              <span className={styles.featureVal}>{item?.value}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section className={styles.sectionBlock}>
         <div className={styles.sectionHeadRow}>
           <h2 className={styles.sectionTitle}>نظرات کاربران</h2>
@@ -373,6 +425,7 @@ export default function Productdetail() {
                 className={styles.input}
                 value={commentName}
                 onChange={(e) => setCommentName(e.target.value)}
+                placeholder="نام خود را وارد کنید"
               />
             </div>
 

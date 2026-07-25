@@ -270,9 +270,6 @@
   font-size: 0.95rem;
 }
 
-/* ========================================== */
-/* MODAL OVERLAY & CONTAINER - FIXED         */
-/* ========================================== */
 
 .modalOverlay {
   position: fixed;
@@ -347,9 +344,6 @@
   color: #0f73b3;
 }
 
-/* ========================================== */
-/* MODAL FORM                                 */
-/* ========================================== */
 
 .modalForm {
   display: flex;
@@ -465,11 +459,8 @@
   transform: scale(0.97);
 }
 
-/* ========================================== */
-/* RESPONSIVE MODAL - FIXED LABEL ISSUE      */
-/* ========================================== */
 
-/* Mobile (up to 768px) */
+
 @media (max-width: 768px) {
   .modalOverlay {
     padding: 10px;
@@ -487,7 +478,6 @@
     margin-bottom: 12px;
   }
 
-  /* ✅ افزایش فاصله بین input ها در موبایل */
   .modalForm {
     gap: 24px !important;
   }
@@ -506,14 +496,12 @@
     right: 10px;
   }
 
-  /* ✅ وقتی label بالا میره، فضای بیشتری اشغال کنه */
   .inputGroup input:focus + label,
   .inputGroup textarea:focus + label,
   .inputGroup input:not(:placeholder-shown) + label,
   .inputGroup textarea:not(:placeholder-shown) + label {
     top: -11px;
     font-size: 12px;
-    /* background: white; */
     padding: 0 6px;
   }
 
@@ -529,7 +517,6 @@
   }
 }
 
-/* Small Mobile (up to 480px) */
 @media (max-width: 480px) {
   .modalOverlay {
     padding: 8px;
@@ -547,7 +534,6 @@
     margin-bottom: 10px;
   }
 
-  /* ✅ افزایش فاصله بین input ها در موبایل کوچک */
   .modalForm {
     gap: 20px !important;
   }
@@ -572,7 +558,6 @@
   .inputGroup textarea:not(:placeholder-shown) + label {
     top: -10px;
     font-size: 11px;
-    /* background: white; */
     padding: 0 4px;
   }
 
@@ -593,7 +578,6 @@
   }
 }
 
-/* Extra Small Mobile (up to 380px) */
 @media (max-width: 380px) {
   .modalOverlay {
     padding: 5px;
@@ -611,7 +595,6 @@
     margin-bottom: 8px;
   }
 
-  /* ✅ افزایش فاصله بین input ها در موبایل خیلی کوچک */
   .modalForm {
     gap: 16px !important;
   }
@@ -657,7 +640,6 @@
   }
 }
 
-/* Height-based adjustments for very short screens */
 @media (max-height: 600px) {
   .modalOverlay {
     padding: 4px;
@@ -759,11 +741,9 @@
   }
 }
 
-/* ========================================== */
-/* RESPONSIVE HERO - CONTACT PAGE            */
-/* ========================================== */
 
-/* Tablet (768px - 1024px) */
+
+
 @media (max-width: 1024px) {
   .headerContact {
     flex-direction: column;
@@ -822,7 +802,6 @@
   }
 }
 
-/* Mobile (up to 768px) - Stack info section vertically */
 @media (max-width: 768px) {
   .headerContact {
     padding: 100px 4vw 40px;
@@ -943,7 +922,6 @@
   }
 }
 
-/* Small Mobile (up to 480px) */
 @media (max-width: 480px) {
   .headerContact {
     padding: 80px 3vw 30px;
