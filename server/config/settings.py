@@ -169,6 +169,7 @@ from datetime import timedelta
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "authuser.authentication.UserJWTAuthentication",
+        "authuser.authentication.AdminJWTAuthentication",
         ),
 }
 

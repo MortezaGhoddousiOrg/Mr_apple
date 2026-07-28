@@ -374,6 +374,7 @@ class UpdatePayment(APIView):
 #         return Response({"error": "Zarinpal request failed", "details": response})
 
 class ZarinpalVerify(APIView):
+    permission_classes = [AllowAny]
 
     def get(self, request):
         authority = request.GET.get("Authority")

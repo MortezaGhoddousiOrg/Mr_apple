@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny
 
 from authuser.authentication import AdminJWTAuthentication
@@ -18,6 +18,8 @@ from django.db.models import Q
 
 #   PRODUCT LIST 
 @api_view(["GET"])
+@authentication_classes([AdminJWTAuthentication])
+@permission_classes([IsAdminUser])
 def product_list(request):
     products = Products.objects.all()
     serializer = ProductSerializer(products, many=True)
@@ -26,6 +28,8 @@ def product_list(request):
 
 #   PRODUCT BY CHILD ID 
 @api_view(["GET"])
+@authentication_classes([AdminJWTAuthentication])
+@permission_classes([IsAdminUser])
 def product_by_child(request, child_id):
     products = Products.objects.filter(category_id_id=child_id)
     serializer = ProductSerializer(products, many=True)
@@ -34,6 +38,8 @@ def product_by_child(request, child_id):
 
 #   LATEST 6 PRODUCTS 
 @api_view(["GET"])
+@authentication_classes([AdminJWTAuthentication])
+@permission_classes([IsAdminUser])
 def product_latest(request):
     products = Products.objects.order_by("-created_at")[:6]
     serializer = ProductSerializer(products, many=True)
@@ -42,6 +48,8 @@ def product_latest(request):
 
 #   HOME PAGE — ONLY 6 PRODUCTS
 @api_view(["GET"])
+@authentication_classes([AdminJWTAuthentication])
+@permission_classes([IsAdminUser])
 def product_home_list(request):
     products = Products.objects.order_by("-created_at")[:6]
     serializer = ProductSerializer(products, many=True)
@@ -147,7 +155,7 @@ class ProductUpdateDeleteView(APIView):
             "quantity": data["quantity"],
             "discount": data["discount"],
             "descriptions": data["descriptions"],
-            "more_description": data.get("more_description", ""),  # ✅ اصلاح شده
+            "more_description": data.get("more_description", ""),  
             "category_id": data["category_child_id"],
             "status": data["status"],
             "feature": data["feature"],
@@ -166,12 +174,10 @@ class ProductUpdateDeleteView(APIView):
         print(f"=== Product Update ===")
         print(f"request.data: {request.data}")
 
-        # دریافت image_ids
         image_ids = request.data.get("image_ids", [])
         deleted_image_ids = request.data.get("deleted_image_ids", [])
         new_main_image_id = request.data.get("main_image_id", None)
         
-        # تبدیل به لیست اگر رشته باشه
         if isinstance(image_ids, str):
             try:
                 image_ids = json.loads(image_ids)
@@ -188,7 +194,6 @@ class ProductUpdateDeleteView(APIView):
         print(f"deleted_image_ids: {deleted_image_ids}")
         print(f"new_main_image_id: {new_main_image_id}")
 
-        # ✅ 1. حذف عکس‌های مشخص شده
         if deleted_image_ids:
             for img_id in deleted_image_ids:
                 try:
@@ -200,7 +205,6 @@ class ProductUpdateDeleteView(APIView):
                 except ProductImages.DoesNotExist:
                     print(f"⚠️ Image {img_id} not found for this product")
 
-        # ✅ 2. اتصال عکس‌های جدید به محصول
         if image_ids:
             existing_image_ids = list(product.images.values_list('id', flat=True))
             new_image_ids = [int(id) for id in image_ids if int(id) not in existing_image_ids]
@@ -209,18 +213,15 @@ class ProductUpdateDeleteView(APIView):
                 ProductImages.objects.filter(id__in=new_image_ids).update(product_id=product)
                 print(f"✅ Added new images: {new_image_ids}")
 
-        # ✅ 3. مدیریت عکس اصلی - حذف عکس اصلی قبلی
         old_main_image = product.images.filter(is_main=True).first()
         
         if new_main_image_id:
-            # عکس اصلی قبلی رو حذف کن
             if old_main_image and old_main_image.id != new_main_image_id:
                 if old_main_image.image and os.path.isfile(os.path.join(settings.MEDIA_ROOT, old_main_image.image.name)):
                     os.remove(os.path.join(settings.MEDIA_ROOT, old_main_image.image.name))
                 old_main_image.delete()
                 print(f"✅ Deleted old main image: {old_main_image.id}")
             
-            # عکس جدید رو به عنوان اصلی تنظیم کن
             try:
                 new_main = ProductImages.objects.get(id=new_main_image_id, product_id=product)
                 new_main.is_main = True
@@ -229,7 +230,6 @@ class ProductUpdateDeleteView(APIView):
             except ProductImages.DoesNotExist:
                 print(f"⚠️ Main image {new_main_image_id} not found for this product")
         else:
-            # اگر عکس اصلی جدیدی مشخص نشده
             if not old_main_image:
                 first_image = product.images.first()
                 if first_image:
@@ -237,13 +237,11 @@ class ProductUpdateDeleteView(APIView):
                     first_image.save()
                     print(f"✅ Set first image as main: {first_image.id}")
 
-        # ✅ 4. آپدیت دیتای محصول
         data = {}
         for key, value in request.data.items():
             if key not in ['image_ids', 'deleted_image_ids', 'main_image_id']:
                 data[key] = value
 
-        # اطمینان از اینکه more_descriptions به درستی پردازش بشه
         if 'more_descriptions' in data:
             data['more_description'] = data.pop('more_descriptions')
 
@@ -278,7 +276,8 @@ class ProductUpdateDeleteView(APIView):
         
         
 class ProductSearchView(APIView):
-    permission_classes = [AllowAny]
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
 
     def get(self, request):
         q = request.GET.get("q", "").strip()
@@ -286,7 +285,6 @@ class ProductSearchView(APIView):
 
         products = Products.objects.all()
 
-        # جستجوی کلی در همه فیلدها (شامل نام دسته‌بندی)
         if q:
             products = products.filter(
                 Q(name__icontains=q) |
@@ -296,7 +294,6 @@ class ProductSearchView(APIView):
                 Q(category_id__title__icontains=q)
             )
 
-        # فیلتر دقیق بر اساس دسته‌بندی (اختیاری)
         if category_id:
             try:
                 category_id = int(category_id)
@@ -304,7 +301,6 @@ class ProductSearchView(APIView):
             except ValueError:
                 return Response({"error": "Invalid category_id"}, status=400)
 
-        # اگر هیچ پارامتری وجود نداشت، همه محصولات رو برگردون
         if not q and not category_id:
             products = Products.objects.all()
 
