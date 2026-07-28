@@ -38,13 +38,13 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
-    # ✅ اصلاح: more_descriptions باید write_only=False باشه تا مقدارش دریافت بشه
-    more_descriptions = serializers.CharField(
-        source="more_description",
-        required=False,
-        allow_blank=True,
-        allow_null=True
-    )
+    # ✅ اصلاح: این فیلد رو حذف کن و از خود more_description استفاده کن
+    # more_descriptions = serializers.CharField(
+    #     source="more_description",
+    #     required=False,
+    #     allow_blank=True,
+    #     allow_null=True
+    # )
 
     image_ids = serializers.ListField(
         child=serializers.IntegerField(),
@@ -68,8 +68,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Products
-        fields = "__all__"
-        
+        fields = "__all__"  # ✅ این همه فیلدها رو شامل میشه، از جمله more_description
+        # ❌ fields رو به "__all__" بذار
         
     def validate_category_id(self, value):
         from category.models import CategoryChild

@@ -55,7 +55,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         quantity: initialData.quantity?.toString() || "",
         discount: initialData.discount?.toString() || "0",
         descriptions: initialData.descriptions || "",
-        more_descriptions: initialData.more_descriptions || "",
+        more_descriptions: initialData.more_description || "", // ✅ اصلاح شده
         category_id: initialData.category_id?.toString() || "",
         status: initialData.status || "active",
       });
@@ -68,7 +68,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
           ([key, value]) => ({
             key,
             value: String(value),
-          }),
+          })
         );
         setFeatures(featuresArray);
       }
@@ -76,7 +76,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
       if (initialData.images && initialData.images.length > 0) {
         const mainImg = initialData.images.find((img) => img.is_main === true);
         const galleryImgs = initialData.images.filter(
-          (img) => img.is_main !== true,
+          (img) => img.is_main !== true
         );
 
         if (mainImg) {
@@ -117,7 +117,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
   const toEnglishDigits = (str) => {
     if (!str) return "";
     return str.replace(/[۰-۹]/g, (d) =>
-      String.fromCharCode(d.charCodeAt(0) - 1728),
+      String.fromCharCode(d.charCodeAt(0) - 1728)
     );
   };
 
@@ -181,7 +181,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
       formDataImg,
       {
         headers: { "Content-Type": "multipart/form-data" },
-      },
+      }
     );
     return response.data;
   };
@@ -218,8 +218,8 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
     if (!image || !image.file) return;
     setGalleryImages((prev) =>
       prev.map((img, i) =>
-        i === index ? { ...img, status: "uploading" } : img,
-      ),
+        i === index ? { ...img, status: "uploading" } : img
+      )
     );
     try {
       const uploaded = await uploadSingleImage(image.file, false);
@@ -227,8 +227,8 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         prev.map((img, i) =>
           i === index
             ? { ...img, id: uploaded.id, status: "success", isExisting: false }
-            : img,
-        ),
+            : img
+        )
       );
       setNotif({
         id: Date.now(),
@@ -237,7 +237,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
       });
     } catch (error) {
       setGalleryImages((prev) =>
-        prev.map((img, i) => (i === index ? { ...img, status: "error" } : img)),
+        prev.map((img, i) => (i === index ? { ...img, status: "error" } : img))
       );
       setNotif({
         id: Date.now(),
@@ -334,7 +334,6 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
       const deleted_image_ids = [...deletedGalleryImages];
       let main_image_id = null;
 
-      // ✅ مدیریت عکس اصلی
       if (mainImage) {
         if (mainImage.id && !mainImage.isExisting) {
           image_ids.push(mainImage.id);
@@ -352,7 +351,6 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         }
       }
 
-      // ✅ مدیریت تصاویر گالری
       galleryImages.forEach((img) => {
         if (img.id && !img.isExisting) {
           image_ids.push(img.id);
@@ -373,7 +371,7 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         category_id: parseInt(formData.category_id),
         discount: parseFloat(formData.discount) || 0,
         descriptions: formData.descriptions || "",
-        more_descriptions: formData.more_descriptions || "", // ✅ این خط باید باشه
+        more_descriptions: formData.more_descriptions || "",
         status: formData.status,
         feature: featureObj,
       };

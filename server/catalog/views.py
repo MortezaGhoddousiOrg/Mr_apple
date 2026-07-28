@@ -146,6 +146,7 @@ class ProductUpdateDeleteView(APIView):
         all_images = product.images.all()
         images_data = ProductImageSerializer(all_images, many=True).data
 
+        # ✅ اصلاح: از data.get("more_description") استفاده کن
         return Response({
             "id": data["id"],
             "product_code": data["product_code"],
@@ -155,7 +156,7 @@ class ProductUpdateDeleteView(APIView):
             "quantity": data["quantity"],
             "discount": data["discount"],
             "descriptions": data["descriptions"],
-            "more_description": data.get("more_description", ""),  
+            "more_description": data.get("more_description", ""),  # ✅ اصلاح شده
             "category_id": data["category_child_id"],
             "status": data["status"],
             "feature": data["feature"],

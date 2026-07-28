@@ -12,7 +12,10 @@ export default function RootLayout({ children }) {
     <html lang="fa" dir="rtl" className={`h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <NotificationProvider>
-          {children}
+          {/* فقط در موبایل padding-top اضافه میشه */}
+          <div className="pt-[70px] md:pt-0">
+            {children}
+          </div>
           <Toast />
         </NotificationProvider>
       </body>

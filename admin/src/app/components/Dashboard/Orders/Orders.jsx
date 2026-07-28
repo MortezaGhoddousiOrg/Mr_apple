@@ -280,7 +280,6 @@ function Orders() {
     <Fragment>
       <section className="p-4 md:p-6">
         <div className="flex justify-between items-center mb-6">
-        
           <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
             سفارشات{" "}
             <span className="text-sm font-normal text-gray-500 mr-2">
