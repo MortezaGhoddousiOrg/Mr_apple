@@ -9,6 +9,7 @@ class Products(models.Model):
     discount = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     quantity = models.IntegerField()
     descriptions = models.TextField(null=True, blank=True)
+    more_description = models.TextField(null=True, blank=True)
     feature = models.JSONField(null=True, blank=True)
     status = models.CharField(max_length=50, default='active')
     category_id = models.ForeignKey(
@@ -34,17 +35,15 @@ class ProductImages(models.Model):
     id = models.AutoField(primary_key=True)
     
     product_id = models.ForeignKey(     
-    Products,
-    on_delete=models.CASCADE,
-    null=True,
-    blank=True,
-    related_name="images",
-    db_column="product_id"
-)    
+        Products,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="images",
+        db_column="product_id"
+    )    
     image = models.ImageField(upload_to='images/products/', null=True, blank=True)
-
     is_main = models.BooleanField(default=False)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -54,4 +53,3 @@ class ProductImages(models.Model):
         if self.product_id:
             return f"{self.product_id.name} - Image"
         return f"Image {self.id}"
-    

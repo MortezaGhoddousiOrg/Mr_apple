@@ -103,7 +103,6 @@ export default function Footer() {
             ) : categories.length > 0 ? (
               categories.map((category) => (
                 <li key={category.id} className={style.footerItem}>
-                  {/* ✅ تغییر از id به title */}
                   <a
                     href={formatCategoryUrl(category.title)}
                     className={style.link}
@@ -118,42 +117,9 @@ export default function Footer() {
               </li>
             )}
           </ul>
-        </div>
-
-        {/* Column 2 */}
-        <div className={style.footerColumn}>
-          <h4 className={style.columnTitle}>گوشی کارکرده</h4>
 
           <ul className={style.columnList}>
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>
-                آیفون کارکرده
-              </a>
-            </li>
-
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>
-                گوشی تعویضی
-              </a>
-            </li>
-
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>
-                گوشی کارشناسی‌شده
-              </a>
-            </li>
-
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>
-                دستگاه‌های اقتصادی
-              </a>
-            </li>
-
-            <li className={style.footerItem}>
-              <a href="" className={style.link}>
-                مقایسه دستگاه‌ها
-              </a>
-            </li>
+            <li className={style.footerItem}>گوشی کارکرده</li>
           </ul>
         </div>
 
@@ -199,11 +165,21 @@ export default function Footer() {
           <h4 className={style.columnTitle}>اعتماد شما</h4>
 
           <div className={style.trustBadges}>
-            <img
-              src="/image-footer/enamad.png"
-              alt="enamad"
-              className={style.badgeImage}
-            />
+            {/* ✅ لینک رسمی نماد اعتماد الکترونیکی */}
+            <a
+              referrerPolicy="origin"
+              target="_blank"
+              href="https://trustseal.enamad.ir/?id=754824&Code=TYI5ctdQ3Yn1Q0pjGjDfRaeEZWmRIZxd"
+              className={style.trustLink}
+            >
+              <img
+                referrerPolicy="origin"
+                src="https://trustseal.enamad.ir/logo.aspx?id=754824&Code=TYI5ctdQ3Yn1Q0pjGjDfRaeEZWmRIZxd"
+                alt="نماد اعتماد الکترونیکی"
+                className={style.badgeImage}
+                code="TYI5ctdQ3Yn1Q0pjGjDfRaeEZWmRIZxd"
+              />
+            </a>
           </div>
         </div>
       </div>

@@ -33,16 +33,43 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
-    # برای فرم ویرایش فرانت
     edit_category_id = serializers.IntegerField(
         source="category_id.id",
         read_only=True
     )
 
+    # ✅ اصلاح: این فیلد رو حذف کن و از خود more_description استفاده کن
+    # more_descriptions = serializers.CharField(
+    #     source="more_description",
+    #     required=False,
+    #     allow_blank=True,
+    #     allow_null=True
+    # )
+
+    image_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
+    
+    deleted_image_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False,
+        allow_empty=True
+    )
+    
+    main_image_id = serializers.IntegerField(
+        write_only=True,
+        required=False,
+        allow_null=True
+    )
+
     class Meta:
         model = Products
-        fields = "__all__"
-        
+        fields = "__all__"  # ✅ این همه فیلدها رو شامل میشه، از جمله more_description
+        # ❌ fields رو به "__all__" بذار
         
     def validate_category_id(self, value):
         from category.models import CategoryChild
@@ -51,6 +78,10 @@ class ProductSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        validated_data.pop('image_ids', None)
+        validated_data.pop('deleted_image_ids', None)
+        validated_data.pop('main_image_id', None)
+        
         category_id = validated_data.pop("category_id", None)
 
         product = Products.objects.create(
@@ -61,6 +92,10 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
     def update(self, instance, validated_data):
+        validated_data.pop('image_ids', None)
+        validated_data.pop('deleted_image_ids', None)
+        validated_data.pop('main_image_id', None)
+        
         category_id = validated_data.pop("category_id", None)
 
         for attr, value in validated_data.items():

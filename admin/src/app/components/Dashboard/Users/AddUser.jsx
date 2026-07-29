@@ -11,6 +11,7 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
     firstname: "",
     lastname: "",
     phone: "",
+    email: "",
     postal_code: "",
     address: "",
     role: "customer",
@@ -25,6 +26,7 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
         firstname: "",
         lastname: "",
         phone: "",
+        email: "",
         postal_code: "",
         address: "",
         role: "customer",
@@ -38,27 +40,14 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
         firstname: initialData.firstname || "",
         lastname: initialData.lastname || "",
         phone: initialData.phone || "",
+        email: initialData.email || "",
         postal_code: initialData.postal_code || "",
         address: initialData.address || "",
-        role: initialData.is_staff ? "admin" : "customer",
-        status: initialData.is_active ? "active" : "inactive",
+        role: initialData.role || "customer",
+        status: initialData.status || "active",
       });
     }
   }, [mode, initialData]);
-
-  useEffect(() => {
-    if (mode === "create") {
-      setFormData({
-        firstname: "",
-        lastname: "",
-        phone: "",
-        postal_code: "",
-        address: "",
-        role: "customer",
-        status: "active",
-      });
-    }
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -83,12 +72,15 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
 
     setLoading(true);
     try {
+      const normalizedPhone = formData.phone.replace(/\s/g, '');
+
       const userData = {
         firstname: formData.firstname,
         lastname: formData.lastname,
-        phone: formData.phone,
-        is_staff: formData.role === "admin",
-        is_active: formData.status === "active",
+        phone: normalizedPhone,
+        email: formData.email || "",
+        role: formData.role,
+        status: formData.status,
       };
 
       if (formData.postal_code && formData.postal_code.trim()) {
@@ -98,7 +90,7 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
         userData.address = formData.address;
       }
 
-      console.log("📤 Sending data:", userData);
+      console.log("📤 Sending data:", JSON.stringify(userData, null, 2));
 
       if (mode === "edit" && initialData?.id) {
         await api.put(`/api/accounts/user/${initialData.id}/`, userData);
@@ -118,7 +110,10 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
 
       onBack();
     } catch (error) {
-      console.error("Error saving user:", error);
+      console.error("❌ Error saving user:", error);
+      console.error("❌ Error response data:", error.response?.data);
+      console.error("❌ Error response status:", error.response?.status);
+      
       let msg = mode === "edit" ? "خطا در ویرایش کاربر" : "خطا در ایجاد کاربر";
       if (error.response?.data) {
         if (typeof error.response.data === "object") {
@@ -166,6 +161,14 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
       required: true,
     },
     {
+      id: "email",
+      name: "email",
+      type: "email",
+      label: "ایمیل",
+      placeholder: "example@email.com (اختیاری)",
+      required: false,
+    },
+    {
       id: "postal_code",
       name: "postal_code",
       type: "text",
@@ -181,6 +184,18 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
       placeholder: "آدرس کامل (اختیاری)",
       required: false,
     },
+  ];
+
+  const roleOptions = [
+    { value: "customer", label: "مشتری" },
+    { value: "admin", label: "مدیر" },
+    { value: "normal", label: "کاربر عادی" },
+  ];
+
+  const statusOptions = [
+    { value: "active", label: "فعال" },
+    { value: "inactive", label: "غیرفعال" },
+    { value: "pending", label: "در انتظار" },
   ];
 
   return (
@@ -246,21 +261,31 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
             ))}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              آدرس
-              <span className="text-gray-400 text-xs mr-1">(اختیاری)</span>
-            </label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              rows="3"
-              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900 transition resize-none"
-              placeholder="آدرس کامل (شهر، خیابان، پلاک، ...)"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {inputFields.slice(4, 6).map((field) => (
+              <div key={field.id}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {field.label}
+                  {field.required && <span className="text-red-500">*</span>}
+                </label>
+                <input
+                  type={field.type}
+                  name={field.name}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900 transition"
+                  placeholder={field.placeholder}
+                />
+                {errors[field.name] && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors[field.name]}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
 
+          {/* ✅ انتخاب نقش کاربری */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               نقش کاربری
@@ -271,29 +296,32 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
               onChange={handleChange}
               className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
             >
-              <option value="customer">مشتری</option>
-              <option value="admin">مدیر</option>
-              <option value="normal">کاربر عادی</option>
+              {roleOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
 
-          {mode === "edit" && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                وضعیت
-              </label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
-              >
-                <option value="active">فعال</option>
-                <option value="inactive">غیرفعال</option>
-                <option value="pending">در انتظار</option>
-              </select>
-            </div>
-          )}
+          {/* ✅ انتخاب وضعیت کاربر */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              وضعیت کاربر
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
+            >
+              {statusOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {errors.submit && (
             <div className="bg-red-50 text-red-600 p-3 rounded-xl text-center text-sm whitespace-pre-wrap">

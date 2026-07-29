@@ -130,7 +130,9 @@ function Users() {
       color: "bg-gray-50 text-gray-700",
     };
     return (
-      <span className={`px-3 py-1 text-xs font-medium rounded-full ${color}`}>
+      <span
+        className={`px-2 sm:px-3 py-1 text-xs font-medium rounded-full ${color}`}
+      >
         {label}
       </span>
     );
@@ -146,7 +148,9 @@ function Users() {
       color: "bg-gray-50 text-gray-700",
     };
     return (
-      <span className={`px-3 py-1 text-xs font-medium rounded-full ${color}`}>
+      <span
+        className={`px-2 sm:px-3 py-1 text-xs font-medium rounded-full ${color}`}
+      >
         {label}
       </span>
     );
@@ -181,9 +185,9 @@ function Users() {
 
   return (
     <Fragment>
-      <section className="p-4 md:p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
+      <section className="p-3 sm:p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
             کاربران
             <span className="text-sm font-normal text-gray-500 mr-2">
               ({users.length})
@@ -196,29 +200,29 @@ function Users() {
           />
         </div>
 
-        <div className="hidden lg:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <table className="w-full">
+        <div className="hidden xl:block bg-white rounded-2xl border border-gray-100 shadow-sm overflow-x-auto">
+          <table className="w-full min-w-[1000px]">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
+                <th className="px-4 py-4 text-right text-sm font-medium text-gray-500 whitespace-nowrap">
                   نام و نام خانوادگی
                 </th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
+                <th className="px-4 py-4 text-right text-sm font-medium text-gray-500 whitespace-nowrap">
                   تلفن همراه
                 </th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
+                <th className="px-4 py-4 text-right text-sm font-medium text-gray-500 whitespace-nowrap">
                   ایمیل
                 </th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
+                <th className="px-4 py-4 text-right text-sm font-medium text-gray-500 whitespace-nowrap">
                   نقش
                 </th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
+                <th className="px-4 py-4 text-right text-sm font-medium text-gray-500 whitespace-nowrap">
                   وضعیت
                 </th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
+                <th className="px-4 py-4 text-right text-sm font-medium text-gray-500 whitespace-nowrap">
                   تاریخ ثبت نام
                 </th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-500">
+                <th className="px-4 py-4 text-right text-sm font-medium text-gray-500 whitespace-nowrap">
                   عملیات
                 </th>
               </tr>
@@ -229,7 +233,7 @@ function Users() {
                   key={user.id}
                   className="hover:bg-gray-50 transition-colors"
                 >
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative w-10 h-10 flex-shrink-0">
                         <Image
@@ -240,25 +244,25 @@ function Users() {
                           className="rounded-full object-cover"
                         />
                       </div>
-                      <div className="font-medium text-gray-900">
+                      <div className="font-medium text-gray-900 whitespace-nowrap">
                         {user.firstname || "—"} {user.lastname || ""}
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900 dir-ltr">
+                  <td className="px-4 py-4 text-sm text-gray-900 dir-ltr whitespace-nowrap">
                     {user.phone || "—"}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900 dir-ltr">
+                  <td className="px-4 py-4 text-sm text-gray-900 dir-ltr">
                     {user.email || "—"}
                   </td>
-                  <td className="px-6 py-4">{getRoleBadge(user.is_staff)}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-4">{getRoleBadge(user.is_staff)}</td>
+                  <td className="px-4 py-4">
                     {getStatusBadge(user.is_active)}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">
                     {formatDate(user.created_at)}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-4">
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(user)}
@@ -309,14 +313,14 @@ function Users() {
           </table>
         </div>
 
-        <div className="lg:hidden space-y-4">
+        <div className="xl:hidden space-y-3 sm:space-y-4">
           {currentUsers.map((user) => (
             <div
               key={user.id}
-              className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm"
+              className="bg-white rounded-2xl border border-gray-100 p-3 sm:p-4 shadow-sm"
             >
-              <div className="flex items-center gap-3">
-                <div className="relative w-12 h-12 flex-shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                   <Image
                     src="/male-avatar-KpudEwK5.webp"
                     alt="avatar"
@@ -325,37 +329,39 @@ function Users() {
                     className="rounded-full object-cover"
                   />
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
                     {user.firstname || "—"} {user.lastname || ""}
                   </h3>
-                  <p className="text-sm text-gray-500 dir-ltr">
+                  <p className="text-xs sm:text-sm text-gray-500 dir-ltr truncate">
                     {user.phone || "—"}
                   </p>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex flex-wrap gap-1 flex-shrink-0">
                   {getRoleBadge(user.is_staff)}
                   {getStatusBadge(user.is_active)}
                 </div>
               </div>
-              <div className="mt-3">
-                <p className="text-sm text-gray-500 break-all dir-ltr">
+
+              <div className="mt-2 sm:mt-3">
+                <p className="text-xs sm:text-sm text-gray-500 break-all dir-ltr">
                   {user.email || "—"}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
                   تاریخ ثبت: {formatDate(user.created_at)}
                 </p>
               </div>
-              <div className="flex gap-2 mt-4 pt-3 border-t border-gray-50">
+
+              <div className="flex gap-2 mt-3 sm:mt-4 pt-3 border-t border-gray-50">
                 <button
                   onClick={() => handleEdit(user)}
-                  className="flex-1 bg-blue-50 text-blue-600 py-2 rounded-xl text-sm font-medium"
+                  className="flex-1 bg-blue-50 text-blue-600 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium"
                 >
                   ویرایش
                 </button>
                 <button
                   onClick={() => handleDelete(user)}
-                  className="flex-1 bg-red-50 text-red-600 py-2 rounded-xl text-sm font-medium"
+                  className="flex-1 bg-red-50 text-red-600 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium"
                 >
                   حذف
                 </button>
