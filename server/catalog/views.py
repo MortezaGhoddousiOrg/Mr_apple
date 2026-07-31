@@ -18,8 +18,6 @@ from django.db.models import Q
 
 #   PRODUCT LIST 
 @api_view(["GET"])
-@authentication_classes([AdminJWTAuthentication])
-@permission_classes([IsAdminUser])
 def product_list(request):
     products = Products.objects.all()
     serializer = ProductSerializer(products, many=True)
@@ -28,8 +26,6 @@ def product_list(request):
 
 #   PRODUCT BY CHILD ID 
 @api_view(["GET"])
-@authentication_classes([AdminJWTAuthentication])
-@permission_classes([IsAdminUser])
 def product_by_child(request, child_id):
     products = Products.objects.filter(category_id_id=child_id)
     serializer = ProductSerializer(products, many=True)
@@ -38,8 +34,6 @@ def product_by_child(request, child_id):
 
 #   LATEST 6 PRODUCTS 
 @api_view(["GET"])
-@authentication_classes([AdminJWTAuthentication])
-@permission_classes([IsAdminUser])
 def product_latest(request):
     products = Products.objects.order_by("-created_at")[:6]
     serializer = ProductSerializer(products, many=True)
@@ -48,8 +42,6 @@ def product_latest(request):
 
 #   HOME PAGE — ONLY 6 PRODUCTS
 @api_view(["GET"])
-@authentication_classes([AdminJWTAuthentication])
-@permission_classes([IsAdminUser])
 def product_home_list(request):
     products = Products.objects.order_by("-created_at")[:6]
     serializer = ProductSerializer(products, many=True)
@@ -146,7 +138,6 @@ class ProductUpdateDeleteView(APIView):
         all_images = product.images.all()
         images_data = ProductImageSerializer(all_images, many=True).data
 
-        # ✅ اصلاح: از data.get("more_description") استفاده کن
         return Response({
             "id": data["id"],
             "product_code": data["product_code"],
@@ -156,7 +147,7 @@ class ProductUpdateDeleteView(APIView):
             "quantity": data["quantity"],
             "discount": data["discount"],
             "descriptions": data["descriptions"],
-            "more_description": data.get("more_description", ""),  # ✅ اصلاح شده
+            "more_description": data["more_description"],  
             "category_id": data["category_child_id"],
             "status": data["status"],
             "feature": data["feature"],
@@ -202,7 +193,6 @@ class ProductUpdateDeleteView(APIView):
                     if img.image and os.path.isfile(os.path.join(settings.MEDIA_ROOT, img.image.name)):
                         os.remove(os.path.join(settings.MEDIA_ROOT, img.image.name))
                     img.delete()
-                    print(f"✅ Deleted image: {img_id}")
                 except ProductImages.DoesNotExist:
                     print(f"⚠️ Image {img_id} not found for this product")
 
@@ -277,8 +267,6 @@ class ProductUpdateDeleteView(APIView):
         
         
 class ProductSearchView(APIView):
-    authentication_classes = [AdminJWTAuthentication]
-    permission_classes = [IsAdminUser]
 
     def get(self, request):
         q = request.GET.get("q", "").strip()

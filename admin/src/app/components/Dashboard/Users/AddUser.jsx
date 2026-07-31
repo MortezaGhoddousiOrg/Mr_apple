@@ -285,7 +285,6 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
             ))}
           </div>
 
-          {/* ✅ انتخاب نقش کاربری */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               نقش کاربری
@@ -304,7 +303,6 @@ function AddUser({ onBack, mode = "create", initialData = null }) {
             </select>
           </div>
 
-          {/* ✅ انتخاب وضعیت کاربر */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               وضعیت کاربر

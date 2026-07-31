@@ -1,9 +1,7 @@
 from rest_framework import serializers
 from .models import Users
 
-
 class UserSerializer(serializers.ModelSerializer):
-    # ✅ فقط برای نمایش در فرانت‌اند (خواندنی)
     is_active = serializers.SerializerMethodField()
     is_staff = serializers.SerializerMethodField()
 

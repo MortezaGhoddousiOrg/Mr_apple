@@ -119,7 +119,6 @@ export default function Footer() {
           </ul>
 
           <ul className={style.columnList}>
-            <li className={style.footerItem}>گوشی کارکرده</li>
           </ul>
         </div>
 
@@ -160,12 +159,10 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Trust Section */}
         <div className={style.trustSection}>
           <h4 className={style.columnTitle}>اعتماد شما</h4>
 
           <div className={style.trustBadges}>
-            {/* ✅ لینک رسمی نماد اعتماد الکترونیکی */}
             <a
               referrerPolicy="origin"
               target="_blank"
