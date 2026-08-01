@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/app/config";
 
@@ -13,8 +13,8 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
+  const searchRef = useRef(null);
 
-  // دریافت لیست دسته‌بندی‌ها
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -27,7 +27,6 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
     fetchCategories();
   }, []);
 
-  // آپدیت زمان
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -46,14 +45,38 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
 
     updateTime();
     const interval = setInterval(updateTime, 60000);
-
     return () => clearInterval(interval);
   }, []);
 
-  // تابع جستجو
+  // جستجو با هر حرف
+  useEffect(() => {
+    const delaySearch = setTimeout(() => {
+      if (searchTerm || selectedCategory) {
+        handleSearch();
+      } else {
+        setShowSearchResults(false);
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(delaySearch);
+  }, [searchTerm, selectedCategory]);
+
+  // بستن نتایج با کلیک خارج
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSearchResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleSearch = async () => {
     if (!searchTerm && !selectedCategory) {
       setShowSearchResults(false);
+      setSearchResults([]);
       return;
     }
 
@@ -64,7 +87,7 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
       if (selectedCategory) params.append("category_id", selectedCategory);
 
       const response = await api.get(
-        `/api/catalog/products/search/?${params.toString()}`
+        `/api/catalog/products/search/?${params.toString()}`,
       );
       setSearchResults(response.data);
       setShowSearchResults(true);
@@ -75,34 +98,22 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
     }
   };
 
-  // رفتن به صفحه محصول با کلیک روی نتیجه
   const handleResultClick = (productId) => {
     setShowSearchResults(false);
     setSearchTerm("");
     setSelectedCategory("");
-    // رفرش صفحه محصولات
+    setSearchResults([]);
     router.push("/dashboard");
-    // میتونیم محصول رو به کامپوننت Products پاس بدیم
     window.dispatchEvent(
-      new CustomEvent("searchProduct", { detail: { productId } })
+      new CustomEvent("searchProduct", { detail: { productId } }),
     );
   };
 
-  // جستجو با Enter
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
-
-  // بستن نتایج با کلیک خارج
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setShowSearchResults(false);
-    };
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
 
   return (
     <header className="fixed top-0 right-0 left-0 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg z-50">
@@ -158,7 +169,10 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
         </div>
 
         {/* باکس سرچ */}
-        <div className="hidden md:flex items-center gap-2 flex-1 max-w-xl mx-4">
+        <div
+          ref={searchRef}
+          className="hidden md:flex items-center gap-2 flex-1 max-w-xl mx-4 relative"
+        >
           <div className="relative flex-1">
             <input
               type="text"
@@ -168,44 +182,47 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
               onKeyDown={handleKeyDown}
               className="w-full px-4 py-1.5 rounded-lg bg-white/90 border border-transparent focus:border-white focus:outline-none text-gray-800 text-sm placeholder-gray-500"
             />
-            {showSearchResults && searchResults.length > 0 && (
+            {showSearchResults && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-80 overflow-y-auto z-50">
-                {searchResults.map((product) => (
-                  <div
-                    key={product.id}
-                    onClick={() => handleResultClick(product.id)}
-                    className="px-4 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
-                  >
-                    <div className="font-medium text-gray-800 text-sm">
-                      {product.name}
+                {searchResults.length > 0 ? (
+                  searchResults.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => handleResultClick(product.id)}
+                      className="px-4 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
+                    >
+                      <div className="font-medium text-gray-800 text-sm">
+                        {product.name}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        کد: {product.product_code || "—"} | قیمت:{" "}
+                        {new Intl.NumberFormat("fa-IR").format(
+                          product.sell_price,
+                        )}{" "}
+                        تومان
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500">
-                      کد: {product.product_code || "—"} | قیمت:{" "}
-                      {new Intl.NumberFormat("fa-IR").format(product.sell_price)}{" "}
-                      تومان
-                    </div>
+                  ))
+                ) : (
+                  <div className="px-4 py-3 text-center text-gray-500 text-sm">
+                    محصولی یافت نشد
                   </div>
-                ))}
-              </div>
-            )}
-            {showSearchResults && searchResults.length === 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 p-4 text-center text-gray-500 text-sm z-50">
-                محصولی یافت نشد
+                )}
               </div>
             )}
           </div>
 
           <select
             value={selectedCategory}
-            onChange={(e) => {
-              setSelectedCategory(e.target.value);
-            }}
+            onChange={(e) => setSelectedCategory(e.target.value)}
             className="px-3 py-1.5 rounded-lg bg-white/90 border border-transparent focus:border-white focus:outline-none text-gray-800 text-sm"
           >
             <option value="">همه دسته‌ها</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
-                {cat.parent?.title ? `${cat.parent.title} / ${cat.title}` : cat.title}
+                {cat.parent?.title
+                  ? `${cat.parent.title} / ${cat.title}`
+                  : cat.title}
               </option>
             ))}
           </select>
@@ -213,7 +230,7 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
           <button
             onClick={handleSearch}
             disabled={isSearching}
-            className="px-4 py-1.5 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium text-sm disabled:opacity-50"
+            className="px-4 py-1.5 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium text-sm disabled:opacity-50 whitespace-nowrap"
           >
             {isSearching ? "..." : "جستجو"}
           </button>
@@ -261,7 +278,7 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
 
       {/* سرچ موبایل */}
       <div className="md:hidden px-3 pb-2 bg-gradient-to-r from-blue-600 to-indigo-700">
-        <div className="flex gap-2">
+        <div ref={searchRef} className="relative flex gap-2">
           <input
             type="text"
             placeholder="جستجوی محصول..."
@@ -289,6 +306,35 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
           >
             {isSearching ? "..." : "🔍"}
           </button>
+
+          {/* نتایج سرچ موبایل */}
+          {showSearchResults && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-60 overflow-y-auto z-50">
+              {searchResults.length > 0 ? (
+                searchResults.map((product) => (
+                  <div
+                    key={product.id}
+                    onClick={() => handleResultClick(product.id)}
+                    className="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
+                  >
+                    <div className="font-medium text-gray-800 text-sm">
+                      {product.name}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {new Intl.NumberFormat("fa-IR").format(
+                        product.sell_price,
+                      )}{" "}
+                      تومان
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="px-3 py-3 text-center text-gray-500 text-sm">
+                  محصولی یافت نشد
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </header>
