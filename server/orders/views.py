@@ -239,7 +239,7 @@ class CreateOrder(APIView):
 
             with httpx.Client(verify=False) as client:
                 resp = client.post(
-                    "https://sandbox.zarinpal.com/pg/v4/payment/request.json",
+                    "https://payment.zarinpal.com/pg/v4/payment/request.json",
                     json=data,
                     timeout=15
                 )
@@ -258,7 +258,7 @@ class CreateOrder(APIView):
             payment.save()
 
             return Response({
-                "payment_url": f"https://sandbox.zarinpal.com/pg/StartPay/{authority}",
+                "payment_url": f"https://payment.zarinpal.com/pg/StartPay/{authority}",
                 "payment_id": payment.id
             })
         else:
@@ -381,19 +381,19 @@ class ZarinpalVerify(APIView):
         status = request.GET.get("Status")
 
         if not authority:
-            return redirect("http://127.0.0.1/Payment?status=false")
+            return redirect("http://127.0.0.1:3000/Payment?status=false")
 
         try:
             payment = Payments.objects.select_related("order", "order__user").get(
                 authority=authority
             )
         except Payments.DoesNotExist:
-            return redirect("http://127.0.0.1/Payment?status=false")
+            return redirect("http://127.0.0.1:3000/Payment?status=false")
 
         if status != "OK":
             payment.status = "failed"
             payment.save(update_fields=["status"])
-            return redirect("http://127.0.0.1/Payment?status=false")
+            return redirect("http://127.0.0.1:3000/Payment?status=false")
 
         verify_data = {
             "merchant_id": settings.ZARINPAL_MERCHANT_ID,
@@ -403,7 +403,7 @@ class ZarinpalVerify(APIView):
 
         try:
             response = requests.post(
-                "https://sandbox.zarinpal.com/pg/v4/payment/verify.json",
+                "https://payment.zarinpal.com/pg/v4/payment/verify.json",
                 json=verify_data,
                 timeout=15,
             )
@@ -418,7 +418,7 @@ class ZarinpalVerify(APIView):
             payment.status = "failed"
             payment.save(update_fields=["status"])
 
-            return redirect("http://127.0.0.1/Payment?status=false")
+            return redirect("http://127.0.0.1:3000/Payment?status=false")
 
         print("Zarinpal Verify Response:", result)
 
@@ -444,14 +444,14 @@ class ZarinpalVerify(APIView):
             Cart.objects.filter(user=order.user).delete()
 
             return redirect(
-                f"http://127.0.0.1/Payment?status=true&ref_id={payment.ref_id}"
+                f"http://127.0.0.1:3000/Payment?status=true&ref_id={payment.ref_id}"
             )
 
         # Already verified payment
         elif code == 101:
 
             return redirect(
-                f"http://127.0.0.1/Payment?status=true&ref_id={payment.ref_id}"
+                f"http://127.0.0.1:3000/Payment?status=true&ref_id={payment.ref_id}"
             )
 
         # Failed verification
@@ -464,7 +464,7 @@ class ZarinpalVerify(APIView):
             error_code = errors.get("code", "unknown")
 
             return redirect(
-                f"http://127.0.0.1/Payment?status=false&error={error_code}"
+                f"http://127.0.0.1:3000/Payment?status=false&error={error_code}"
             )
 
 
