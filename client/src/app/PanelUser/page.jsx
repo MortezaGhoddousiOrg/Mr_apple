@@ -57,7 +57,7 @@ export default function PanelUser() {
                 {dataForm.firstname} {dataForm.lastname}
               </p>
             ) : (
-              <p>username</p>
+              <p>{dataForm.phone}</p>
             )}
           </div>
           <div className={styles.sidebarHeader}>
