@@ -1,5 +1,5 @@
 "use client";
- 
+
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -9,30 +9,32 @@ import Products from "./Products/Products";
 import Users from "./Users/Users";
 import Orders from "./Orders/Orders";
 import Category from "./Category/Category";
- 
-export default function SideBar({ setRendered }) {
+import Education from "./Trinning/Education";
+
+export default function SideBar({ setRendered, isSidebarOpen, closeSidebar }) {
   const router = useRouter();
   const [activeItem, setActiveItem] = useState("داشبورد");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [loading, setLoading] = useState(false);
- 
+
   const list_items = [
     { name: "داشبورد", icon: "📊" },
     { name: "محصولات", icon: "📦" },
     { name: "کاربران", icon: "👥" },
     { name: "سفارشات", icon: "🛒" },
     { name: "دسته‌بندی‌ها", icon: "🗂️" },
+    { name: "مقالات", icon: "📰" }, 
   ];
- 
+
   const user = {
     firstname: "مدیر",
     lastname: "سیستم",
     role: "مدیر ارشد",
   };
- 
+
   const handleClick = (item) => {
     setActiveItem(item);
- 
+
     switch (item) {
       case "داشبورد":
         setRendered(<Dashboard />);
@@ -49,11 +51,18 @@ export default function SideBar({ setRendered }) {
       case "دسته‌بندی‌ها":
         setRendered(<Category />);
         break;
+      case "مقالات":
+        setRendered(<Education />);
+        break;  
       default:
         setRendered(<Dashboard />);
     }
+
+    if (window.innerWidth < 768) {
+      closeSidebar();
+    }
   };
- 
+
   const handleLogout = async () => {
     setLoading(true);
     try {
@@ -63,22 +72,31 @@ export default function SideBar({ setRendered }) {
     } finally {
       localStorage.removeItem("admin");
       localStorage.removeItem("isAuthenticated");
- 
+
       document.cookie =
         "admin_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie =
         "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
- 
+
       setLoading(false);
       setShowLogoutModal(false);
- 
+
       router.push("/");
     }
   };
- 
+
   return (
     <>
-      <aside className="fixed right-0 top-16 h-[calc(100vh-4rem)] w-64 bg-gradient-to-b from-gray-900 to-gray-800 shadow-xl z-50 flex flex-col">
+      <aside
+        className={`
+          fixed right-0 top-16 h-[calc(100vh-4rem)] 
+          bg-gradient-to-b from-gray-900 to-gray-800 shadow-xl z-50 
+          flex flex-col transition-all duration-300 ease-in-out
+          w-72
+          md:translate-x-0
+          ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}
+        `}
+      >
         <div className="flex flex-col items-center py-4 px-4 border-b border-gray-700 flex-shrink-0">
           <div className="relative">
             <Image
@@ -97,7 +115,7 @@ export default function SideBar({ setRendered }) {
             {user.role}
           </p>
         </div>
- 
+
         <nav className="flex-1 overflow-y-auto mt-4 px-3 min-h-0">
           <ul className="space-y-1 pb-2">
             {list_items.map((li, idx) => (
@@ -124,7 +142,7 @@ export default function SideBar({ setRendered }) {
             ))}
           </ul>
         </nav>
- 
+
         <div className="flex-shrink-0 p-4 border-t border-gray-700">
           <button
             onClick={() => setShowLogoutModal(true)}
@@ -148,11 +166,10 @@ export default function SideBar({ setRendered }) {
           </button>
         </div>
       </aside>
- 
+
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
           <div className="bg-white rounded-2xl max-w-md w-full p-6 text-center">
-            {/* آیکون */}
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="w-8 h-8 text-red-500"
@@ -168,13 +185,13 @@ export default function SideBar({ setRendered }) {
                 />
               </svg>
             </div>
- 
+
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               خروج از پنل کاربری
             </h3>
- 
+
             <p className="text-gray-500 mb-6">آیا از خروج خود مطمئن هستید؟</p>
- 
+
             <div className="flex gap-3">
               <button
                 onClick={() => setShowLogoutModal(false)}

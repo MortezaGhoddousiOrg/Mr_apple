@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny  # ✅ این خط
 from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
@@ -374,6 +374,7 @@ class UpdatePayment(APIView):
 #         return Response({"error": "Zarinpal request failed", "details": response})
 
 class ZarinpalVerify(APIView):
+    permission_classes = [AllowAny]
 
     def get(self, request):
         authority = request.GET.get("Authority")

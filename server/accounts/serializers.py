@@ -1,20 +1,23 @@
 from rest_framework import serializers
-from authuser.models import User
+from .models import Users
 
 
 class UserSerializer(serializers.ModelSerializer):
+    # ✅ فقط برای نمایش در فرانت‌اند (خواندنی)
+    is_active = serializers.SerializerMethodField()
+    is_staff = serializers.SerializerMethodField()
+
     class Meta:
-        model = User
+        model = Users
         fields = "__all__"
         extra_kwargs = {
-            "password": {"write_only": True}
+            'phone': {'required': True},
+            'firstname': {'required': True},
+            'lastname': {'required': True},
         }
 
-    def create(self, validated_data):
-        password = validated_data.pop("password")
+    def get_is_active(self, obj):
+        return obj.status == "active"
 
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
-
-        return user
+    def get_is_staff(self, obj):
+        return obj.role == "admin"

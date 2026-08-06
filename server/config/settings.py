@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'catalog.apps.CatalogConfig',
     'category',
     'authuser',
+    'education',
 ]
 
 MIDDLEWARE = [
@@ -168,8 +169,8 @@ from datetime import timedelta
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "authuser.authentication.UserJWTAuthentication",
-        "authuser.authentication.AdminJWTAuthentication",  
-    ),
+        "authuser.authentication.AdminJWTAuthentication",
+        ),
 }
 
 SIMPLE_JWT = {
