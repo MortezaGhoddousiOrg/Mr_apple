@@ -116,12 +116,17 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
   };
 
   return (
-    <header className="fixed top-0 right-0 left-0 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg z-50">
+    // ⚠️ z-[60] به‌جای z-50: چون این هدر position:fixed داره و یک stacking context
+    // جدید می‌سازه، باید از هر عنصر دیگه‌ای (مثل ساید‌بار) بالاتر باشه وگرنه
+    // باکس نتایج جستجوی داخلش (با اینکه خودش هم z بالایی داره) ممکنه پشت
+    // ساید‌بار بره. اگه جایی توی پروژه از z-index بالاتر از ۶۰ استفاده شده،
+    // همینجا هم عدد رو بالاتر ببر.
+    <header className="fixed top-0 right-0 left-0 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg shadow-blue-900/20 z-[60]">
       <div className="h-full px-3 sm:px-4 md:px-6 flex justify-between items-center">
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={toggleSidebar}
-            className="md:hidden text-white hover:text-blue-200 transition-colors p-1"
+            className="md:hidden text-white hover:text-blue-200 active:scale-95 transition-all p-1.5 rounded-lg hover:bg-white/10"
             aria-label="Toggle sidebar"
           >
             <svg
@@ -148,7 +153,7 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
             </svg>
           </button>
 
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
             <svg
               className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"
               fill="none"
@@ -174,27 +179,40 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
           className="hidden md:flex items-center gap-2 flex-1 max-w-xl mx-4 relative"
         >
           <div className="relative flex-1">
+            <svg
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
             <input
               type="text"
               placeholder="جستجوی محصول..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full px-4 py-1.5 rounded-lg bg-white/90 border border-transparent focus:border-white focus:outline-none text-gray-800 text-sm placeholder-gray-500"
+              className="w-full pr-9 pl-4 py-1.5 rounded-lg bg-white/95 border border-transparent focus:border-white focus:ring-2 focus:ring-white/40 focus:outline-none text-gray-800 text-sm placeholder-gray-400 transition"
             />
             {showSearchResults && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-80 overflow-y-auto z-50">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl ring-1 ring-black/5 max-h-80 overflow-y-auto z-[70]">
                 {searchResults.length > 0 ? (
                   searchResults.map((product) => (
                     <div
                       key={product.id}
                       onClick={() => handleResultClick(product.id)}
-                      className="px-4 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
+                      className="px-4 py-2.5 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors"
                     >
                       <div className="font-medium text-gray-800 text-sm">
                         {product.name}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 mt-0.5">
                         کد: {product.product_code || "—"} | قیمت:{" "}
                         {new Intl.NumberFormat("fa-IR").format(
                           product.sell_price,
@@ -204,7 +222,7 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
                     </div>
                   ))
                 ) : (
-                  <div className="px-4 py-3 text-center text-gray-500 text-sm">
+                  <div className="px-4 py-4 text-center text-gray-400 text-sm">
                     محصولی یافت نشد
                   </div>
                 )}
@@ -215,7 +233,7 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-1.5 rounded-lg bg-white/90 border border-transparent focus:border-white focus:outline-none text-gray-800 text-sm"
+            className="px-3 py-1.5 rounded-lg bg-white/95 border border-transparent focus:border-white focus:ring-2 focus:ring-white/40 focus:outline-none text-gray-800 text-sm transition"
           >
             <option value="">همه دسته‌ها</option>
             {categories.map((cat) => (
@@ -230,9 +248,15 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
           <button
             onClick={handleSearch}
             disabled={isSearching}
-            className="px-4 py-1.5 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium text-sm disabled:opacity-50 whitespace-nowrap"
+            className="px-4 py-1.5 bg-white text-blue-600 rounded-lg hover:bg-blue-50 active:scale-95 transition font-medium text-sm disabled:opacity-50 whitespace-nowrap flex items-center gap-1.5"
           >
-            {isSearching ? "..." : "جستجو"}
+            {isSearching && (
+              <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            )}
+            جستجو
           </button>
         </div>
 
@@ -257,7 +281,7 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
             </span>
           </div>
 
-          <button className="relative text-white hover:text-blue-200 transition-colors">
+          <button className="relative text-white hover:text-blue-200 transition-colors p-1.5 rounded-lg hover:bg-white/10">
             <svg
               className="w-5 h-5 sm:w-6 sm:h-6"
               fill="none"
@@ -271,26 +295,41 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
               />
             </svg>
-            <span className="absolute -top-1 -left-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            <span className="absolute top-1 left-1 w-2 h-2 bg-red-500 rounded-full ring-2 ring-blue-600 animate-pulse"></span>
           </button>
         </div>
       </div>
 
       {/* سرچ موبایل */}
-      <div className="md:hidden px-3 pb-2 bg-gradient-to-r from-blue-600 to-indigo-700">
+      <div className="md:hidden px-3 pb-2.5 bg-gradient-to-r from-blue-600 to-indigo-700">
         <div ref={searchRef} className="relative flex gap-2">
-          <input
-            type="text"
-            placeholder="جستجوی محصول..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1 px-3 py-1.5 rounded-lg bg-white/90 border border-transparent focus:border-white focus:outline-none text-gray-800 text-sm placeholder-gray-500"
-          />
+          <div className="relative flex-1">
+            <svg
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              placeholder="جستجوی محصول..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="w-full pr-9 pl-3 py-1.5 rounded-lg bg-white/95 border border-transparent focus:border-white focus:ring-2 focus:ring-white/40 focus:outline-none text-gray-800 text-sm placeholder-gray-400 transition"
+            />
+          </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-2 py-1.5 rounded-lg bg-white/90 border border-transparent focus:border-white focus:outline-none text-gray-800 text-sm max-w-[100px]"
+            className="px-2 py-1.5 rounded-lg bg-white/95 border border-transparent focus:border-white focus:outline-none text-gray-800 text-sm max-w-[100px]"
           >
             <option value="">همه</option>
             {categories.map((cat) => (
@@ -302,25 +341,32 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
           <button
             onClick={handleSearch}
             disabled={isSearching}
-            className="px-3 py-1.5 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition font-medium text-sm disabled:opacity-50"
+            className="px-3 py-1.5 bg-white text-blue-600 rounded-lg hover:bg-blue-50 active:scale-95 transition font-medium text-sm disabled:opacity-50"
           >
-            {isSearching ? "..." : "🔍"}
+            {isSearching ? (
+              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            ) : (
+              "🔍"
+            )}
           </button>
 
           {/* نتایج سرچ موبایل */}
           {showSearchResults && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 max-h-60 overflow-y-auto z-50">
+            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl ring-1 ring-black/5 max-h-60 overflow-y-auto z-[70]">
               {searchResults.length > 0 ? (
                 searchResults.map((product) => (
                   <div
                     key={product.id}
                     onClick={() => handleResultClick(product.id)}
-                    className="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
+                    className="px-3 py-2.5 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors"
                   >
                     <div className="font-medium text-gray-800 text-sm">
                       {product.name}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 mt-0.5">
                       {new Intl.NumberFormat("fa-IR").format(
                         product.sell_price,
                       )}{" "}
@@ -329,7 +375,7 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
                   </div>
                 ))
               ) : (
-                <div className="px-3 py-3 text-center text-gray-500 text-sm">
+                <div className="px-3 py-4 text-center text-gray-400 text-sm">
                   محصولی یافت نشد
                 </div>
               )}
