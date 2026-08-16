@@ -13,6 +13,13 @@ from .serializers import (
     SendCodeSerializer,
     VerifyCodeSerializer,
 )
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+OTP_API_KEY = os.getenv("OTP_API_KEY")
 
 User = get_user_model()
 
@@ -29,9 +36,8 @@ class SendCodeView(APIView):
 
         phone = serializer.validated_data["phone"]
 
-        # code = str(random.randint(100000, 999999))
-        code = "123456"
-        expires_at = timezone.now() + timedelta(minutes=1)
+        code = str(random.randint(100000, 999999))
+        expires_at = timezone.now() + timedelta(minutes=10)
 
         OTP.objects.filter(phone=phone).delete()
 
@@ -43,9 +49,31 @@ class SendCodeView(APIView):
 
         print("OTP:", code)
 
+        # -----------------------------------
+        # 🔥 ارسال پیامک با API رسمی sms.ir
+        # -----------------------------------
+        url = "https://api.sms.ir/v1/send/verify"
+
+        payload = {
+            "mobile": phone,
+            "templateId": 459529,
+            "parameters": [
+                { "name": "CODE", "value": code }
+            ]
+        }
+
+        headers = {
+            "Content-Type": "application/json",
+            "x-api-key": OTP_API_KEY
+        }
+
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            print("SMS.IR Response:", response.json())
+        except Exception as e:
+            print("SMS.IR Error:", e)
+
         return Response({"message": "کد ارسال شد"}, status=status.HTTP_200_OK)
-
-
 # -----------------------------
 # VERIFY OTP (USER LOGIN)
 # -----------------------------

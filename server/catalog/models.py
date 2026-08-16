@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Products(models.Model):
     id = models.AutoField(primary_key=True)
     product_code = models.CharField(max_length=100, null=True, blank=True)
@@ -12,6 +13,7 @@ class Products(models.Model):
     more_description = models.TextField(null=True, blank=True)
     feature = models.JSONField(null=True, blank=True)
     status = models.CharField(max_length=50, default='active')
+
     category_id = models.ForeignKey(
         'category.CategoryChild',
         on_delete=models.SET_NULL,
@@ -33,15 +35,15 @@ class Products(models.Model):
 
 class ProductImages(models.Model):
     id = models.AutoField(primary_key=True)
-    
-    product_id = models.ForeignKey(     
+
+    product_id = models.ForeignKey(
         Products,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="images",
         db_column="product_id"
-    )    
+    )
     image = models.ImageField(upload_to='images/products/', null=True, blank=True)
     is_main = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -53,3 +55,43 @@ class ProductImages(models.Model):
         if self.product_id:
             return f"{self.product_id.name} - Image"
         return f"Image {self.id}"
+
+
+# -------------------------------
+# 🔥 PRODUCT VARIANT MODEL
+# -------------------------------
+class ProductVariant(models.Model):
+    CONDITION_CHOICES = [
+        ("new", "اکبند"),
+        ("used", "دست دوم"),
+    ]
+
+    WARRANTY_CHOICES = [
+        ("no_warranty", "بدون گارانتی"),
+        ("official", "گارانتی رسمی"),
+        ("store", "گارانتی فروشگاه"),
+    ]
+
+    product = models.ForeignKey(
+        Products,
+        on_delete=models.CASCADE,
+        related_name="variants"
+    )
+
+    color = models.CharField(max_length=50, blank=True, null=True)
+    duration_months = models.IntegerField(blank=True, null=True)
+
+    condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default="new")
+    warranty = models.CharField(max_length=20, choices=WARRANTY_CHOICES, default="no_warranty")
+
+    price = models.IntegerField()
+    quantity = models.IntegerField(default=0)
+
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "product_variants"
+
+    def __str__(self):
+        return f"{self.product.name} - {self.color or ''} - {self.duration_months or ''}"

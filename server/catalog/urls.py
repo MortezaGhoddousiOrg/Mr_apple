@@ -9,6 +9,8 @@ from .views import (
     DeleteProductImage,
     ProductCreateView,
     ProductUpdateDeleteView,
+    VariantCreateView,
+    VariantUpdateDeleteView,
 )
 
 urlpatterns = [
@@ -23,13 +25,17 @@ urlpatterns = [
     # PRODUCT CREATE
     path("product/create/", ProductCreateView.as_view()),
 
-    # ✅ PRODUCT UPDATE & DELETE - با as_view() درست
+    # PRODUCT UPDATE & DELETE
     path("product/<int:product_id>/", ProductUpdateDeleteView.as_view()),
 
     # PRODUCT IMAGES
     path("product/image/upload/", UploadProductImage.as_view()),
     path("product/image/<int:image_id>/", DeleteProductImage.as_view()),
-    
+
     # SEARCH
     path("products/search/", ProductSearchView.as_view()),
+
+    # VARIANTS
+    path("product/<int:product_id>/variant/create/", VariantCreateView.as_view()),
+    path("variant/<int:variant_id>/", VariantUpdateDeleteView.as_view()),
 ]

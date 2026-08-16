@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Products, ProductImages
+from .models import Products, ProductImages, ProductVariant
 from category.serializers import CategoryChildSerializer
 
 
@@ -9,42 +9,28 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class ProductVariantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = [
+            "id",
+            "color",
+            "duration_months",
+            "condition",
+            "warranty",
+            "price",
+            "quantity",
+            "is_active",
+        ]
+
+
 class ProductSerializer(serializers.ModelSerializer):
-
     images = ProductImageSerializer(many=True, read_only=True)
+    variants = ProductVariantSerializer(many=True, read_only=True)
 
-    category = CategoryChildSerializer(
-        source="category_id",
-        read_only=True
-    )
+    category = CategoryChildSerializer(source="category_id", read_only=True)
 
-    category_id = serializers.IntegerField(
-        write_only=True,
-        required=False
-    )
-
-    category_child_id = serializers.IntegerField(
-        source="category_id.id",
-        read_only=True
-    )
-
-    category_parent_id = serializers.IntegerField(
-        source="category_id.parent.id",
-        read_only=True
-    )
-
-    edit_category_id = serializers.IntegerField(
-        source="category_id.id",
-        read_only=True
-    )
-
-    # ✅ اصلاح: این فیلد رو حذف کن و از خود more_description استفاده کن
-    # more_descriptions = serializers.CharField(
-    #     source="more_description",
-    #     required=False,
-    #     allow_blank=True,
-    #     allow_null=True
-    # )
+    category_id = serializers.IntegerField(write_only=True, required=False)
 
     image_ids = serializers.ListField(
         child=serializers.IntegerField(),
@@ -52,14 +38,14 @@ class ProductSerializer(serializers.ModelSerializer):
         required=False,
         allow_empty=True
     )
-    
+
     deleted_image_ids = serializers.ListField(
         child=serializers.IntegerField(),
         write_only=True,
         required=False,
         allow_empty=True
     )
-    
+
     main_image_id = serializers.IntegerField(
         write_only=True,
         required=False,
@@ -68,9 +54,8 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Products
-        fields = "__all__"  # ✅ این همه فیلدها رو شامل میشه، از جمله more_description
-        # ❌ fields رو به "__all__" بذار
-        
+        fields = "__all__"
+
     def validate_category_id(self, value):
         from category.models import CategoryChild
         if value and not CategoryChild.objects.filter(id=value).exists():
@@ -78,10 +63,10 @@ class ProductSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        validated_data.pop('image_ids', None)
-        validated_data.pop('deleted_image_ids', None)
-        validated_data.pop('main_image_id', None)
-        
+        validated_data.pop("image_ids", None)
+        validated_data.pop("deleted_image_ids", None)
+        validated_data.pop("main_image_id", None)
+
         category_id = validated_data.pop("category_id", None)
 
         product = Products.objects.create(
@@ -92,10 +77,10 @@ class ProductSerializer(serializers.ModelSerializer):
         return product
 
     def update(self, instance, validated_data):
-        validated_data.pop('image_ids', None)
-        validated_data.pop('deleted_image_ids', None)
-        validated_data.pop('main_image_id', None)
-        
+        validated_data.pop("image_ids", None)
+        validated_data.pop("deleted_image_ids", None)
+        validated_data.pop("main_image_id", None)
+
         category_id = validated_data.pop("category_id", None)
 
         for attr, value in validated_data.items():

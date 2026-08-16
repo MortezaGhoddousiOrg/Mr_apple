@@ -54,3 +54,27 @@ class Tutorial(models.Model):
 
     def __str__(self):
         return self.title
+    
+class NewsGallery(models.Model):
+    news = models.ForeignKey(
+        News,
+        on_delete=models.CASCADE,
+        related_name="gallery"
+    )
+    image = models.ImageField(upload_to="education/news/gallery/")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.news.title} - {self.id}"
+
+class TutorialGallery(models.Model):
+    tutorial = models.ForeignKey(
+        Tutorial,
+        on_delete=models.CASCADE,
+        related_name="gallery"
+    )
+    image = models.ImageField(upload_to="education/tutorial/gallery/")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.tutorial.title} - {self.id}"
