@@ -19,6 +19,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             "condition",
             "warranty",
             "price",
+            "discount",
             "quantity",
             "is_active",
         ]

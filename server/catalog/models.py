@@ -85,10 +85,12 @@ class ProductVariant(models.Model):
     warranty = models.CharField(max_length=20, choices=WARRANTY_CHOICES, default="no_warranty")
 
     price = models.IntegerField()
+    discount = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     quantity = models.IntegerField(default=0)
 
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    
 
     class Meta:
         db_table = "product_variants"

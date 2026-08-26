@@ -15,6 +15,7 @@ from .views import (
 
     # UPLOAD GALLERY IMAGE
     NewsGalleryUploadView,
+    TutorialGalleryUploadView,   
 )
 
 urlpatterns = [
@@ -45,4 +46,5 @@ urlpatterns = [
     # UPLOAD GALLERY IMAGE
     # -----------------------------
     path("admin/news/<int:news_id>/gallery/upload/", NewsGalleryUploadView.as_view()),
+    path("admin/tutorials/<int:tutorial_id>/gallery/upload/", TutorialGalleryUploadView.as_view()),
 ]

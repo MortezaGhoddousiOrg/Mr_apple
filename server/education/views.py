@@ -7,7 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 
 from authuser.authentication import AdminJWTAuthentication
-from .models import News, Tutorial, EducationImages, NewsGallery
+from .models import News, Tutorial, EducationImages, NewsGallery, TutorialGallery
 from .serializers import (
     EducationImageSerializer,
     NewsSerializer,
@@ -212,3 +212,29 @@ class TutorialAdminView(APIView):
 
         item.delete()
         return Response({"message": "Tutorial deleted"}, status=200)
+
+# -----------------------------
+# Upload Gallery Image for Tutorial
+# -----------------------------
+class TutorialGalleryUploadView(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, tutorial_id):
+        try:
+            tutorial = Tutorial.objects.get(id=tutorial_id)
+        except Tutorial.DoesNotExist:
+            return Response({"error": "Tutorial not found"}, status=404)
+
+        image = request.FILES.get("image")
+        if not image:
+            return Response({"error": "image file is required"}, status=400)
+
+        gallery_item = TutorialGallery.objects.create(tutorial=tutorial, image=image)
+        serializer = NewsGallerySerializer(gallery_item)  # یا اگر serializer جدا داری، همونو بذار
+
+        return Response({
+            "message": "Gallery image uploaded",
+            "data": serializer.data
+        }, status=201)
