@@ -35,6 +35,24 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState({});
 
+  // ============================================================
+  // 🔥 واریانت‌های محصول (رنگ / مدت زمان / قیمت و موجودی جداگانه)
+  // ============================================================
+  const emptyVariantForm = {
+    color: "",
+    duration_months: "",
+    warranty_months: "",
+    price: "",
+    discount: "0",
+    quantity: "",
+    is_active: true,
+  };
+  const [variants, setVariants] = useState([]);
+  const [variantForm, setVariantForm] = useState(emptyVariantForm);
+  const [editingVariantId, setEditingVariantId] = useState(null);
+  const [variantLoading, setVariantLoading] = useState(false);
+  const [variantError, setVariantError] = useState("");
+
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -55,8 +73,13 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         quantity: initialData.quantity?.toString() || "",
         discount: initialData.discount?.toString() || "0",
         descriptions: initialData.descriptions || "",
-        more_descriptions: initialData.more_description || "", // ✅ اصلاح شده
-        category_id: initialData.category_id?.toString() || "",
+        more_descriptions: initialData.more_description || "",
+        // ⚠️ فیکس مهم: «category_id» توی سریالایزر write_only است، پس
+        // هیچ‌وقت توسط GET برگردانده نمی‌شود. مقدار واقعی از فیلد read-only
+        // «category» (که خودِ سریالایزر برمی‌گرداند) خوانده می‌شود.
+        category_id:
+          (initialData.category?.id ?? initialData.category_id)?.toString() ||
+          "",
         status: initialData.status || "active",
       });
 
@@ -71,6 +94,11 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
           })
         );
         setFeatures(featuresArray);
+      }
+
+      // ✅ بارگذاری واریانت‌های موجود محصول
+      if (initialData.variants && Array.isArray(initialData.variants)) {
+        setVariants(initialData.variants);
       }
 
       if (initialData.images && initialData.images.length > 0) {
@@ -301,6 +329,172 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
     setFeatures((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // ============================================================
+  // 🔥 توابع مدیریت واریانت‌ها
+  // ============================================================
+
+  const resetVariantForm = () => {
+    setVariantForm(emptyVariantForm);
+    setEditingVariantId(null);
+    setVariantError("");
+  };
+
+  const handleVariantPriceChange = (e) => {
+    const digits = toEnglishDigits(e.target.value.replace(/[^0-9]/g, ""));
+    setVariantForm((prev) => ({
+      ...prev,
+      price: formatNumberWithCommas(digits),
+    }));
+  };
+
+  const handleVariantDiscountChange = (e) => {
+    let digits = toEnglishDigits(e.target.value.replace(/[^0-9]/g, ""));
+    if (digits === "") {
+      setVariantForm((prev) => ({ ...prev, discount: "" }));
+      return;
+    }
+    let num = parseInt(digits, 10);
+    if (num > 100) num = 100;
+    if (num < 0) num = 0;
+    setVariantForm((prev) => ({ ...prev, discount: num.toString() }));
+  };
+
+  const handleEditVariant = (variant) => {
+    setVariantForm({
+      color: variant.color || "",
+      duration_months: variant.duration_months?.toString() || "",
+      warranty_months: variant.warranty_months?.toString() || "",
+      price: variant.price
+        ? formatNumberWithCommas(variant.price.toString())
+        : "",
+      discount: variant.discount?.toString() || "0",
+      quantity: variant.quantity?.toString() || "",
+      is_active: variant.is_active !== false,
+    });
+    setEditingVariantId(variant.id ?? variant.localId);
+  };
+
+  const handleDeleteVariant = async (variant) => {
+    const key = variant.id ?? variant.localId;
+
+    if (variant.id) {
+      // این واریانت واقعاً در بک‌اند ذخیره شده (فقط در حالت ویرایش ممکن است)
+      setVariantLoading(true);
+      try {
+        await api.delete(`/api/catalog/variant/${variant.id}/`);
+        setVariants((prev) => prev.filter((v) => v.id !== variant.id));
+        setNotif({
+          id: Date.now(),
+          message: "واریانت حذف شد",
+          type: "success",
+        });
+      } catch (error) {
+        console.error(error);
+        setNotif({
+          id: Date.now(),
+          message: "خطا در حذف واریانت",
+          type: "error",
+        });
+      } finally {
+        setVariantLoading(false);
+      }
+    } else {
+      // هنوز ذخیره نشده - فقط از لیست محلی حذف می‌شود (حالت ایجاد محصول جدید)
+      setVariants((prev) => prev.filter((v) => v.localId !== variant.localId));
+    }
+
+    if (editingVariantId === key) resetVariantForm();
+  };
+
+  const handleAddOrUpdateVariant = async () => {
+    setVariantError("");
+
+    const rawPrice = toEnglishDigits(variantForm.price).replace(/,/g, "");
+    if (!rawPrice || Number(rawPrice) <= 0) {
+      setVariantError("قیمت واریانت الزامی است");
+      return;
+    }
+    if (variantForm.quantity === "" || Number(variantForm.quantity) < 0) {
+      setVariantError("موجودی واریانت الزامی است");
+      return;
+    }
+
+    const payload = {
+      color: variantForm.color || null,
+      duration_months: variantForm.duration_months
+        ? parseInt(variantForm.duration_months)
+        : null,
+      warranty_months: variantForm.warranty_months
+        ? parseInt(variantForm.warranty_months)
+        : null,
+      price: parseInt(rawPrice),
+      discount: parseFloat(variantForm.discount) || 0,
+      quantity: parseInt(variantForm.quantity),
+      is_active: variantForm.is_active,
+    };
+
+    // در حالت ویرایش، محصول از قبل id دارد پس می‌شود مستقیم با API کار کرد
+    const productId = mode === "edit" ? initialData?.id : null;
+
+    if (productId) {
+      setVariantLoading(true);
+      try {
+        if (editingVariantId) {
+          const res = await api.put(
+            `/api/catalog/variant/${editingVariantId}/`,
+            payload
+          );
+          setVariants((prev) =>
+            prev.map((v) => (v.id === editingVariantId ? res.data.variant : v))
+          );
+          setNotif({
+            id: Date.now(),
+            message: "واریانت ویرایش شد",
+            type: "success",
+          });
+        } else {
+          const res = await api.post(
+            `/api/catalog/product/${productId}/variant/create/`,
+            payload
+          );
+          setVariants((prev) => [...prev, res.data.variant]);
+          setNotif({
+            id: Date.now(),
+            message: "واریانت اضافه شد",
+            type: "success",
+          });
+        }
+        resetVariantForm();
+      } catch (error) {
+        console.error(error);
+        setVariantError("خطا در ثبت واریانت");
+      } finally {
+        setVariantLoading(false);
+      }
+    } else {
+      // حالت ایجاد محصول جدید: هنوز id محصول نداریم، فقط لوکال نگه می‌داریم
+      // و بعد از ثبت نهایی محصول (در handleSubmit) به بک‌اند ارسال می‌شود
+      if (editingVariantId) {
+        setVariants((prev) =>
+          prev.map((v) =>
+            v.localId === editingVariantId ? { ...v, ...payload } : v
+          )
+        );
+      } else {
+        setVariants((prev) => [
+          ...prev,
+          {
+            ...payload,
+            localId: `local-${Date.now()}-${Math.random()
+              .toString(36)
+              .slice(2)}`,
+          },
+        ]);
+      }
+      resetVariantForm();
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -371,7 +565,12 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         category_id: parseInt(formData.category_id),
         discount: parseFloat(formData.discount) || 0,
         descriptions: formData.descriptions || "",
-        more_descriptions: formData.more_descriptions || "",
+        // ⚠️ فیکس مهم: کلید بک‌اند «more_description» است (بدون s)، نه
+        // «more_descriptions». چون قبلاً کلید اشتباه فرستاده می‌شد،
+        // سریالایزر (fields="__all__") آن را کلاً نادیده می‌گرفت و این
+        // فیلد هیچ‌وقت واقعاً در دیتابیس ذخیره نمی‌شد - دقیقاً همون چیزی
+        // که باعث می‌شد همیشه در ویرایش خالی به نظر برسه.
+        more_description: formData.more_descriptions || "",
         status: formData.status,
         feature: featureObj,
       };
@@ -398,7 +597,36 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
           type: "success",
         });
       } else {
-        await api.post("/api/catalog/product/create/", productData);
+        const createRes = await api.post(
+          "/api/catalog/product/create/",
+          productData
+        );
+
+        // ✅ بعد از ساخت محصول جدید، واریانت‌هایی که لوکال اضافه شده بودند
+        // را یکی‌یکی به بک‌اند ارسال می‌کنیم (چون قبلاً id محصول را نداشتیم)
+        const newProductId = createRes.data?.product?.id;
+
+        if (newProductId && variants.length > 0) {
+          for (const v of variants) {
+            try {
+              await api.post(
+                `/api/catalog/product/${newProductId}/variant/create/`,
+                {
+                  color: v.color,
+                  duration_months: v.duration_months,
+                  warranty_months: v.warranty_months || null,
+                  price: v.price,
+                  discount: v.discount || 0,
+                  quantity: v.quantity,
+                  is_active: v.is_active,
+                }
+              );
+            } catch (variantErr) {
+              console.error("خطا در ثبت واریانت:", variantErr);
+            }
+          }
+        }
+
         setNotif({
           id: Date.now(),
           message: "محصول با موفقیت اضافه شد",
@@ -880,6 +1108,251 @@ function AddProduct({ onBack, mode = "create", initialData = null }) {
         >
           + افزودن ویژگی
         </button>
+
+        {/* ============================================================ */}
+        {/* 🔥 بخش واریانت‌های محصول */}
+        {/* ============================================================ */}
+        <div className="pt-6 mt-2 border-t border-gray-100 space-y-6">
+          <h2 className="text-lg font-semibold text-gray-900">
+            واریانت‌های محصول
+            <span className="text-gray-400 text-xs font-normal mr-2">
+              (رنگ‌های مختلف، مدت زمان اشتراک، هرکدام با قیمت و موجودی جدا)
+            </span>
+          </h2>
+
+          {mode === "create" && (
+            <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
+              واریانت‌هایی که اینجا اضافه می‌کنید، بعد از ثبت نهایی محصول
+              (کلیک روی «افزودن محصول») در بک‌اند ذخیره می‌شوند.
+            </p>
+          )}
+
+          {variants.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-200 rounded-xl text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 py-2 text-right text-gray-700">رنگ</th>
+                    <th className="px-3 py-2 text-right text-gray-700">
+                      مدت (ماه)
+                    </th>
+                    <th className="px-3 py-2 text-right text-gray-700">
+                      گارانتی (ماه)
+                    </th>
+                    <th className="px-3 py-2 text-right text-gray-700">
+                      قیمت
+                    </th>
+                    <th className="px-3 py-2 text-right text-gray-700">
+                      تخفیف
+                    </th>
+                    <th className="px-3 py-2 text-right text-gray-700">
+                      موجودی
+                    </th>
+                    <th className="px-3 py-2 text-center text-gray-700">
+                      فعال
+                    </th>
+                    <th className="px-3 py-2 text-center text-gray-700">
+                      عملیات
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {variants.map((v) => (
+                    <tr key={v.id ?? v.localId}>
+                      <td className="px-3 py-2 text-gray-900">
+                        {v.color || "—"}
+                      </td>
+                      <td className="px-3 py-2 text-gray-900">
+                        {v.duration_months || "—"}
+                      </td>
+                      <td className="px-3 py-2 text-gray-900">
+                        {v.warranty_months ? `${v.warranty_months} ماه` : "—"}
+                      </td>
+                      <td className="px-3 py-2 text-gray-900">
+                        {formatNumberWithCommas(String(v.price))} تومان
+                      </td>
+                      <td className="px-3 py-2 text-gray-900">
+                        {v.discount ? `${v.discount}%` : "—"}
+                      </td>
+                      <td className="px-3 py-2 text-gray-900">{v.quantity}</td>
+                      <td className="px-3 py-2 text-center">
+                        <span
+                          className={`inline-block w-2.5 h-2.5 rounded-full ${
+                            v.is_active ? "bg-green-500" : "bg-gray-300"
+                          }`}
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center justify-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => handleEditVariant(v)}
+                            className="text-blue-500 hover:text-blue-700 text-xs font-medium"
+                          >
+                            ویرایش
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteVariant(v)}
+                            disabled={variantLoading}
+                            className="text-red-500 hover:text-red-700 text-xs font-medium disabled:opacity-50"
+                          >
+                            حذف
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                رنگ
+              </label>
+              <input
+                type="text"
+                value={variantForm.color}
+                onChange={(e) =>
+                  setVariantForm((prev) => ({ ...prev, color: e.target.value }))
+                }
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
+                placeholder="مثال: مشکی"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                مدت زمان (ماه)
+                <span className="text-gray-400 text-xs mr-1">(اشتراک)</span>
+              </label>
+              <input
+                type="number"
+                value={variantForm.duration_months}
+                onChange={(e) =>
+                  setVariantForm((prev) => ({
+                    ...prev,
+                    duration_months: e.target.value,
+                  }))
+                }
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
+                placeholder="مثال: 12"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                گارانتی (ماه)
+                <span className="text-gray-400 text-xs mr-1">
+                  (اختیاری - برای دستگاه‌های فیزیکی)
+                </span>
+              </label>
+              <input
+                type="number"
+                value={variantForm.warranty_months}
+                onChange={(e) =>
+                  setVariantForm((prev) => ({
+                    ...prev,
+                    warranty_months: e.target.value,
+                  }))
+                }
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
+                placeholder="مثال: 18"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                قیمت (تومان) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                dir="ltr"
+                value={variantForm.price}
+                onChange={handleVariantPriceChange}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                تخفیف <span className="text-gray-400 text-xs">(درصد)</span>
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={variantForm.discount}
+                  onChange={handleVariantDiscountChange}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
+                  placeholder="0"
+                />
+                <span className="text-gray-500 text-sm">%</span>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                موجودی <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                value={variantForm.quantity}
+                onChange={(e) =>
+                  setVariantForm((prev) => ({
+                    ...prev,
+                    quantity: e.target.value,
+                  }))
+                }
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+          <label className="flex items-center gap-2 text-sm text-gray-700">
+            <input
+              type="checkbox"
+              checked={variantForm.is_active}
+              onChange={(e) =>
+                setVariantForm((prev) => ({
+                  ...prev,
+                  is_active: e.target.checked,
+                }))
+              }
+              className="rounded border-gray-300"
+            />
+            فعال (قابل خرید)
+          </label>
+
+          {variantError && (
+            <p className="text-sm text-red-500">{variantError}</p>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={handleAddOrUpdateVariant}
+              disabled={variantLoading}
+              className="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-medium transition disabled:opacity-50"
+            >
+              {variantLoading
+                ? "در حال ثبت..."
+                : editingVariantId !== null
+                  ? "ذخیره تغییرات واریانت"
+                  : "+ افزودن واریانت"}
+            </button>
+            {editingVariantId !== null && (
+              <button
+                type="button"
+                onClick={resetVariantForm}
+                className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition"
+              >
+                انصراف از ویرایش
+              </button>
+            )}
+          </div>
+        </div>
+
         {errors.submit && (
           <div className="bg-red-50 text-red-600 p-3 rounded-xl text-center whitespace-pre-wrap text-sm">
             {errors.submit}

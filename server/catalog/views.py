@@ -15,9 +15,7 @@ from .models import Products, ProductImages, ProductVariant
 from .serializers import ProductSerializer, ProductImageSerializer, ProductVariantSerializer
 
 
-# -------------------------------
-# PRODUCT LIST
-# -------------------------------
+
 @api_view(["GET"])
 def product_list(request):
     products = Products.objects.prefetch_related("variants").all()

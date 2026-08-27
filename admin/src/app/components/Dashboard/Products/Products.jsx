@@ -1,62 +1,64 @@
-"use client";
+  "use client";
 
-import { useState, useEffect, Fragment } from "react";
-import Image from "next/image";
-import { api, MEDIA_URL } from "@/app/config";
-import Button from "../../Button";
-import AddProduct from "./AddProduct";
-import { useNotification } from "@/app/Context/NotificationContext";
+  import { useState, useEffect, Fragment } from "react";
+  import Image from "next/image";
+  import { api, MEDIA_URL } from "@/app/config";
+  import Button from "../../Button";
+  import AddProduct from "./AddProduct";
+  import { useNotification } from "@/app/Context/NotificationContext";
 
-function Products() {
-  const { setNotif } = useNotification();
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showAddProduct, setShowAddProduct] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [editProductData, setEditProductData] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [editLoading, setEditLoading] = useState(false);
-  const productsPerPage = 20;
+  function Products() {
+    const { setNotif } = useNotification();
+    const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [showAddProduct, setShowAddProduct] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [editProductData, setEditProductData] = useState(null);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [editLoading, setEditLoading] = useState(false);
+    const productsPerPage = 20;
 
-  const fetchCategories = async () => {
-    try {
-      const childResponse = await api.get("/api/category/child/");
-      const parentResponse = await api.get("/api/category/parent/");
-      const allCategories = [...childResponse.data, ...parentResponse.data];
-      setCategories(allCategories);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+    
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get("/api/catalog/product/");
-      console.log("📦 Products data:", response.data);
-      setProducts(response.data);
-    } catch (err) {
-      setError("خطا در دریافت لیست محصولات");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchCategories = async () => {
+      try {
+        const childResponse = await api.get("/api/category/child/");
+        const parentResponse = await api.get("/api/category/parent/");
+        const allCategories = [...childResponse.data, ...parentResponse.data];
+        setCategories(allCategories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
 
-  useEffect(() => {
-    fetchCategories();
-    fetchProducts();
-  }, []);
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get("/api/catalog/product/");
+        console.log("📦 Products data:", response.data);
+        setProducts(response.data);
+      } catch (err) {
+        setError("خطا در دریافت لیست محصولات");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleAddProduct = () => setShowAddProduct(true);
-  const handleBackToList = () => {
-    setShowAddProduct(false);
-    setEditProductData(null);
-    fetchProducts();
-  };
+    useEffect(() => {
+      fetchCategories();
+      fetchProducts();
+    }, []);
+
+    const handleAddProduct = () => setShowAddProduct(true);
+    const handleBackToList = () => {
+      setShowAddProduct(false);
+      setEditProductData(null);
+      fetchProducts();
+    };
 
   const handleEdit = async (product) => {
     setEditLoading(true);

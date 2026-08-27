@@ -13,8 +13,12 @@ from .views import (
     # UPLOAD MAIN IMAGE
     UploadEducationImageView,
 
-    # UPLOAD GALLERY IMAGE
+    # UPLOAD GALLERY IMAGE (attached directly to an existing news_id)
     NewsGalleryUploadView,
+
+    # 🔥 UPLOAD / DELETE GALLERY IMAGE (decoupled, no news_id needed yet)
+    UploadNewsGalleryImage,
+    DeleteNewsGalleryImage,
 )
 
 urlpatterns = [
@@ -42,7 +46,13 @@ urlpatterns = [
     path("admin/upload-image/", UploadEducationImageView.as_view()),
 
     # -----------------------------
-    # UPLOAD GALLERY IMAGE
+    # UPLOAD GALLERY IMAGE (attached to an existing news item)
     # -----------------------------
     path("admin/news/<int:news_id>/gallery/upload/", NewsGalleryUploadView.as_view()),
+
+    # -----------------------------
+    # 🔥 UPLOAD / DELETE GALLERY IMAGE (decoupled - like the main image)
+    # -----------------------------
+    path("admin/news-gallery/upload/", UploadNewsGalleryImage.as_view()),
+    path("admin/news-gallery/<int:image_id>/", DeleteNewsGalleryImage.as_view()),
 ]

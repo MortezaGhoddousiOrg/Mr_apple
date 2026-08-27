@@ -54,6 +54,11 @@
   transition: box-shadow 0.3s ease;
 }
 
+.articleImageSection {
+  width: 100%;
+  margin-bottom: 32px;
+}
+
 /* تصویر */
 .imageWrapper {
   position: relative;
@@ -84,6 +89,45 @@
 
 .imageWrapper:hover img {
   transform: scale(1.02);
+}
+
+/* گالری تصاویر - بعد از تصویر اصلی */
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+  padding: 20px 40px 0;
+}
+
+.galleryThumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f1f5f9;
+  border: 1px solid #eef1f5;
+  transition: border-color 0.2s ease;
+}
+
+.galleryThumb:hover {
+  border-color: #cbd5e1;
+}
+
+.galleryThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.galleryThumbFallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 20px;
 }
 
 /* محتوا */
@@ -121,6 +165,8 @@
   margin-bottom: 14px;
   line-height: 1.45;
   letter-spacing: -0.2px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* تاریخ */
@@ -131,7 +177,7 @@
   color: #6b7280;
   font-size: 13.5px;
   font-weight: 500;
-  margin-bottom: 26px;
+  margin-bottom: 18px;
   padding-bottom: 22px;
   border-bottom: 1px solid #f1f5f9;
 }
@@ -142,12 +188,34 @@
   stroke: #94a3b8;
 }
 
+/* برچسب‌های سئو */
+.tagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.tagBadge {
+  font-size: 12px;
+  font-weight: 700;
+  color: #2563eb;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
 /* توضیحات */
 .description {
   font-size: 16px;
   line-height: 2;
   color: #334155;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -171,6 +239,11 @@
 
   .imageWrapper img {
     padding: 14px;
+  }
+
+  .galleryGrid {
+    padding: 16px 20px 0;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
   }
 
   .description {
@@ -208,6 +281,12 @@
     padding: 10px;
   }
 
+  .galleryGrid {
+    padding: 12px 16px 0;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 8px;
+  }
+
   .description {
     font-size: 14px;
     line-height: 1.8;
@@ -220,5 +299,10 @@
 
   .dateWrapper {
     font-size: 12.5px;
+  }
+
+  .tagBadge {
+    font-size: 11px;
+    padding: 4px 10px;
   }
 }

@@ -1,10 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { api, MEDIA_URL } from "@/app/config";
 import { useNotification } from "@/app/Context/NotificationContext";
 import DatePicker from "@/app/components/DatePicker";
+import RichTextEditor from "@/app/components/Richtexteditor";
+
+// ⚠️ همان راه‌حل مشترک باگ عکس: هم آدرس کامل و هم مسیر نسبی را درست می‌سازد
+function getMediaUrl(path) {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = (MEDIA_URL || "").endsWith("/")
+    ? MEDIA_URL.slice(0, -1)
+    : MEDIA_URL || "";
+  const rel = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${rel}`;
+}
 
 export default function AddEducation({
   mode = "create",
@@ -17,40 +29,71 @@ export default function AddEducation({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    publish_date: "",
+  // ⚠️ همه‌ی state های زیر عمداً با lazy initializer (تابع داخل useState)
+  // مستقیم از initialData ساخته می‌شن، نه با یک useEffect که بعد از mount
+  // مقدار رو ست کنه. چون AddEducation هر بار که وارد حالت ویرایش می‌شی از
+  // نو mount میشه (توسط Education.jsx)، این مقدار همیشه از همون رندر اول
+  // درسته - و برخلاف افکت، برای RichTextEditor (که contentEditable است، نه
+  // input معمولی) قابل‌اعتماده.
+  const [formData, setFormData] = useState(() => ({
+    title: (isEdit && initialData?.title) || "",
+    description: (isEdit && initialData?.description) || "",
+    publish_date:
+      (isEdit && (initialData?.publish_date || initialData?.date)) || "",
     type: initialData?.type || "news",
+  }));
+
+  const [image, setImage] = useState(() => {
+    if (isEdit && initialData?.image) {
+      return {
+        // ⚠️ image_id در بک‌اند write_only است و توسط GET برگردانده
+        // نمی‌شود؛ پس اینجا همیشه null است مگر عکس تازه آپلود بشه.
+        id: null,
+        imagePath: initialData.image,
+        preview: getMediaUrl(initialData.image),
+        status: "success",
+        isExisting: true,
+      };
+    }
+    return null;
   });
 
-  const [image, setImage] = useState(null);
-
-  useEffect(() => {
-    if (isEdit && initialData) {
-      setFormData({
-        title: initialData.title || "",
-        description: initialData.description || "",
-        publish_date: initialData.publish_date || initialData.date || "",
-        type: initialData.type || "news",
-      });
-
-      if (initialData.image) {
-        setImage({
-          id: initialData.image_id ?? null,
-          imagePath: initialData.image,
-          preview: `${MEDIA_URL}${initialData.image}`,
-          status: "success",
-          isExisting: true,
-        });
-      }
+  // ============================================================
+  // 🔥 تصاویر گالری (بعد از تصویر اصلی نمایش داده می‌شوند)
+  // با endpoint جدید و مستقل از news_id، دقیقاً مثل تصویر اصلی آپلود می‌شوند
+  // ============================================================
+  const [galleryImages, setGalleryImages] = useState(() => {
+    if (isEdit && Array.isArray(initialData?.gallery)) {
+      return initialData.gallery.map((g) => ({
+        id: g.id,
+        imagePath: g.image,
+        preview: getMediaUrl(g.image),
+        status: "success",
+        isExisting: true,
+      }));
     }
-  }, [isEdit, initialData]);
+    return [];
+  });
+
+  // ============================================================
+  // 🔥 برچسب‌های سئو
+  // ============================================================
+  const [tags, setTags] = useState(() =>
+    isEdit && Array.isArray(initialData?.tags) ? initialData.tags : []
+  );
+  const [tagInput, setTagInput] = useState("");
+
+  const stripHtml = (html) => (html || "").replace(/<[^>]*>/g, "").trim();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+
+    // اگر در حالت ایجاد، نوع مقاله از خبر به آموزش تغییر کرد، گالری معنا ندارد
+    if (name === "type" && value !== "news" && !isEdit) {
+      setGalleryImages([]);
+    }
   };
 
   const handleDateChange = (date) => {
@@ -128,12 +171,130 @@ export default function AddEducation({
     setImage(null);
   };
 
+  // ============================================================
+  // 🔥 توابع مدیریت گالری - دقیقاً مثل تصویر اصلی، مستقل از وجود مقاله
+  // (نیازمند endpoint های جدید بک‌اند: آپلود و حذف مستقل از news_id)
+  // ============================================================
+
+  const uploadGalleryImage = async (file) => {
+    const formDataImg = new FormData();
+    formDataImg.append("file", file);
+    const response = await api.post(
+      "/education/admin/news-gallery/upload/",
+      formDataImg,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+    return response.data.data;
+  };
+
+  const selectGalleryImages = (e) => {
+    const files = Array.from(e.target.files);
+    const newImages = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+      id: null,
+      status: "pending",
+      isExisting: false,
+    }));
+    setGalleryImages((prev) => [...prev, ...newImages]);
+  };
+
+  const handleGalleryImageUpload = async (index) => {
+    const img = galleryImages[index];
+    if (!img || !img.file) return;
+
+    setGalleryImages((prev) =>
+      prev.map((it, i) => (i === index ? { ...it, status: "uploading" } : it))
+    );
+    try {
+      const uploaded = await uploadGalleryImage(img.file);
+      setGalleryImages((prev) =>
+        prev.map((it, i) =>
+          i === index
+            ? {
+                ...it,
+                id: uploaded.id,
+                imagePath: uploaded.image,
+                status: "success",
+                isExisting: false,
+              }
+            : it
+        )
+      );
+      setNotif({
+        id: Date.now(),
+        message: "تصویر گالری آپلود شد",
+        type: "success",
+      });
+    } catch (error) {
+      console.error(error);
+      setGalleryImages((prev) =>
+        prev.map((it, i) => (i === index ? { ...it, status: "error" } : it))
+      );
+      setNotif({
+        id: Date.now(),
+        message: "خطا در آپلود تصویر گالری",
+        type: "error",
+      });
+    }
+  };
+
+  const removeGalleryImage = async (index) => {
+    const img = galleryImages[index];
+
+    if (img.id) {
+      // این عکس قبلاً روی سرور ذخیره شده - واقعاً حذفش می‌کنیم
+      try {
+        await api.delete(`/education/admin/news-gallery/${img.id}/`);
+        setNotif({
+          id: Date.now(),
+          message: "تصویر گالری حذف شد",
+          type: "success",
+        });
+      } catch (error) {
+        console.error(error);
+        setNotif({
+          id: Date.now(),
+          message: "خطا در حذف تصویر گالری",
+          type: "error",
+        });
+        return;
+      }
+    }
+
+    if (img.preview && !img.isExisting) URL.revokeObjectURL(img.preview);
+    setGalleryImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // ============================================================
+  // 🔥 توابع مدیریت برچسب‌ها (تگ‌های سئو)
+  // ============================================================
+
+  const addTag = () => {
+    const t = tagInput.trim().replace(/^#/, "");
+    if (t && !tags.includes(t)) {
+      setTags((prev) => [...prev, t]);
+    }
+    setTagInput("");
+  };
+
+  const removeTag = (tag) => {
+    setTags((prev) => prev.filter((t) => t !== tag));
+  };
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTag();
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const newErrors = {};
-    if (!formData.title.trim()) newErrors.title = "عنوان الزامی است";
-    if (!formData.description.trim())
+    if (!stripHtml(formData.title)) newErrors.title = "عنوان الزامی است";
+    if (!stripHtml(formData.description))
       newErrors.description = "توضیحات الزامی است";
     if (!formData.publish_date.trim())
       newErrors.publish_date = "تاریخ الزامی است";
@@ -150,12 +311,31 @@ export default function AddEducation({
     setLoading(true);
 
     try {
+      // آی‌دی گالری‌هایی که آپلود شده‌اند (چه قبلاً موجود بوده‌اند چه همین حالا)
+      const galleryIds = galleryImages.filter((g) => g.id).map((g) => g.id);
+
       const articleData = {
         title: formData.title,
         description: formData.description,
         publish_date: formData.publish_date,
-        image_id: image.id,
+        tags: tags,
       };
+
+      // ⚠️ نکته مهم: image_id در بک‌اند write_only و غیر nullable است، و
+      // چون GET هیچ‌وقت image_id را برنمی‌گرداند، در حالت ویرایش (بدون
+      // آپلود عکس تازه) این مقدار همیشه null می‌ماند. اگر null را صراحتاً
+      // بفرستیم، کل درخواست ویرایش با خطای اعتبارسنجی رد می‌شود. پس فقط
+      // وقتی واقعاً id معتبر داریم (عکس تازه آپلود شده) آن را می‌فرستیم؛
+      // در غیر این صورت اصلاً این کلید را نمی‌فرستیم تا عکس فعلی دست‌نخورده بماند.
+      if (image?.id) {
+        articleData.image_id = image.id;
+      }
+
+      // ⚠️ نیازمند پشتیبانی سریالایزر News از gallery_ids برای اتصال عکس‌های
+      // گالری‌ای که مستقل از مقاله آپلود شدند (جزئیات در پاسخ متنی)
+      if (formData.type === "news" || initialData?.type === "news") {
+        articleData.gallery_ids = galleryIds;
+      }
 
       if (isEdit && initialData?.id) {
         const endpoint =
@@ -261,43 +441,64 @@ export default function AddEducation({
             </select>
           </div>
 
-          {/* عنوان */}
+          {/* عنوان - با ابزار متن غنی + پیش‌نمایش زنده */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               عنوان <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              name="title"
+            <RichTextEditor
               value={formData.title}
-              onChange={handleChange}
-              className={`w-full px-4 py-2.5 rounded-xl border ${
-                errors.title ? "border-red-500" : "border-gray-200"
-              } focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900`}
+              onChange={(html) => {
+                setFormData((prev) => ({ ...prev, title: html }));
+                if (errors.title) setErrors((prev) => ({ ...prev, title: "" }));
+              }}
               placeholder="عنوان مقاله را وارد کنید"
+              rows={1}
             />
             {errors.title && (
               <p className="mt-1 text-sm text-red-500">{errors.title}</p>
             )}
+            {stripHtml(formData.title) && (
+              <div className="mt-2">
+                <span className="text-xs text-gray-400 block mb-1">
+                  پیش‌نمایش:
+                </span>
+                <div
+                  className="px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-100 text-lg font-bold text-gray-900"
+                  dangerouslySetInnerHTML={{ __html: formData.title }}
+                />
+              </div>
+            )}
           </div>
 
-          {/* توضیحات */}
+          {/* توضیحات - با ابزار متن غنی + پیش‌نمایش زنده */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               توضیحات <span className="text-red-500">*</span>
             </label>
-            <textarea
-              name="description"
+            <RichTextEditor
               value={formData.description}
-              onChange={handleChange}
-              rows="5"
-              className={`w-full px-4 py-2.5 rounded-xl border ${
-                errors.description ? "border-red-500" : "border-gray-200"
-              } focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none resize-none text-gray-900`}
+              onChange={(html) => {
+                setFormData((prev) => ({ ...prev, description: html }));
+                if (errors.description)
+                  setErrors((prev) => ({ ...prev, description: "" }));
+              }}
               placeholder="متن مقاله را وارد کنید..."
+              rows={6}
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-500">{errors.description}</p>
+            )}
+            {stripHtml(formData.description) && (
+              <div className="mt-2">
+                <span className="text-xs text-gray-400 block mb-1">
+                  پیش‌نمایش:
+                </span>
+                <div
+                  className="px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 text-gray-800 leading-8"
+                  dangerouslySetInnerHTML={{ __html: formData.description }}
+                />
+              </div>
             )}
           </div>
 
@@ -316,10 +517,58 @@ export default function AddEducation({
             )}
           </div>
 
-          {/* تصویر - مثل AddProduct */}
+          {/* برچسب‌های سئو */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              برچسب‌ها (هشتگ‌های سئو)
+              <span className="text-gray-400 text-xs mr-1">
+                (اختیاری - برای بهبود سئو مقاله)
+              </span>
+            </label>
+
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1.5 rounded-full"
+                  >
+                    #{tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="text-blue-400 hover:text-blue-700"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none text-gray-900"
+                placeholder="یک کلمه بنویس و Enter بزن..."
+              />
+              <button
+                type="button"
+                onClick={addTag}
+                className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium text-sm transition"
+              >
+                افزودن
+              </button>
+            </div>
+          </div>
+
+          {/* تصویر اصلی */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
             <h2 className="text-lg font-semibold text-gray-900 pb-2 border-b border-gray-100">
-              تصویر مقاله{" "}
+              تصویر اصلی{" "}
               {mode === "create" && <span className="text-red-500">*</span>}
             </h2>
             <div className="space-y-4">
@@ -374,6 +623,74 @@ export default function AddEducation({
               )}
             </div>
           </div>
+
+          {/* تصاویر گالری - فقط برای خبر (طبق بک‌اند فعلی)، آپلود مستقیم مثل عکس اصلی */}
+          {(formData.type === "news" || initialData?.type === "news") && (
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+              <h2 className="text-lg font-semibold text-gray-900 pb-2 border-b border-gray-100">
+                تصاویر گالری
+                <span className="text-gray-400 text-xs font-normal mr-2">
+                  (بعد از تصویر اصلی نمایش داده می‌شوند)
+                </span>
+              </h2>
+
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={selectGalleryImages}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+
+              <div className="space-y-3">
+                {galleryImages.map((img, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"
+                  >
+                    <div className="relative w-20 h-20">
+                      <Image
+                        src={img.preview}
+                        alt={`گالری ${index + 1}`}
+                        width={80}
+                        height={80}
+                        className="rounded-lg object-cover"
+                        unoptimized={true}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <StatusBadge
+                        status={img.isExisting ? "success" : img.status}
+                      />
+                    </div>
+                    {img.status === "pending" && !img.isExisting && (
+                      <button
+                        type="button"
+                        onClick={() => handleGalleryImageUpload(index)}
+                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium text-sm transition"
+                      >
+                        آپلود
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeGalleryImage(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      حذف
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {formData.type === "tutorial" && (
+            <p className="text-xs text-gray-400 bg-gray-50 rounded-lg px-3 py-2">
+              گالری تصاویر برای «آموزش‌ها» هنوز در بک‌اند پیاده‌سازی نشده
+              است.
+            </p>
+          )}
 
           {errors.submit && (
             <div className="bg-red-50 text-red-600 p-3 rounded-xl text-center whitespace-pre-wrap text-sm">

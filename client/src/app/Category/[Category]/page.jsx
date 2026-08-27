@@ -1,12 +1,109 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import style from "@/app/Category/[Category]/page.module.css";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { api } from "@/app/config";
 import CategoryTabFeature from "@/app/CategoryTabFeature/CategoryTabFeature";
 import { useAuth } from "@/app/Context/Context";
+
+// قیمت نهایی (با احتساب تخفیف) - برای مرتب‌سازی درست بر اساس همون قیمتی
+// که کاربر واقعاً می‌بینه، نه قیمت خام قبل از تخفیف
+function getEffectivePrice(p) {
+  const price = Number(p?.sell_price);
+  const discount = Number(p?.discount);
+  if (Number.isNaN(price)) return 0;
+  if (Number.isNaN(discount) || discount <= 0) return price;
+  return price - price * (discount / 100);
+}
+
+// آیا این محصول (از طریق واریانت‌هاش) گارانتی داره؟
+// معیار: حداقل یک واریانت فعال با warranty_months بزرگ‌تر از صفر
+function hasWarranty(p) {
+  if (!Array.isArray(p?.variants)) return false;
+  return p.variants.some(
+    (v) => v?.is_active !== false && Number(v?.warranty_months) > 0
+  );
+}
+
+const PRICE_OPTIONS = [
+  { value: "default", label: "پیش‌فرض" },
+  { value: "cheap", label: "ارزان‌ترین" },
+  { value: "expensive", label: "گران‌ترین" },
+];
+
+const WARRANTY_OPTIONS = [
+  { value: "all", label: "همه محصولات" },
+  { value: "warranty", label: "فقط دارای گارانتی" },
+];
+
+// دراپ‌داون سفارشی کوچیک - همون ظاهر قرص‌مانند با فلش که توی طرح خواسته شده
+function FilterDropdown({ label, value, options, onChange }) {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const current = options.find((o) => o.value === value);
+
+  return (
+    <div className={style.filterDropdown} ref={wrapperRef}>
+      <button
+        type="button"
+        className={`${style.filterDropdownBtn} ${open ? style.filterDropdownBtnOpen : ""}`}
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <svg
+          className={`${style.filterChevron} ${open ? style.filterChevronOpen : ""}`}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+        <span className={style.filterDropdownValue}>
+          {current?.label || label}
+        </span>
+        <span className={style.filterDropdownLabel}>{label}</span>
+      </button>
+
+      {open && (
+        <ul className={style.filterDropdownList}>
+          {options.map((opt) => (
+            <li key={opt.value}>
+              <button
+                type="button"
+                className={`${style.filterDropdownOption} ${
+                  opt.value === value ? style.filterDropdownOptionActive : ""
+                }`}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+              >
+                {opt.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 export default function Category() {
   const params = useParams();
@@ -21,6 +118,29 @@ export default function Category() {
   const { setNotif } = useAuth();
 
   const [product, setProduct] = useState([]);
+
+  // ============================================================
+  // 🔥 فیلتر محصولات (قیمت / گارانتی) - کاملاً فرانت، روی همون
+  // لیستی که از بک‌اند اومده اعمال می‌شه
+  // ============================================================
+  const [priceFilter, setPriceFilter] = useState("default");
+  const [warrantyFilter, setWarrantyFilter] = useState("all");
+
+  const filteredProduct = useMemo(() => {
+    let list = [...product];
+
+    if (warrantyFilter === "warranty") {
+      list = list.filter(hasWarranty);
+    }
+
+    if (priceFilter === "cheap") {
+      list.sort((a, b) => getEffectivePrice(a) - getEffectivePrice(b));
+    } else if (priceFilter === "expensive") {
+      list.sort((a, b) => getEffectivePrice(b) - getEffectivePrice(a));
+    }
+
+    return list;
+  }, [product, priceFilter, warrantyFilter]);
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -167,9 +287,25 @@ export default function Category() {
         </header>
 
         <section className={style.tabSection}>
+          {/* 🔥 فیلتر محصولات - قیمت و گارانتی */}
+          <div className={style.filterBar}>
+            <FilterDropdown
+              label="قیمت"
+              value={priceFilter}
+              options={PRICE_OPTIONS}
+              onChange={setPriceFilter}
+            />
+            <FilterDropdown
+              label="گارانتی"
+              value={warrantyFilter}
+              options={WARRANTY_OPTIONS}
+              onChange={setWarrantyFilter}
+            />
+          </div>
+
           <CategoryTabFeature
             Tab={categoryChild}
-            products={product}
+            products={filteredProduct}
             setProducts={setProduct}
             setSelectedCategory={setSelectedCategory}
           />

@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Head from "next/head";
-import Image from "next/image";
-import styles from "./page.module.css";  
+import styles from "./page.module.css";
 import Imagedetail from "@/app/ProductDetail/ImageDetail/Imagedetail";
 import { useAuth } from "@/app/Context/Context";
 import { api, MEDIA_URL } from "@/app/config";
@@ -41,6 +40,47 @@ function calcDiscountPercent(discountPercent) {
   return Math.min(95, Math.max(0, Math.round(percent)));
 }
 
+// ⚠️ چون بک‌اند برای بعضی محیط‌های هاست، MEDIA_URL را به‌صورت آدرس کامل
+// برمی‌گرداند و بعضی وقت‌ها فقط مسیر نسبی، این تابع هر دو حالت را درست
+// می‌سازد و از باگ «URL دوبار پیشوند خورده» یا «اسلش جا‌افتاده» جلوگیری می‌کند.
+function getMediaUrl(path) {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = (MEDIA_URL || "").endsWith("/")
+    ? MEDIA_URL.slice(0, -1)
+    : MEDIA_URL || "";
+  const rel = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${rel}`;
+}
+
+// نگاشت چند رنگ رایج فارسی به کد رنگ، برای نمایش دایره‌ی رنگ در انتخابگر واریانت.
+// اگر رنگی در این لیست نبود، دایره با حالت نوترال (نقطه‌چین) نمایش داده می‌شود
+// و نام رنگ همیشه به‌صورت متن هم زیرش نوشته می‌شود تا مبهم نماند.
+const COLOR_NAME_MAP = {
+  "مشکی": "#111827",
+  "سیاه": "#111827",
+  "سفید": "#f8fafc",
+  "آبی": "#2563eb",
+  "سرمه‌ای": "#1e3a8a",
+  "قرمز": "#ef4444",
+  "سبز": "#16a34a",
+  "زرد": "#facc15",
+  "طلایی": "#eab308",
+  "نقره‌ای": "#9ca3af",
+  "خاکستری": "#6b7280",
+  "بنفش": "#7c3aed",
+  "صورتی": "#ec4899",
+  "نارنجی": "#f97316",
+  "قهوه‌ای": "#78350f",
+  "کرمی": "#fef3c7",
+  "یاقوتی": "#9f1239",
+};
+
+function colorToHex(name) {
+  if (!name) return null;
+  return COLOR_NAME_MAP[name.trim()] || null;
+}
+
 export default function Productdetail() {
   const params = useParams();
   const id = params?.Productdetail;
@@ -53,6 +93,11 @@ export default function Productdetail() {
   const [commentName, setCommentName] = useState("");
   const [commentText, setCommentText] = useState("");
   const [commentRate, setCommentRate] = useState(5);
+
+  // ============================================================
+  // 🔥 انتخاب واریانت (رنگ / مدت زمان اشتراک)
+  // ============================================================
+  const [selectedVariantId, setSelectedVariantId] = useState(null);
 
   const { addToCart, productbuy, setNotif } = useAuth();
 
@@ -77,16 +122,27 @@ export default function Productdetail() {
     fetchProduct();
   }, [id]);
 
+  // وقتی محصول تغییر کرد (بارگذاری اولیه یا محصول جدید)، اولین واریانت فعال
+  // را به‌صورت پیش‌فرض انتخاب کن
+  useEffect(() => {
+    if (product?.variants && Array.isArray(product.variants)) {
+      const firstActive = product.variants.find((v) => v?.is_active !== false);
+      setSelectedVariantId(firstActive ? firstActive.id : null);
+    } else {
+      setSelectedVariantId(null);
+    }
+  }, [product]);
+
   const galleryImages = useMemo(() => {
     if (!product?.images || !Array.isArray(product.images)) return [];
 
     const imagesList = product.images
       .filter((img) => img?.image)
-      .map((img) => `${MEDIA_URL}${img.image}`);
+      .map((img) => getMediaUrl(img.image));
 
     const mainImage = product.images.find((img) => img.is_main === true);
     if (mainImage) {
-      const mainUrl = `${MEDIA_URL}${mainImage.image}`;
+      const mainUrl = getMediaUrl(mainImage.image);
       const others = imagesList.filter((url) => url !== mainUrl);
       return [mainUrl, ...others];
     }
@@ -105,26 +161,78 @@ export default function Productdetail() {
     return [];
   }, [product]);
 
+  // ============================================================
+  // 🔥 واریانت‌های فعال + تشخیص اینکه محصول رنگ دارد یا مدت‌زمان اشتراک
+  // ============================================================
+  const activeVariants = useMemo(() => {
+    if (!product?.variants || !Array.isArray(product.variants)) return [];
+    return product.variants.filter((v) => v?.is_active !== false);
+  }, [product]);
+
+  const hasColorOptions = useMemo(
+    () =>
+      activeVariants.some((v) => v?.color && String(v.color).trim() !== ""),
+    [activeVariants]
+  );
+
+  const hasDurationOptions = useMemo(
+    () =>
+      activeVariants.some(
+        (v) =>
+          v?.duration_months !== null &&
+          v?.duration_months !== undefined &&
+          v?.duration_months !== ""
+      ),
+    [activeVariants]
+  );
+
+  const hasVariants =
+    activeVariants.length > 0 && (hasColorOptions || hasDurationOptions);
+
+  const selectedVariant = useMemo(
+    () => activeVariants.find((v) => v.id === selectedVariantId) || null,
+    [activeVariants, selectedVariantId]
+  );
+
+  // اگر واریانتی انتخاب شده، قیمت/موجودی/تخفیف از خود واریانت خوانده می‌شود،
+  // در غیر این صورت (محصول بدون واریانت) دقیقاً مثل قبل از خود محصول خوانده می‌شود
+  const effectiveSellPrice = selectedVariant
+    ? selectedVariant.price
+    : product?.sell_price;
+
+  // ⚠️ فیلد discount روی واریانت فعلاً در بک‌اند (ProductVariant) وجود ندارد.
+  // تا وقتی این فیلد به مدل/سریالایزر اضافه نشود، این مقدار همیشه 0 خواهد بود
+  // و تخفیف فقط برای محصولات بدون واریانت اعمال می‌شود.
+  const effectiveDiscount = selectedVariant
+    ? selectedVariant.discount ?? 0
+    : product?.discount;
+
+  const effectiveQuantity = selectedVariant
+    ? selectedVariant.quantity
+    : product?.quantity;
+
   const discountedPrice = useMemo(
-    () => calcDiscountedPrice(product?.sell_price, product?.discount),
-    [product?.sell_price, product?.discount],
+    () => calcDiscountedPrice(effectiveSellPrice, effectiveDiscount),
+    [effectiveSellPrice, effectiveDiscount]
   );
 
   const hasDiscount = useMemo(() => {
-    const percent = Number(product?.discount);
+    const percent = Number(effectiveDiscount);
     return !isNaN(percent) && percent > 0;
-  }, [product?.discount]);
+  }, [effectiveDiscount]);
 
   const discountPercent = useMemo(
-    () => calcDiscountPercent(product?.discount),
-    [product?.discount],
+    () => calcDiscountPercent(effectiveDiscount),
+    [effectiveDiscount]
   );
 
-  const stockCount = Number(product?.quantity ?? 0);
+  const stockCount = Number(effectiveQuantity ?? 0);
   const inStock = stockCount > 0;
 
   const isAdded = productbuy?.some(
-    (p) => (p.product_id || p.id) === product?.id,
+    (p) =>
+      (p.product_id || p.id) === product?.id &&
+      (p.variant_id ?? p.variantId ?? null) === (selectedVariant?.id ?? null)
   );
 
   const handleAddToCart = async () => {
@@ -149,10 +257,14 @@ export default function Productdetail() {
     }
 
     try {
+      // ⚠️ توجه: باید مطمئن شوی تابع addToCart در Context، فیلد variantId را
+      // هم به‌عنوان variant_id به endpoint سبد خرید (/api/orders/cart/add/)
+      // ارسال می‌کند، وگرنه محصول بدون واریانت به سبد اضافه خواهد شد.
       await addToCart({
         id: product.id,
+        variantId: selectedVariant?.id || null,
         title: product.name,
-        price: discountedPrice ?? product.sell_price,
+        price: discountedPrice ?? effectiveSellPrice,
         image: galleryImages?.[0] || "",
         description: product.descriptions,
       });
@@ -201,7 +313,6 @@ export default function Productdetail() {
       </div>
     );
   }
-
   if (error || !product) {
     return (
       <div className={styles.pageShell}>
@@ -249,6 +360,87 @@ export default function Productdetail() {
             </div>
 
             <div className={styles.purchaseCard}>
+
+              {hasVariants && (
+                <div className={styles.variantSection}>
+                  {hasColorOptions && (
+                    <div className={styles.variantGroup}>
+                      <span className={styles.variantLabel}>رنگ</span>
+                      <div className={styles.variantOptions}>
+                        {activeVariants
+                          .filter(
+                            (v) => v.color && String(v.color).trim() !== ""
+                          )
+                          .map((v) => {
+                            const hex = colorToHex(v.color);
+                            const isActive = v.id === selectedVariantId;
+                            const isOut = Number(v.quantity) <= 0;
+                            return (
+                              <button
+                                key={v.id}
+                                type="button"
+                                className={`${styles.colorSwatchBtn} ${
+                                  isActive ? styles.active : ""
+                                } ${isOut ? styles.variantDisabled : ""}`}
+                                onClick={() =>
+                                  !isOut && setSelectedVariantId(v.id)
+                                }
+                                disabled={isOut}
+                                title={v.color}
+                              >
+                                <span
+                                  className={styles.colorSwatchCircle}
+                                  style={{
+                                    background: hex || "#e5e7eb",
+                                    borderStyle: hex ? "solid" : "dashed",
+                                  }}
+                                />
+                                <span className={styles.colorSwatchName}>
+                                  {v.color}
+                                </span>
+                              </button>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+
+                  {hasDurationOptions && (
+                    <div className={styles.variantGroup}>
+                      <span className={styles.variantLabel}>مدت زمان</span>
+                      <div className={styles.variantOptions}>
+                        {activeVariants
+                          .filter(
+                            (v) =>
+                              v.duration_months !== null &&
+                              v.duration_months !== undefined &&
+                              v.duration_months !== ""
+                          )
+                          .map((v) => {
+                            const isActive = v.id === selectedVariantId;
+                            const isOut = Number(v.quantity) <= 0;
+                            return (
+                              <button
+                                key={v.id}
+                                type="button"
+                                className={`${styles.durationPill} ${
+                                  isActive ? styles.active : ""
+                                } ${isOut ? styles.variantDisabled : ""}`}
+                                onClick={() =>
+                                  !isOut && setSelectedVariantId(v.id)
+                                }
+                                disabled={isOut}
+                              >
+                                {toPersianDigits(v.duration_months)} ماهه
+                              </button>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className={styles.priceBox}>
                 <span>قیمت</span>
 
@@ -256,11 +448,11 @@ export default function Productdetail() {
                   <div className={styles.priceColumn}>
                     <strong>{formatPriceFa(discountedPrice)} تومان</strong>
                     <span className={styles.oldPrice}>
-                      {formatPriceFa(product?.sell_price)} تومان
+                      {formatPriceFa(effectiveSellPrice)} تومان
                     </span>
                   </div>
                 ) : (
-                  <strong>{formatPriceFa(product?.sell_price)} تومان</strong>
+                  <strong>{formatPriceFa(effectiveSellPrice)} تومان</strong>
                 )}
               </div>
 
@@ -310,38 +502,42 @@ export default function Productdetail() {
               {/* ✅ توضیحات بیشتر */}
               {product?.more_description && (
                 <div className={styles.moreDescriptionBox}>
-                  <div 
+                  <div
                     className={styles.moreDescriptionContent}
                     onClick={toggleDescription}
                   >
                     <div className={styles.moreDescriptionHeader}>
-                      <svg 
-                        className={styles.moreDescriptionIcon} 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
+                      <svg
+                        className={styles.moreDescriptionIcon}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        <path d="M12 8v4"/>
-                        <path d="M12 16h.01"/>
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M12 8v4" />
+                        <path d="M12 16h.01" />
                       </svg>
-                      <span className={styles.moreDescriptionTitle}>توضیحات بیشتر</span>
-                      <svg 
-                        className={`${styles.moreDescriptionChevron} ${showFullDescription ? styles.chevronOpen : ''}`} 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
+                      <span className={styles.moreDescriptionTitle}>
+                        توضیحات بیشتر
+                      </span>
+                      <svg
+                        className={`${styles.moreDescriptionChevron} ${showFullDescription ? styles.chevronOpen : ""}`}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <polyline points="6 9 12 15 18 9"/>
+                        <polyline points="6 9 12 15 18 9" />
                       </svg>
                     </div>
-                    <div className={`${styles.moreDescriptionText} ${!showFullDescription ? styles.collapsed : ''}`}>
+                    <div
+                      className={`${styles.moreDescriptionText} ${!showFullDescription ? styles.collapsed : ""}`}
+                    >
                       {product.more_description}
                     </div>
                   </div>
@@ -368,7 +564,6 @@ export default function Productdetail() {
             اطلاعات ثبت‌شده برای این محصول
           </p>
         </div>
-
         <div className={styles.featureList}>
           {featureArray.length > 0 ? (
             featureArray.map((item, index) => (
@@ -416,7 +611,6 @@ export default function Productdetail() {
           <h2 className={styles.sectionTitle}>نظرات کاربران</h2>
           <p className={styles.sectionSubtitle}>نظر خودتان را ثبت کنید</p>
         </div>
-
         <form className={styles.commentForm} onSubmit={handleSubmitComment}>
           <div className={styles.commentGrid}>
             <div className={styles.field}>

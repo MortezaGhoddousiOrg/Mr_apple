@@ -135,7 +135,7 @@
 
 .categoryImageContainer {
   position: absolute;
-  top: 100px;
+  top: 130px;
   left: 100px;
   z-index: 2;
   min-height: 520px;
@@ -179,6 +179,115 @@
   margin-top: 0;
   z-index: 5;
   padding: 0 4vw;
+}
+
+/* ============================================================ */
+/* 🔥 فیلتر محصولات (قیمت / گارانتی) */
+/* ============================================================ */
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 28px 0 20px;
+}
+
+.filterDropdown {
+  position: relative;
+}
+
+.filterDropdownBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 190px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  cursor: pointer;
+  font-family: "vazir", sans-serif;
+  transition: 180ms ease;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.filterDropdownBtn:hover {
+  border-color: #cbd5e1;
+}
+
+.filterDropdownBtnOpen {
+  border-color: #2366ff;
+  box-shadow: 0 0 0 3px rgba(35, 102, 255, 0.12);
+}
+
+.filterChevron {
+  color: #9ca3af;
+  flex-shrink: 0;
+  transition: transform 200ms ease;
+}
+
+.filterChevronOpen {
+  transform: rotate(180deg);
+  color: #2366ff;
+}
+
+.filterDropdownValue {
+  flex: 1;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filterDropdownLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.filterDropdownList {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
+  z-index: 20;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  padding: 6px;
+  list-style: none;
+  margin: 0;
+}
+
+.filterDropdownOption {
+  display: block;
+  width: 100%;
+  text-align: right;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #374151;
+  font-family: "vazir", sans-serif;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: 150ms ease;
+}
+
+.filterDropdownOption:hover {
+  background: #f3f4f6;
+}
+
+.filterDropdownOptionActive {
+  background: #eef2ff;
+  color: #2366ff;
+  font-weight: 700;
 }
 
 .box {
@@ -378,6 +487,18 @@
 
   .tabSection {
     padding: 0 12px;
+  }
+
+  .filterBar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin: 20px 0 16px;
+  }
+
+  .filterDropdownBtn {
+    min-width: 0;
+    width: 100%;
   }
 }
 

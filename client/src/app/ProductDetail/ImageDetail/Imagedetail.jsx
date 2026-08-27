@@ -14,7 +14,11 @@ const customLoader = ({ src, width, quality }) => {
   return `${src}?w=${width}&q=${q}`;
 };
 
-export default function Imagedetail({ images = [], discountPercent = 0 }) {
+export default function Imagedetail({
+  images = [],
+  discountPercent = 0,
+  compact = false,
+}) {
   const gallery = useMemo(
     () => (Array.isArray(images) ? images.filter(Boolean) : []),
     [images],
@@ -80,7 +84,11 @@ export default function Imagedetail({ images = [], discountPercent = 0 }) {
 
   return (
     <>
-      <div className={styles.galleryShell}>
+      <div
+        className={`${styles.galleryShell} ${
+          compact ? styles.compactGallery : ""
+        }`}
+      >
         <div className={styles.mainCard}>
           {discountPercent > 0 && (
             <div className={styles.discountBadge}>{discountPercent}٪</div>

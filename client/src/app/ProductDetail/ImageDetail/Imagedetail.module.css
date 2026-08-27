@@ -198,6 +198,40 @@
   box-sizing: border-box;
 }
 
+
+.compactGallery .mainCard {
+  min-height: 0;
+  height: auto;
+  aspect-ratio: 16 / 6;
+  border-radius: 20px;
+}
+
+.compactGallery .mainImageWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compactGallery .mainImage {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+
+.compactGallery .thumbRow {
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.compactGallery .thumbBtn {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+}
+
 @media (max-width: 992px) {
   .mainCard {
     min-height: 440px;

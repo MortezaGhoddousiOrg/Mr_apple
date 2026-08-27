@@ -40,7 +40,6 @@ class UploadEducationImageView(APIView):
             "data": serializer.data
         }, status=201)
 
-
 # -----------------------------
 # News List
 # -----------------------------
@@ -113,9 +112,8 @@ class NewsAdminView(APIView):
         item.delete()
         return Response({"message": "News deleted"}, status=200)
 
-
 # -----------------------------
-# Upload Gallery Image for News
+# Upload Gallery Image for News (attached immediately to a known news_id)
 # -----------------------------
 class NewsGalleryUploadView(APIView):
     authentication_classes = [AdminJWTAuthentication]
@@ -139,6 +137,57 @@ class NewsGalleryUploadView(APIView):
             "message": "Gallery image uploaded",
             "data": serializer.data
         }, status=201)
+
+
+# -----------------------------
+# 🔥 Upload Gallery Image - DECOUPLED (no news_id needed yet)
+# دقیقاً مثل UploadEducationImageView: عکس مستقل آپلود می‌شود و بعداً
+# با gallery_ids در NewsSerializer به یک خبر متصل می‌شود. این همان چیزی
+# است که به ادمین اجازه می‌دهد قبل از ساخت خبر، عکس‌های گالری را آپلود کند.
+# -----------------------------
+class UploadNewsGalleryImage(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        file = request.FILES.get("file")
+        if not file:
+            return Response({"error": "No file provided"}, status=400)
+
+        if not file.content_type.startswith("image/"):
+            return Response({"error": "File must be an image"}, status=400)
+
+        gallery_item = NewsGallery.objects.create(image=file)
+        serializer = NewsGallerySerializer(gallery_item)
+
+        return Response({
+            "message": "Image saved",
+            "data": serializer.data
+        }, status=201)
+
+
+# -----------------------------
+# 🔥 Delete Gallery Image
+# -----------------------------
+class DeleteNewsGalleryImage(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+
+    def delete(self, request, image_id):
+        try:
+            img = NewsGallery.objects.get(id=image_id)
+        except NewsGallery.DoesNotExist:
+            return Response({"error": "Image not found"}, status=404)
+
+        file_path = os.path.join(settings.MEDIA_ROOT, img.image.name)
+
+        img.delete()
+
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+        return Response({"message": "Image deleted"}, status=200)
 
 
 # -----------------------------

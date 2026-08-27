@@ -2,9 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
+import Imagedetail from "@/app/ProductDetail/ImageDetail/Imagedetail";
 import { api, MEDIA_URL } from "@/app/config";
 import styles from "./page.module.css";
+
+// ⚠️ همان راه‌حل مشترک باگ عکس: هم آدرس کامل و هم مسیر نسبی را درست می‌سازد
+function getMediaUrl(path) {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = (MEDIA_URL || "").endsWith("/")
+    ? MEDIA_URL.slice(0, -1)
+    : MEDIA_URL || "";
+  const rel = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${rel}`;
+}
+
+function stripHtml(html) {
+  if (!html) return "";
+  return String(html)
+    .replace(/<[^>]*>/g, "")
+    .trim();
+}
 
 export default function ArticleDetail() {
   const router = useRouter();
@@ -16,6 +34,9 @@ export default function ArticleDetail() {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // const [mainImageBroken, setMainImageBroken] = useState(false);
+  // const [brokenGalleryIds, setBrokenGalleryIds] = useState(new Set());
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -42,13 +63,13 @@ export default function ArticleDetail() {
   const formatDate = (date) => {
     if (!date) return "---";
     try {
-      const parts = date.split('T')[0].split('-');
+      const parts = date.split("T")[0].split("-");
       if (parts.length === 3) {
         const year = parseInt(parts[0]);
         const month = parseInt(parts[1]);
         const day = parseInt(parts[2]);
         const jYear = year - 621;
-        return `${jYear}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+        return `${jYear}/${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}`;
       }
       return date;
     } catch {
@@ -77,21 +98,35 @@ export default function ArticleDetail() {
       <div className={styles.page}>
         <div className={styles.container}>
           <div className="flex justify-center items-center min-h-[60vh]">
-            <div className="text-red-500 text-lg">{error || "مقاله یافت نشد"}</div>
+            <div className="text-red-500 text-lg">
+              {error || "مقاله یافت نشد"}
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
+  const mainImageUrl = getMediaUrl(article.image);
+
+  const gallery = Array.isArray(article.gallery) ? article.gallery : [];
+
+  const galleryImages = gallery
+    .map((g) => getMediaUrl(g?.image))
+    .filter(Boolean);
+
+  const articleImages = [
+    mainImageUrl,
+    ...galleryImages.filter((url) => url !== mainImageUrl),
+  ].filter(Boolean);
+
+  const tags = Array.isArray(article.tags) ? article.tags : [];
+
   return (
     <div className={styles.page}>
       <div className={styles.container}>
         {/* دکمه بازگشت */}
-        <button
-          onClick={() => router.back()}
-          className={styles.backButton}
-        >
+        <button onClick={() => router.back()} className={styles.backButton}>
           <svg
             className="w-5 h-5"
             fill="none"
@@ -108,15 +143,11 @@ export default function ArticleDetail() {
           بازگشت
         </button>
 
-        {/* کارت مقاله */}
         <div className={styles.articleCard}>
-          {/* تصویر */}
-          {article.image && (
-            <div className={styles.imageWrapper}>
-              <img
-                src={`${MEDIA_URL}${article.image}`}
-                alt={article.title}
-              />
+          {/* گالری تصاویر مقاله */}
+          {articleImages.length > 0 && (
+            <div className={styles.articleImageSection}>
+              <Imagedetail images={articleImages} compact />{" "}
             </div>
           )}
 
@@ -131,18 +162,15 @@ export default function ArticleDetail() {
               {getTypeLabel(article.type)}
             </span>
 
-            {/* عنوان */}
-            <h1 className={styles.title}>
-              {article.title}
-            </h1>
+            {/* عنوان - ممکن است شامل HTML از تولبار متن غنی ادمین باشد */}
+            <h1
+              className={styles.title}
+              dangerouslySetInnerHTML={{ __html: article.title }}
+            />
 
             {/* تاریخ */}
             <div className={styles.dateWrapper}>
-              <svg
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -153,10 +181,22 @@ export default function ArticleDetail() {
               <span>{formatDate(article.publish_date)}</span>
             </div>
 
-            {/* توضیحات */}
-            <div className={styles.description}>
-              {article.description}
-            </div>
+            {/* برچسب‌های سئو */}
+            {tags.length > 0 && (
+              <div className={styles.tagsRow}>
+                {tags.map((tag) => (
+                  <span key={tag} className={styles.tagBadge}>
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* توضیحات - ممکن است شامل HTML از تولبار متن غنی ادمین باشد */}
+            <div
+              className={styles.description}
+              dangerouslySetInnerHTML={{ __html: article.description }}
+            />
           </div>
         </div>
       </div>

@@ -56,7 +56,6 @@ class ProductImages(models.Model):
             return f"{self.product_id.name} - Image"
         return f"Image {self.id}"
 
-
 # -------------------------------
 # 🔥 PRODUCT VARIANT MODEL
 # -------------------------------
@@ -83,8 +82,14 @@ class ProductVariant(models.Model):
 
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default="new")
     warranty = models.CharField(max_length=20, choices=WARRANTY_CHOICES, default="no_warranty")
+    # 🔥 گارانتی به‌صورت عدد ماه (مثلاً 12، 18، 24) - این همون فیلدیه که
+    # فیلتر «دارای گارانتی» توی کلاینت ازش می‌خونه. اختیاریه: اگه خالی/صفر
+    # بمونه یعنی این واریانت گارانتی نداره.
+    warranty_months = models.IntegerField(blank=True, null=True)
 
     price = models.IntegerField()
+    # 🔥 تخفیف مخصوص همین واریانت (درصدی) - مستقل از تخفیف خودِ محصول
+    discount = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     quantity = models.IntegerField(default=0)
 
     is_active = models.BooleanField(default=True)

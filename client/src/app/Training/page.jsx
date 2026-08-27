@@ -7,6 +7,9 @@ import { api, MEDIA_URL } from "@/app/config";
 import styles from "./page.module.css";
 import moment from "moment-jalaali";
 
+// ⚠️ این آرایه قبلاً به‌صورت کامنت رها شده بود و باعث می‌شد کل صفحه (حتی تب
+// «اخبار») با خطای «fakePhones is not defined» کرش کند، چون در پایین همین
+// فایل بی‌قید‌وشرط استفاده می‌شد. برگردانده شد تا صفحه سالم لود شود.
 const fakePhones = [
   {
     id: "iphone-15-pro",
@@ -51,6 +54,29 @@ const fakePhones = [
 ];
 
 const getValue = (str) => parseInt(str.replace(/[^0-9]/g, "")) || 0;
+
+// ⚠️ چون بک‌اند در بعضی حالت‌های هاست، آدرس عکس را کامل (absolute) برمی‌گرداند
+// و بعضی وقت‌ها فقط مسیر نسبی، این تابع هر دو حالت را درست می‌سازد. دقیقاً همین
+// ناهماهنگی باعث «دیده نشدن عکس مقاله» روی هاست می‌شد (یا پیشوند دوبار اضافه
+// می‌شد، یا اسلش بین دامنه و مسیر جا می‌افتاد).
+function getMediaUrl(path) {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = (MEDIA_URL || "").endsWith("/")
+    ? MEDIA_URL.slice(0, -1)
+    : MEDIA_URL || "";
+  const rel = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${rel}`;
+}
+
+// عنوان/توضیحات مقالات حالا از تولبار متن غنی ادمین می‌آیند و ممکن است HTML
+// باشند (مثلاً <b>...</b>). برای پیش‌نمایش کارت لیست، فقط متن خام نشان
+// می‌دهیم تا با line-clamp وسط یک تگ قطع نشود و ظاهر خراب نشود؛ نمایش کامل
+// فرمت‌شده در صفحه‌ی جزئیات مقاله انجام می‌شود.
+function stripHtml(html) {
+  if (!html) return "";
+  return String(html).replace(/<[^>]*>/g, "").trim();
+}
 
 const specLabels = {
   battery: "باتری",
@@ -98,6 +124,10 @@ export default function Training() {
   const [tutorials, setTutorials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // ✅ عکس‌هایی که لود نشدند اینجا نگه‌داری می‌شوند تا به‌جای آیکون شکسته‌ی
+  // مرورگر، جای‌گزین 📷 نشان داده شود
+  const [brokenImages, setBrokenImages] = useState(new Set());
 
   const [phoneAId, setPhoneAId] = useState("iphone-15-pro");
   const [phoneBId, setPhoneBId] = useState("iphone-15");
@@ -176,7 +206,6 @@ export default function Training() {
 
   const recommendations = getRecommendations();
 
-  // دریافت دیتا از بک‌اند
   useEffect(() => {
     const fetchArticles = async () => {
       setLoading(true);
@@ -219,11 +248,11 @@ export default function Training() {
 
   const items = getItems();
 
-  // فیلتر بر اساس جستجو
+  // فیلتر بر اساس جستجو (روی متن خام، بدون تگ‌های HTML)
   const filteredItems = items.filter(
     (item) =>
-      item.title?.includes(searchTerm) ||
-      item.description?.includes(searchTerm)
+      stripHtml(item.title)?.includes(searchTerm) ||
+      stripHtml(item.description)?.includes(searchTerm)
   );
 
   // رفتن به صفحه جزئیات
@@ -301,6 +330,7 @@ export default function Training() {
               </button>
             ))}
           </nav>
+
           {activeTab === "مقایسه" && (
             <div className={styles.sidebarCompareTools}>
               <h4 className={styles.toolTitle}>انتخاب مدل‌ها</h4>
@@ -342,39 +372,48 @@ export default function Training() {
                   {searchTerm ? "نتیجه‌ای یافت نشد" : "هیچ مقاله‌ای وجود ندارد"}
                 </div>
               ) : (
-                filteredItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className={styles.newsCard}
-                    onClick={() => handleCardClick(item.id, item.type)}
-                  >
-                    <div className={styles.newsContent}>
-                      <h3 className={styles.newsTitle}>{item.title}</h3>
-                      <p className={styles.newsDescription}>
-                        {item.description}
-                      </p>
-                      <span className={styles.newsDate}>
-                        {formatDate(item.publish_date)}
-                      </span>
+                filteredItems.map((item) => {
+                  const imageUrl = getMediaUrl(item.image);
+                  const imageFailed = brokenImages.has(item.id);
+                  return (
+                    <div
+                      key={item.id}
+                      className={styles.newsCard}
+                      onClick={() => handleCardClick(item.id, item.type)}
+                    >
+                      <div className={styles.newsContent}>
+                        <h3 className={styles.newsTitle}>
+                          {stripHtml(item.title)}
+                        </h3>
+                        <p className={styles.newsDescription}>
+                          {stripHtml(item.description)}
+                        </p>
+                        <span className={styles.newsDate}>
+                          {formatDate(item.publish_date)}
+                        </span>
+                      </div>
+                      <div className={styles.newsImageWrapper}>
+                        {imageUrl && !imageFailed ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={imageUrl}
+                            alt={stripHtml(item.title)}
+                            className={styles.newsImage}
+                            onError={() =>
+                              setBrokenImages((prev) =>
+                                new Set(prev).add(item.id)
+                              )
+                            }
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-2xl">
+                            📷
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className={styles.newsImageWrapper}>
-                      {item.image ? (
-                        <Image
-                          src={`${MEDIA_URL}${item.image}`}
-                          alt={item.title}
-                          width={220}
-                          height={140}
-                          className={styles.newsImage}
-                          unoptimized={true}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                          📷
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           )}

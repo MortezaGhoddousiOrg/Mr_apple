@@ -49,13 +49,51 @@
   justify-content: flex-start;
 }
 
+/* کارت تصویر محصول */
 .imageWrapper {
   width: 100%;
   max-width: 560px;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
+  position: relative;
+  background:
+    radial-gradient(
+      120% 100% at 50% 15%,
+      rgba(255, 255, 255, 0.9),
+      rgba(247, 247, 245, 0.3) 55%,
+      transparent 100%
+    ),
+    linear-gradient(160deg, #ffffff 0%, #f1f1ef 100%);
+  border: 1px solid rgba(17, 17, 17, 0.06);
+  border-radius: 28px;
+  box-shadow:
+    0 1px 2px rgba(17, 17, 17, 0.04),
+    0 24px 48px -16px rgba(17, 17, 17, 0.14);
+  padding: 32px;
+  overflow: hidden;
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+
+.imageWrapper:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 1px 2px rgba(17, 17, 17, 0.04),
+    0 32px 64px -16px rgba(17, 17, 17, 0.18);
+}
+
+.imageWrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    closest-side,
+    rgba(0, 0, 0, 0.035),
+    transparent 70%
+  );
+  z-index: 0;
+}
+
+.imageWrapper > * {
+  position: relative;
+  z-index: 1;
 }
 
 .imageLoading {
@@ -132,6 +170,95 @@
   gap: 14px;
 }
 
+/* ============================================================ */
+/* 🔥 انتخابگر واریانت (رنگ / مدت زمان اشتراک) */
+/* ============================================================ */
+
+.variantSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.variantGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.variantLabel {
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(17, 17, 17, 0.55);
+}
+
+.variantOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.colorSwatchBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: "vazir", sans-serif;
+}
+
+.colorSwatchCircle {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 2px solid rgba(17, 17, 17, 0.14);
+  transition: 200ms ease;
+  display: block;
+}
+
+.colorSwatchBtn.active .colorSwatchCircle {
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.12);
+  transform: scale(1.06);
+}
+
+.colorSwatchName {
+  font-size: 11px;
+  color: rgba(17, 17, 17, 0.6);
+  font-weight: 700;
+}
+
+.durationPill {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 850;
+  color: #111;
+  cursor: pointer;
+  transition: 200ms ease;
+  font-family: "vazir", sans-serif;
+}
+
+.durationPill.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.variantDisabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.variantDisabled:hover {
+  transform: none !important;
+}
+
 .priceBox {
   display: flex;
   align-items: flex-end;
@@ -163,7 +290,6 @@
   font-size: 13px;
   color: rgba(17, 17, 17, 0.45);
 }
-
 .metaRow {
   display: flex;
   align-items: center;
@@ -371,7 +497,6 @@
   border-radius: 22px;
   overflow: hidden;
 }
-
 .featureRow {
   display: grid;
   grid-template-columns: 180px 1fr;
@@ -533,7 +658,7 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 6px;
-  min-width: 0; /* برای اینکه children بتونن جمع بشن */
+  min-width: 0;
 }
 
 .moreDescriptionIcon {
@@ -545,7 +670,7 @@
 
 .moreDescriptionTitle {
   flex: 1;
-  min-width: 0; /* حیاتی: تو flex بدون این، آیتم از پدر بیرون می‌زنه */
+  min-width: 0;
   font-size: 13px;
   font-weight: 700;
   color: rgba(17, 17, 17, 0.6);
@@ -564,7 +689,7 @@
   line-height: 2;
   color: rgba(17, 17, 17, 0.75);
   white-space: pre-wrap;
-  overflow-wrap: anywhere; /* شکستن کلمات طولانی/بی‌فاصله */
+  overflow-wrap: anywhere;
   word-break: break-word;
   max-width: 100%;
   overflow: hidden;
@@ -666,5 +791,15 @@
   .moreDescriptionChevron {
     width: 16px;
     height: 16px;
+  }
+
+  .colorSwatchCircle {
+    width: 30px;
+    height: 30px;
+  }
+
+  .durationPill {
+    padding: 8px 16px;
+    font-size: 12.5px;
   }
 }
