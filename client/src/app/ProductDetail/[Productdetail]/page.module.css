@@ -171,7 +171,7 @@
 }
 
 /* ============================================================ */
-/* 🔥 انتخابگر واریانت (رنگ / مدت زمان اشتراک) */
+/* انتخابگر واریانت (رنگ / مدت زمان اشتراک) */
 /* ============================================================ */
 
 .variantSection {
@@ -329,6 +329,30 @@
   padding: 7px 10px;
   border-radius: 999px;
   letter-spacing: 0.2px;
+}
+
+/* ============================================================ */
+/* گارانتی واریانت انتخاب‌شده */
+/* ============================================================ */
+
+.warrantyLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f766e;
+  background: rgba(13, 148, 136, 0.08);
+  border: 1px solid rgba(13, 148, 136, 0.18);
+  padding: 8px 14px;
+  border-radius: 999px;
+  width: fit-content;
+}
+
+.warrantyIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .actionRow {

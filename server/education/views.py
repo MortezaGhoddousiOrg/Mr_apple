@@ -7,12 +7,13 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 
 from authuser.authentication import AdminJWTAuthentication
-from .models import News, Tutorial, EducationImages, NewsGallery
+from .models import News, Tutorial, EducationImages, NewsGallery, TutorialGallery
 from .serializers import (
     EducationImageSerializer,
     NewsSerializer,
     TutorialSerializer,
-    NewsGallerySerializer
+    NewsGallerySerializer,
+    TutorialGallerySerializer
 )
 
 
@@ -191,13 +192,90 @@ class DeleteNewsGalleryImage(APIView):
 
 
 # -----------------------------
+# Upload Gallery Image for Tutorial (attached immediately to a known tutorial_id)
+# -----------------------------
+class TutorialGalleryUploadView(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, tutorial_id):
+        try:
+            tutorial = Tutorial.objects.get(id=tutorial_id)
+        except Tutorial.DoesNotExist:
+            return Response({"error": "Tutorial not found"}, status=404)
+
+        image = request.FILES.get("image")
+        if not image:
+            return Response({"error": "image file is required"}, status=400)
+
+        gallery_item = TutorialGallery.objects.create(tutorial=tutorial, image=image)
+        serializer = TutorialGallerySerializer(gallery_item)
+
+        return Response({
+            "message": "Gallery image uploaded",
+            "data": serializer.data
+        }, status=201)
+
+
+# -----------------------------
+# 🔥 Upload Gallery Image - DECOUPLED (no tutorial_id needed yet)
+# دقیقاً مثل UploadNewsGalleryImage: عکس مستقل آپلود می‌شود و بعداً
+# با gallery_ids در TutorialSerializer به یک آموزش متصل می‌شود.
+# -----------------------------
+class UploadTutorialGalleryImage(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        file = request.FILES.get("file")
+        if not file:
+            return Response({"error": "No file provided"}, status=400)
+
+        if not file.content_type.startswith("image/"):
+            return Response({"error": "File must be an image"}, status=400)
+
+        gallery_item = TutorialGallery.objects.create(image=file)
+        serializer = TutorialGallerySerializer(gallery_item)
+
+        return Response({
+            "message": "Image saved",
+            "data": serializer.data
+        }, status=201)
+
+
+# -----------------------------
+# 🔥 Delete Gallery Image (Tutorial)
+# -----------------------------
+class DeleteTutorialGalleryImage(APIView):
+    authentication_classes = [AdminJWTAuthentication]
+    permission_classes = [IsAdminUser]
+
+    def delete(self, request, image_id):
+        try:
+            img = TutorialGallery.objects.get(id=image_id)
+        except TutorialGallery.DoesNotExist:
+            return Response({"error": "Image not found"}, status=404)
+
+        file_path = os.path.join(settings.MEDIA_ROOT, img.image.name)
+
+        img.delete()
+
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+        return Response({"message": "Image deleted"}, status=200)
+
+
+# -----------------------------
 # Tutorial List
 # -----------------------------
 class TutorialListView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        items = Tutorial.objects.all()
+        items = Tutorial.objects.prefetch_related("gallery").all()
         serializer = TutorialSerializer(items, many=True)
         return Response(serializer.data, status=200)
 
@@ -210,7 +288,7 @@ class TutorialDetailView(APIView):
 
     def get(self, request, item_id):
         try:
-            item = Tutorial.objects.get(id=item_id)
+            item = Tutorial.objects.prefetch_related("gallery").get(id=item_id)
         except Tutorial.DoesNotExist:
             return Response({"error": "Item not found"}, status=404)
 

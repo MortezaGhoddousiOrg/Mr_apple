@@ -1,13 +1,12 @@
 import os
 import uuid
-import json
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.db.models import Q
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import AllowAny, IsAdminUser
 
 from authuser.authentication import AdminJWTAuthentication
@@ -15,28 +14,36 @@ from .models import Products, ProductImages, ProductVariant
 from .serializers import ProductSerializer, ProductImageSerializer, ProductVariantSerializer
 
 
-
+# -------------------------------
+# PRODUCT LIST (PUBLIC)
+# -------------------------------
 @api_view(["GET"])
+@authentication_classes([])              # بدون احراز هویت
+@permission_classes([AllowAny])          # همه دسترسی دارند
 def product_list(request):
-    products = Products.objects.prefetch_related("variants").all()
+    products = Products.objects.prefetch_related("variants", "images").all()
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=200)
 
 
 # -------------------------------
-# PRODUCT BY CHILD CATEGORY
+# PRODUCT BY CHILD CATEGORY (PUBLIC)
 # -------------------------------
 @api_view(["GET"])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def product_by_child(request, child_id):
-    products = Products.objects.filter(category_id_id=child_id).prefetch_related("variants")
+    products = Products.objects.filter(category_id_id=child_id).prefetch_related("variants", "images")
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data, status=200)
 
 
 # -------------------------------
-# LATEST PRODUCTS
+# LATEST PRODUCTS (PUBLIC)
 # -------------------------------
 @api_view(["GET"])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def product_latest(request):
     products = Products.objects.order_by("-created_at")[:6]
     serializer = ProductSerializer(products, many=True)
@@ -44,9 +51,11 @@ def product_latest(request):
 
 
 # -------------------------------
-# HOME PAGE PRODUCTS
+# HOME PAGE PRODUCTS (PUBLIC)
 # -------------------------------
 @api_view(["GET"])
+@authentication_classes([])
+@permission_classes([AllowAny])
 def product_home_list(request):
     products = Products.objects.order_by("-created_at")[:6]
     serializer = ProductSerializer(products, many=True)
@@ -54,7 +63,7 @@ def product_home_list(request):
 
 
 # -------------------------------
-# UPLOAD PRODUCT IMAGE
+# UPLOAD PRODUCT IMAGE (ADMIN)
 # -------------------------------
 class UploadProductImage(APIView):
     authentication_classes = [AdminJWTAuthentication]
@@ -83,7 +92,7 @@ class UploadProductImage(APIView):
 
 
 # -------------------------------
-# DELETE PRODUCT IMAGE
+# DELETE PRODUCT IMAGE (ADMIN)
 # -------------------------------
 class DeleteProductImage(APIView):
     authentication_classes = [AdminJWTAuthentication]
@@ -106,7 +115,7 @@ class DeleteProductImage(APIView):
 
 
 # -------------------------------
-# CREATE PRODUCT
+# CREATE PRODUCT (ADMIN)
 # -------------------------------
 class ProductCreateView(APIView):
     authentication_classes = [AdminJWTAuthentication]
@@ -129,7 +138,7 @@ class ProductCreateView(APIView):
 
 
 # -------------------------------
-# UPDATE / DELETE PRODUCT
+# UPDATE / DELETE PRODUCT (ADMIN)
 # -------------------------------
 class ProductUpdateDeleteView(APIView):
     authentication_classes = [AdminJWTAuthentication]
@@ -159,7 +168,7 @@ class ProductUpdateDeleteView(APIView):
         deleted_image_ids = request.data.get("deleted_image_ids", [])
         new_main_image_id = request.data.get("main_image_id", None)
 
-        # حذف عکس‌ها
+        # حذف تصاویر
         if deleted_image_ids:
             for img_id in deleted_image_ids:
                 try:
@@ -170,14 +179,14 @@ class ProductUpdateDeleteView(APIView):
                 except ProductImages.DoesNotExist:
                     pass
 
-        # اضافه کردن عکس‌های جدید
+        # اضافه کردن تصاویر جدید به محصول
         if image_ids:
             existing_image_ids = list(product.images.values_list("id", flat=True))
             new_image_ids = [int(id) for id in image_ids if int(id) not in existing_image_ids]
             if new_image_ids:
                 ProductImages.objects.filter(id__in=new_image_ids).update(product_id=product)
 
-        # عکس اصلی
+        # مدیریت تصویر اصلی
         old_main_image = product.images.filter(is_main=True).first()
 
         if new_main_image_id:
@@ -215,9 +224,12 @@ class ProductUpdateDeleteView(APIView):
 
 
 # -------------------------------
-# PRODUCT SEARCH
+# PRODUCT SEARCH (PUBLIC)
 # -------------------------------
 class ProductSearchView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
     def get(self, request):
         q = request.GET.get("q", "").strip()
         category_id = request.GET.get("category_id", None)
@@ -245,7 +257,7 @@ class ProductSearchView(APIView):
 
 
 # -------------------------------
-#  CREATE VARIANT
+#  CREATE VARIANT (ADMIN)
 # -------------------------------
 class VariantCreateView(APIView):
     authentication_classes = [AdminJWTAuthentication]
@@ -269,7 +281,7 @@ class VariantCreateView(APIView):
 
 
 # -------------------------------
-#  UPDATE / DELETE VARIANT
+#  UPDATE / DELETE VARIANT (ADMIN)
 # -------------------------------
 class VariantUpdateDeleteView(APIView):
     authentication_classes = [AdminJWTAuthentication]
@@ -299,3 +311,15 @@ class VariantUpdateDeleteView(APIView):
         variant.delete()
 
         return Response({"message": "Variant deleted"}, status=200)
+
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def product_detail(request, product_id):
+    try:
+        product = Products.objects.get(id=product_id)
+    except Products.DoesNotExist:
+        return Response({"error": "Product not found"}, status=404)
+
+    serializer = ProductSerializer(product)
+    return Response(serializer.data, status=200)

@@ -40,9 +40,6 @@ function calcDiscountPercent(discountPercent) {
   return Math.min(95, Math.max(0, Math.round(percent)));
 }
 
-// ⚠️ چون بک‌اند برای بعضی محیط‌های هاست، MEDIA_URL را به‌صورت آدرس کامل
-// برمی‌گرداند و بعضی وقت‌ها فقط مسیر نسبی، این تابع هر دو حالت را درست
-// می‌سازد و از باگ «URL دوبار پیشوند خورده» یا «اسلش جا‌افتاده» جلوگیری می‌کند.
 function getMediaUrl(path) {
   if (!path) return null;
   if (/^https?:\/\//i.test(path)) return path;
@@ -53,27 +50,24 @@ function getMediaUrl(path) {
   return `${base}${rel}`;
 }
 
-// نگاشت چند رنگ رایج فارسی به کد رنگ، برای نمایش دایره‌ی رنگ در انتخابگر واریانت.
-// اگر رنگی در این لیست نبود، دایره با حالت نوترال (نقطه‌چین) نمایش داده می‌شود
-// و نام رنگ همیشه به‌صورت متن هم زیرش نوشته می‌شود تا مبهم نماند.
 const COLOR_NAME_MAP = {
-  "مشکی": "#111827",
-  "سیاه": "#111827",
-  "سفید": "#f8fafc",
-  "آبی": "#2563eb",
-  "سرمه‌ای": "#1e3a8a",
-  "قرمز": "#ef4444",
-  "سبز": "#16a34a",
-  "زرد": "#facc15",
-  "طلایی": "#eab308",
-  "نقره‌ای": "#9ca3af",
-  "خاکستری": "#6b7280",
-  "بنفش": "#7c3aed",
-  "صورتی": "#ec4899",
-  "نارنجی": "#f97316",
-  "قهوه‌ای": "#78350f",
-  "کرمی": "#fef3c7",
-  "یاقوتی": "#9f1239",
+  مشکی: "#111827",
+  سیاه: "#111827",
+  سفید: "#f8fafc",
+  آبی: "#2563eb",
+  سرمه‌ای: "#1e3a8a",
+  قرمز: "#ef4444",
+  سبز: "#16a34a",
+  زرد: "#facc15",
+  طلایی: "#eab308",
+  نقره‌ای: "#9ca3af",
+  خاکستری: "#6b7280",
+  بنفش: "#7c3aed",
+  صورتی: "#ec4899",
+  نارنجی: "#f97316",
+  قهوه‌ای: "#78350f",
+  کرمی: "#fef3c7",
+  یاقوتی: "#9f1239",
 };
 
 function colorToHex(name) {
@@ -94,9 +88,6 @@ export default function Productdetail() {
   const [commentText, setCommentText] = useState("");
   const [commentRate, setCommentRate] = useState(5);
 
-  // ============================================================
-  // 🔥 انتخاب واریانت (رنگ / مدت زمان اشتراک)
-  // ============================================================
   const [selectedVariantId, setSelectedVariantId] = useState(null);
 
   const { addToCart, productbuy, setNotif } = useAuth();
@@ -107,7 +98,7 @@ export default function Productdetail() {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const response = await api.get(`/api/catalog/product/${id}/`);
+        const response = await api.get(`/api/catalog/product/detail/${id}/`);
         setProduct(response.data);
         setError(null);
       } catch (err) {
@@ -122,8 +113,6 @@ export default function Productdetail() {
     fetchProduct();
   }, [id]);
 
-  // وقتی محصول تغییر کرد (بارگذاری اولیه یا محصول جدید)، اولین واریانت فعال
-  // را به‌صورت پیش‌فرض انتخاب کن
   useEffect(() => {
     if (product?.variants && Array.isArray(product.variants)) {
       const firstActive = product.variants.find((v) => v?.is_active !== false);
@@ -161,18 +150,14 @@ export default function Productdetail() {
     return [];
   }, [product]);
 
-  // ============================================================
-  // 🔥 واریانت‌های فعال + تشخیص اینکه محصول رنگ دارد یا مدت‌زمان اشتراک
-  // ============================================================
   const activeVariants = useMemo(() => {
     if (!product?.variants || !Array.isArray(product.variants)) return [];
     return product.variants.filter((v) => v?.is_active !== false);
   }, [product]);
 
   const hasColorOptions = useMemo(
-    () =>
-      activeVariants.some((v) => v?.color && String(v.color).trim() !== ""),
-    [activeVariants]
+    () => activeVariants.some((v) => v?.color && String(v.color).trim() !== ""),
+    [activeVariants],
   );
 
   const hasDurationOptions = useMemo(
@@ -181,9 +166,9 @@ export default function Productdetail() {
         (v) =>
           v?.duration_months !== null &&
           v?.duration_months !== undefined &&
-          v?.duration_months !== ""
+          v?.duration_months !== "",
       ),
-    [activeVariants]
+    [activeVariants],
   );
 
   const hasVariants =
@@ -191,20 +176,15 @@ export default function Productdetail() {
 
   const selectedVariant = useMemo(
     () => activeVariants.find((v) => v.id === selectedVariantId) || null,
-    [activeVariants, selectedVariantId]
+    [activeVariants, selectedVariantId],
   );
 
-  // اگر واریانتی انتخاب شده، قیمت/موجودی/تخفیف از خود واریانت خوانده می‌شود،
-  // در غیر این صورت (محصول بدون واریانت) دقیقاً مثل قبل از خود محصول خوانده می‌شود
   const effectiveSellPrice = selectedVariant
     ? selectedVariant.price
     : product?.sell_price;
 
-  // ⚠️ فیلد discount روی واریانت فعلاً در بک‌اند (ProductVariant) وجود ندارد.
-  // تا وقتی این فیلد به مدل/سریالایزر اضافه نشود، این مقدار همیشه 0 خواهد بود
-  // و تخفیف فقط برای محصولات بدون واریانت اعمال می‌شود.
   const effectiveDiscount = selectedVariant
-    ? selectedVariant.discount ?? 0
+    ? (selectedVariant.discount ?? 0)
     : product?.discount;
 
   const effectiveQuantity = selectedVariant
@@ -213,7 +193,7 @@ export default function Productdetail() {
 
   const discountedPrice = useMemo(
     () => calcDiscountedPrice(effectiveSellPrice, effectiveDiscount),
-    [effectiveSellPrice, effectiveDiscount]
+    [effectiveSellPrice, effectiveDiscount],
   );
 
   const hasDiscount = useMemo(() => {
@@ -223,7 +203,7 @@ export default function Productdetail() {
 
   const discountPercent = useMemo(
     () => calcDiscountPercent(effectiveDiscount),
-    [effectiveDiscount]
+    [effectiveDiscount],
   );
 
   const stockCount = Number(effectiveQuantity ?? 0);
@@ -232,58 +212,101 @@ export default function Productdetail() {
   const isAdded = productbuy?.some(
     (p) =>
       (p.product_id || p.id) === product?.id &&
-      (p.variant_id ?? p.variantId ?? null) === (selectedVariant?.id ?? null)
+      (p.variant_id ?? p.variantId ?? null) === (selectedVariant?.id ?? null),
   );
 
   const handleAddToCart = async () => {
-    if (!product?.id) return;
+  if (!product?.id) return;
 
-    if (!inStock) {
-      setNotif({
-        id: Date.now(),
-        message: "این محصول موجود نیست",
-        type: "warning",
-      });
-      return;
-    }
+  if (!inStock) {
+    setNotif({
+      id: Date.now(),
+      message: "این محصول موجود نیست",
+      type: "warning",
+    });
+    return;
+  }
 
-    if (isAdded) {
-      setNotif({
-        id: Date.now(),
-        message: "این محصول قبلاً به سبد خرید اضافه شده است",
-        type: "warning",
-      });
-      return;
-    }
+  if (isAdded) {
+    setNotif({
+      id: Date.now(),
+      message: "این محصول قبلاً به سبد خرید اضافه شده است",
+      type: "warning",
+    });
+    return;
+  }
 
-    try {
-      // ⚠️ توجه: باید مطمئن شوی تابع addToCart در Context، فیلد variantId را
-      // هم به‌عنوان variant_id به endpoint سبد خرید (/api/orders/cart/add/)
-      // ارسال می‌کند، وگرنه محصول بدون واریانت به سبد اضافه خواهد شد.
-      await addToCart({
-        id: product.id,
-        variantId: selectedVariant?.id || null,
-        title: product.name,
-        price: discountedPrice ?? effectiveSellPrice,
-        image: galleryImages?.[0] || "",
-        description: product.descriptions,
-      });
+  try {
+    await addToCart({
+      id: product.id,
+      product_id: product.id,
 
-      setNotif({
-        id: Date.now(),
-        message: "محصول با موفقیت به سبد خرید اضافه شد",
-        type: "success",
-      });
-    } catch (err) {
-      console.error(err);
+      variant_id: selectedVariant?.id ?? null,
 
-      setNotif({
-        id: Date.now(),
-        message: "خطا در افزودن محصول",
-        type: "error",
-      });
-    }
-  };
+      name: product.name ?? "",
+      title: product.name ?? "",
+      description: product.descriptions ?? "",
+      more_description: product.more_description ?? "",
+
+      image: galleryImages?.[0] || "",
+
+      original_price:
+        selectedVariant?.price ??
+        product.sell_price ??
+        product.price ??
+        0,
+
+      price: discountedPrice ?? effectiveSellPrice ?? 0,
+
+      discount_percent:
+        selectedVariant?.discount ??
+        product.discount ??
+        0,
+
+      brand: product.brand ?? "",
+      category:
+        product.category?.title ??
+        product.category ??
+        "",
+
+      color: selectedVariant?.color ?? "",
+
+      condition: selectedVariant?.condition ?? "",
+
+      sku:
+        product.product_code ??
+        product.sku ??
+        "",
+
+      warranty: selectedVariant?.warranty ?? "",
+      warranty_months:
+        selectedVariant?.warranty_months ?? null,
+
+      duration_months:
+        selectedVariant?.duration_months ?? null,
+
+      quantity: Number(
+        selectedVariant?.quantity ??
+        product.quantity ??
+        0
+      ),
+    });
+
+    setNotif({
+      id: Date.now(),
+      message: "محصول با موفقیت به سبد خرید اضافه شد",
+      type: "success",
+    });
+  } catch (err) {
+    console.error(err);
+
+    setNotif({
+      id: Date.now(),
+      message: "خطا در افزودن محصول",
+      type: "error",
+    });
+  }
+};
 
   const handleSubmitComment = (e) => {
     e.preventDefault();
@@ -360,7 +383,6 @@ export default function Productdetail() {
             </div>
 
             <div className={styles.purchaseCard}>
-
               {hasVariants && (
                 <div className={styles.variantSection}>
                   {hasColorOptions && (
@@ -369,7 +391,7 @@ export default function Productdetail() {
                       <div className={styles.variantOptions}>
                         {activeVariants
                           .filter(
-                            (v) => v.color && String(v.color).trim() !== ""
+                            (v) => v.color && String(v.color).trim() !== "",
                           )
                           .map((v) => {
                             const hex = colorToHex(v.color);
@@ -414,7 +436,7 @@ export default function Productdetail() {
                             (v) =>
                               v.duration_months !== null &&
                               v.duration_months !== undefined &&
-                              v.duration_months !== ""
+                              v.duration_months !== "",
                           )
                           .map((v) => {
                             const isActive = v.id === selectedVariantId;
@@ -472,6 +494,28 @@ export default function Productdetail() {
                 )}
               </div>
 
+              {/* گارانتی - فقط وقتی واریانت انتخاب‌شده واقعاً گارانتی داره */}
+              {Number(selectedVariant?.warranty_months) > 0 && (
+                <div className={styles.warrantyLine}>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={styles.warrantyIcon}
+                  >
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
+                  <span>
+                    {toPersianDigits(selectedVariant.warranty_months)} ماه
+                    گارانتی
+                  </span>
+                </div>
+              )}
+
               <div className={styles.actionRow}>
                 <button
                   className={`${styles.primaryBtn} ${isAdded ? styles.primaryBtnGreen : ""}`}
@@ -499,7 +543,6 @@ export default function Productdetail() {
                 </button>
               </div>
 
-              {/* ✅ توضیحات بیشتر */}
               {product?.more_description && (
                 <div className={styles.moreDescriptionBox}>
                   <div

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from catalog.models import Products, ProductVariant   
 
 User = get_user_model()
 
@@ -21,7 +22,14 @@ class Orders(models.Model):
 
 class OrderItems(models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey("catalog.Products", on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    variant = models.ForeignKey(   
+        ProductVariant,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="order_items"
+    )
     quantity = models.IntegerField()
     price = models.IntegerField()
 
@@ -56,16 +64,25 @@ class Payments(models.Model):
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="cart")
-    product = models.ForeignKey("catalog.Products", on_delete=models.CASCADE)
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    variant = models.ForeignKey(   
+        ProductVariant,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="cart_items"
+    )
     quantity = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "cart"
         constraints = [
-            models.UniqueConstraint(fields=["user", "product"], name="unique_user_product_cart")
+            models.UniqueConstraint(
+                fields=["user", "product", "variant"],   
+                name="unique_user_product_variant_cart"
+            )
         ]
 
     def __str__(self):
         return f"Cart {self.id} - User {self.user_id}"
-    

@@ -76,41 +76,61 @@ export default function CheckoutFormPopup({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // اول در هر دو حالت فرم را اعتبارسنجی کن
+    const error = validateForm();
+
+    if (error) {
+      setNotif({
+        id: Date.now(),
+        message: error,
+        type: "error",
+      });
+
+      return;
+    }
+
+    // -----------------------------
+    // کاربر مهمان
+    // -----------------------------
     if (!isLoggedIn) {
       try {
         localStorage.setItem("pendingCheckoutForm", JSON.stringify(dataForm));
+
         await sendCode(dataForm.phone);
+
         setNotif({
           id: Date.now(),
           message: "کد تایید برای شما ارسال شد",
           type: "success",
         });
+
         setCode(true);
       } catch (err) {
         console.error(err);
+
         setNotif({
           id: Date.now(),
           message: "خطا در ارسال، لطفا دوباره امتحان کنید",
           type: "error",
         });
       }
-    } else {
-      const error = validateForm();
-      if (error) {
-        setNotif({ id: Date.now(), message: error, type: "error" });
-        return;
-      }
 
-      try {
-        await submitOrder(dataForm);
-      } catch (err) {
-        console.log(err);
-        setNotif({
-          id: Date.now(),
-          message: "خطا در ثبت سفارش",
-          type: "error",
-        });
-      }
+      return;
+    }
+
+    // -----------------------------
+    // کاربر لاگین شده
+    // -----------------------------
+    try {
+      await submitOrder(dataForm);
+    } catch (err) {
+      console.error(err);
+
+      setNotif({
+        id: Date.now(),
+        message: "خطا در ثبت سفارش",
+        type: "error",
+      });
     }
   };
 

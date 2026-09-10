@@ -1,13 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from authuser.models import User
 from .serializers import UserSerializer
-from .models import Users
+
 
 class UserView(APIView):
 
     def get(self, request):
-        users = Users.objects.all()
+        users = User.objects.all().order_by('-created_at')
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
@@ -16,11 +17,6 @@ class UserView(APIView):
         data.pop('password', None)
         data.pop('is_active', None)
         data.pop('is_staff', None)
-
-        if 'role' not in data or not data['role']:
-            data['role'] = 'customer'
-        if 'status' not in data or not data['status']:
-            data['status'] = 'active'
 
         serializer = UserSerializer(data=data)
         if serializer.is_valid():
@@ -36,8 +32,8 @@ class UserDetailView(APIView):
 
     def get(self, request, id):
         try:
-            user = Users.objects.get(id=id)
-        except Users.DoesNotExist:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
 
         serializer = UserSerializer(user)
@@ -45,8 +41,8 @@ class UserDetailView(APIView):
 
     def put(self, request, id):
         try:
-            user = Users.objects.get(id=id)
-        except Users.DoesNotExist:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
 
         data = request.data.copy()
@@ -62,8 +58,8 @@ class UserDetailView(APIView):
 
     def delete(self, request, id):
         try:
-            user = Users.objects.get(id=id)
-        except Users.DoesNotExist:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
 
         user.delete()

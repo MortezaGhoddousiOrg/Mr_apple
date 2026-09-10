@@ -7,7 +7,6 @@ import { useNotification } from "@/app/Context/NotificationContext";
 import DatePicker from "@/app/components/DatePicker";
 import RichTextEditor from "@/app/components/Richtexteditor";
 
-// ⚠️ همان راه‌حل مشترک باگ عکس: هم آدرس کامل و هم مسیر نسبی را درست می‌سازد
 function getMediaUrl(path) {
   if (!path) return null;
   if (/^https?:\/\//i.test(path)) return path;
@@ -16,6 +15,14 @@ function getMediaUrl(path) {
     : MEDIA_URL || "";
   const rel = path.startsWith("/") ? path : `/${path}`;
   return `${base}${rel}`;
+}
+
+// 🔥 بک‌اند حالا برای هر دو نوع (خبر/آموزش) به‌صورت کاملاً متقارن گالری
+// دارد: /education/admin/news-gallery/... و /education/admin/tutorial-gallery/...
+function galleryBasePath(type) {
+  return type === "news"
+    ? "/education/admin/news-gallery"
+    : "/education/admin/tutorial-gallery";
 }
 
 export default function AddEducation({
@@ -29,12 +36,6 @@ export default function AddEducation({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // ⚠️ همه‌ی state های زیر عمداً با lazy initializer (تابع داخل useState)
-  // مستقیم از initialData ساخته می‌شن، نه با یک useEffect که بعد از mount
-  // مقدار رو ست کنه. چون AddEducation هر بار که وارد حالت ویرایش می‌شی از
-  // نو mount میشه (توسط Education.jsx)، این مقدار همیشه از همون رندر اول
-  // درسته - و برخلاف افکت، برای RichTextEditor (که contentEditable است، نه
-  // input معمولی) قابل‌اعتماده.
   const [formData, setFormData] = useState(() => ({
     title: (isEdit && initialData?.title) || "",
     description: (isEdit && initialData?.description) || "",
@@ -46,8 +47,6 @@ export default function AddEducation({
   const [image, setImage] = useState(() => {
     if (isEdit && initialData?.image) {
       return {
-        // ⚠️ image_id در بک‌اند write_only است و توسط GET برگردانده
-        // نمی‌شود؛ پس اینجا همیشه null است مگر عکس تازه آپلود بشه.
         id: null,
         imagePath: initialData.image,
         preview: getMediaUrl(initialData.image),
@@ -58,10 +57,6 @@ export default function AddEducation({
     return null;
   });
 
-  // ============================================================
-  // 🔥 تصاویر گالری (بعد از تصویر اصلی نمایش داده می‌شوند)
-  // با endpoint جدید و مستقل از news_id، دقیقاً مثل تصویر اصلی آپلود می‌شوند
-  // ============================================================
   const [galleryImages, setGalleryImages] = useState(() => {
     if (isEdit && Array.isArray(initialData?.gallery)) {
       return initialData.gallery.map((g) => ({
@@ -75,9 +70,6 @@ export default function AddEducation({
     return [];
   });
 
-  // ============================================================
-  // 🔥 برچسب‌های سئو
-  // ============================================================
   const [tags, setTags] = useState(() =>
     isEdit && Array.isArray(initialData?.tags) ? initialData.tags : []
   );
@@ -85,13 +77,17 @@ export default function AddEducation({
 
   const stripHtml = (html) => (html || "").replace(/<[^>]*>/g, "").trim();
 
+  // نوع فعلی مقاله - در ویرایش همیشه از initialData (چون select غیرفعاله)
+  const currentType = isEdit ? initialData?.type : formData.type;
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
 
-    // اگر در حالت ایجاد، نوع مقاله از خبر به آموزش تغییر کرد، گالری معنا ندارد
-    if (name === "type" && value !== "news" && !isEdit) {
+    // اگر در حالت ایجاد نوع مقاله عوض شد، گالری قبلی (که مال endpoint نوع
+    // قبلی بود) دیگه معتبر نیست
+    if (name === "type" && !isEdit) {
       setGalleryImages([]);
     }
   };
@@ -172,18 +168,16 @@ export default function AddEducation({
   };
 
   // ============================================================
-  // 🔥 توابع مدیریت گالری - دقیقاً مثل تصویر اصلی، مستقل از وجود مقاله
-  // (نیازمند endpoint های جدید بک‌اند: آپلود و حذف مستقل از news_id)
+  // 🔥 گالری - حالا برای هر دو نوع (خبر/آموزش) کار می‌کند
   // ============================================================
 
   const uploadGalleryImage = async (file) => {
+    const base = galleryBasePath(currentType);
     const formDataImg = new FormData();
     formDataImg.append("file", file);
-    const response = await api.post(
-      "/education/admin/news-gallery/upload/",
-      formDataImg,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
+    const response = await api.post(`${base}/upload/`, formDataImg, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data.data;
   };
 
@@ -243,9 +237,9 @@ export default function AddEducation({
     const img = galleryImages[index];
 
     if (img.id) {
-      // این عکس قبلاً روی سرور ذخیره شده - واقعاً حذفش می‌کنیم
       try {
-        await api.delete(`/education/admin/news-gallery/${img.id}/`);
+        const base = galleryBasePath(currentType);
+        await api.delete(`${base}/${img.id}/`);
         setNotif({
           id: Date.now(),
           message: "تصویر گالری حذف شد",
@@ -267,7 +261,7 @@ export default function AddEducation({
   };
 
   // ============================================================
-  // 🔥 توابع مدیریت برچسب‌ها (تگ‌های سئو)
+  // 🔥 برچسب‌های سئو
   // ============================================================
 
   const addTag = () => {
@@ -311,7 +305,7 @@ export default function AddEducation({
     setLoading(true);
 
     try {
-      // آی‌دی گالری‌هایی که آپلود شده‌اند (چه قبلاً موجود بوده‌اند چه همین حالا)
+      // حالا برای هر دو نوع مقاله ارسال می‌شود، چون بک‌اند از هر دو پشتیبانی می‌کنه
       const galleryIds = galleryImages.filter((g) => g.id).map((g) => g.id);
 
       const articleData = {
@@ -319,22 +313,11 @@ export default function AddEducation({
         description: formData.description,
         publish_date: formData.publish_date,
         tags: tags,
+        gallery_ids: galleryIds,
       };
 
-      // ⚠️ نکته مهم: image_id در بک‌اند write_only و غیر nullable است، و
-      // چون GET هیچ‌وقت image_id را برنمی‌گرداند، در حالت ویرایش (بدون
-      // آپلود عکس تازه) این مقدار همیشه null می‌ماند. اگر null را صراحتاً
-      // بفرستیم، کل درخواست ویرایش با خطای اعتبارسنجی رد می‌شود. پس فقط
-      // وقتی واقعاً id معتبر داریم (عکس تازه آپلود شده) آن را می‌فرستیم؛
-      // در غیر این صورت اصلاً این کلید را نمی‌فرستیم تا عکس فعلی دست‌نخورده بماند.
       if (image?.id) {
         articleData.image_id = image.id;
-      }
-
-      // ⚠️ نیازمند پشتیبانی سریالایزر News از gallery_ids برای اتصال عکس‌های
-      // گالری‌ای که مستقل از مقاله آپلود شدند (جزئیات در پاسخ متنی)
-      if (formData.type === "news" || initialData?.type === "news") {
-        articleData.gallery_ids = galleryIds;
       }
 
       if (isEdit && initialData?.id) {
@@ -421,10 +404,8 @@ export default function AddEducation({
           بازگشت
         </button>
       </div>
-
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
-          {/* نوع مقاله */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               نوع مقاله <span className="text-red-500">*</span>
@@ -441,7 +422,6 @@ export default function AddEducation({
             </select>
           </div>
 
-          {/* عنوان - با ابزار متن غنی + پیش‌نمایش زنده */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               عنوان <span className="text-red-500">*</span>
@@ -471,7 +451,6 @@ export default function AddEducation({
             )}
           </div>
 
-          {/* توضیحات - با ابزار متن غنی + پیش‌نمایش زنده */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               توضیحات <span className="text-red-500">*</span>
@@ -502,7 +481,6 @@ export default function AddEducation({
             )}
           </div>
 
-          {/* تاریخ */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               تاریخ انتشار <span className="text-red-500">*</span>
@@ -517,7 +495,6 @@ export default function AddEducation({
             )}
           </div>
 
-          {/* برچسب‌های سئو */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               برچسب‌ها (هشتگ‌های سئو)
@@ -565,7 +542,6 @@ export default function AddEducation({
             </div>
           </div>
 
-          {/* تصویر اصلی */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
             <h2 className="text-lg font-semibold text-gray-900 pb-2 border-b border-gray-100">
               تصویر اصلی{" "}
@@ -624,73 +600,64 @@ export default function AddEducation({
             </div>
           </div>
 
-          {/* تصاویر گالری - فقط برای خبر (طبق بک‌اند فعلی)، آپلود مستقیم مثل عکس اصلی */}
-          {(formData.type === "news" || initialData?.type === "news") && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
-              <h2 className="text-lg font-semibold text-gray-900 pb-2 border-b border-gray-100">
-                تصاویر گالری
-                <span className="text-gray-400 text-xs font-normal mr-2">
-                  (بعد از تصویر اصلی نمایش داده می‌شوند)
-                </span>
-              </h2>
+          {/* تصاویر گالری - حالا برای هر دو نوع (خبر/آموزش) */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+            <h2 className="text-lg font-semibold text-gray-900 pb-2 border-b border-gray-100">
+              تصاویر گالری
+              <span className="text-gray-400 text-xs font-normal mr-2">
+                (بعد از تصویر اصلی نمایش داده می‌شوند)
+              </span>
+            </h2>
 
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={selectGalleryImages}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              />
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={selectGalleryImages}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-900 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
 
-              <div className="space-y-3">
-                {galleryImages.map((img, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"
-                  >
-                    <div className="relative w-20 h-20">
-                      <Image
-                        src={img.preview}
-                        alt={`گالری ${index + 1}`}
-                        width={80}
-                        height={80}
-                        className="rounded-lg object-cover"
-                        unoptimized={true}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <StatusBadge
-                        status={img.isExisting ? "success" : img.status}
-                      />
-                    </div>
-                    {img.status === "pending" && !img.isExisting && (
-                      <button
-                        type="button"
-                        onClick={() => handleGalleryImageUpload(index)}
-                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium text-sm transition"
-                      >
-                        آپلود
-                      </button>
-                    )}
+            <div className="space-y-3">
+              {galleryImages.map((img, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"
+                >
+                  <div className="relative w-20 h-20">
+                    <Image
+                      src={img.preview}
+                      alt={`گالری ${index + 1}`}
+                      width={80}
+                      height={80}
+                      className="rounded-lg object-cover"
+                      unoptimized={true}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <StatusBadge
+                      status={img.isExisting ? "success" : img.status}
+                    />
+                  </div>
+                  {img.status === "pending" && !img.isExisting && (
                     <button
                       type="button"
-                      onClick={() => removeGalleryImage(index)}
-                      className="text-red-500 hover:text-red-700"
+                      onClick={() => handleGalleryImageUpload(index)}
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium text-sm transition"
                     >
-                      حذف
+                      آپلود
                     </button>
-                  </div>
-                ))}
-              </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryImage(index)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    حذف
+                  </button>
+                </div>
+              ))}
             </div>
-          )}
-
-          {formData.type === "tutorial" && (
-            <p className="text-xs text-gray-400 bg-gray-50 rounded-lg px-3 py-2">
-              گالری تصاویر برای «آموزش‌ها» هنوز در بک‌اند پیاده‌سازی نشده
-              است.
-            </p>
-          )}
+          </div>
 
           {errors.submit && (
             <div className="bg-red-50 text-red-600 p-3 rounded-xl text-center whitespace-pre-wrap text-sm">

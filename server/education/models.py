@@ -81,9 +81,14 @@ class NewsGallery(models.Model):
         return f"Gallery Image {self.id} (unattached)"
 
 class TutorialGallery(models.Model):
+    # 🔥 tutorial می‌تواند موقتاً null باشد: تصویر گالری اول به‌صورت مستقل
+    # آپلود می‌شود (دقیقاً مثل NewsGallery.news) و سپس هنگام ساخت/ویرایش
+    # آموزش، به آن آموزش متصل (attach) می‌شود.
     tutorial = models.ForeignKey(
         Tutorial,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
         related_name="gallery"
     )
     image = models.ImageField(upload_to="education/tutorial/gallery/")

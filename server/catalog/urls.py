@@ -11,6 +11,7 @@ from .views import (
     ProductUpdateDeleteView,
     VariantCreateView,
     VariantUpdateDeleteView,
+    product_detail,
 )
 
 urlpatterns = [
@@ -38,4 +39,7 @@ urlpatterns = [
     # VARIANTS
     path("product/<int:product_id>/variant/create/", VariantCreateView.as_view()),
     path("variant/<int:variant_id>/", VariantUpdateDeleteView.as_view()),
+    
+    #detail
+    path("product/detail/<int:product_id>/", product_detail),
 ]

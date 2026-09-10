@@ -61,9 +61,33 @@ export default function Category() {
       fetchCategories();
     } catch (err) {
       console.error(err);
+
+      // ⚠️ بک‌اند وقتی دسته‌بندی اصلی هنوز زیردسته دارد، حذف را با پیام
+      // مشخص "Cannot delete parent with existing child categories" رد
+      // می‌کند - این را تشخیص می‌دیم و یک پیام فارسی روشن نشون می‌دیم
+      // به‌جای پیام عمومی «خطا در حذف»
+      const backendError = err.response?.data?.error || "";
+
+      let message;
+      if (
+        deleteTarget.type === "parent" &&
+        backendError.toLowerCase().includes("existing child")
+      ) {
+        message =
+          "چون دسته‌بندی فرعی برای این دسته‌بندی وجود دارد، حذف امکان‌پذیر نیست";
+      } else if (
+        deleteTarget.type === "child" &&
+        backendError.toLowerCase().includes("existing products")
+      ) {
+        message =
+          "چون محصولی در این دسته‌بندی فرعی وجود دارد، حذف امکان‌پذیر نیست";
+      } else {
+        message = `خطا در حذف ${deleteTarget.type === "parent" ? "دسته‌بندی اصلی" : "دسته‌بندی فرعی"}`;
+      }
+
       setNotif({
         id: Date.now(),
-        message: `خطا در حذف ${deleteTarget.type === "parent" ? "دسته‌بندی اصلی" : "دسته‌بندی فرعی"}`,
+        message,
         type: "error",
       });
     } finally {

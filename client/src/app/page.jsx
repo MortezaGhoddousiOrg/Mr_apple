@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-// import Header from "@/app/Components/Header/Header";
 import Content from "@/app/Components/Content/Content";
 import Dashboard from "@/app/Components/Dashboard/Dashboard";
 import InfoSection from "./Components/InfoSection/InfoSection";
@@ -9,9 +7,6 @@ import Service from "@/app/Components/Service/Service";
 import ServiceSpecial from "@/app/Components/ServiceSpecial/ServiceSpecial";
 import { api } from "./config";
 import { MEDIA_URL } from "@/app/config";
-// import Footer from "./Components/Footer/Footer";
-// import style from "@/"
-// import { useRouter } from "next/router";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import FeaturedProduct from "./Components/FeaturedProducts/FeaturedProducts";
@@ -47,8 +42,7 @@ export default function Home() {
     description: item.descriptions,
     price: item.sell_price,
     status: item.status,
-
-    
+    discount: item.discount,
   }));
 
   return (

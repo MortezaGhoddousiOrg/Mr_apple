@@ -3,12 +3,18 @@ from .models import Products, ProductImages, ProductVariant
 from category.serializers import CategoryChildSerializer
 
 
+# -------------------------------
+# PRODUCT IMAGE SERIALIZER
+# -------------------------------
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImages
         fields = "__all__"
 
 
+# -------------------------------
+# PRODUCT VARIANT SERIALIZER
+# -------------------------------
 class ProductVariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
@@ -25,7 +31,25 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             "is_active",
         ]
 
+    def validate_price(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Price cannot be negative")
+        return value
 
+    def validate_quantity(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Quantity cannot be negative")
+        return value
+
+    def validate_discount(self, value):
+        if value < 0 or value > 100:
+            raise serializers.ValidationError("Discount must be between 0 and 100")
+        return value
+
+
+# -------------------------------
+# PRODUCT SERIALIZER
+# -------------------------------
 class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     variants = ProductVariantSerializer(many=True, read_only=True)
@@ -58,12 +82,18 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Products
         fields = "__all__"
 
+    # -------------------------------
+    # VALIDATION
+    # -------------------------------
     def validate_category_id(self, value):
         from category.models import CategoryChild
         if value and not CategoryChild.objects.filter(id=value).exists():
             raise serializers.ValidationError("Invalid category_id")
         return value
 
+    # -------------------------------
+    # CREATE PRODUCT
+    # -------------------------------
     def create(self, validated_data):
         validated_data.pop("image_ids", None)
         validated_data.pop("deleted_image_ids", None)
@@ -78,6 +108,9 @@ class ProductSerializer(serializers.ModelSerializer):
 
         return product
 
+    # -------------------------------
+    # UPDATE PRODUCT
+    # -------------------------------
     def update(self, instance, validated_data):
         validated_data.pop("image_ids", None)
         validated_data.pop("deleted_image_ids", None)

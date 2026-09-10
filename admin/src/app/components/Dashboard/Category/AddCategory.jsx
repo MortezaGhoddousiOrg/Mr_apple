@@ -81,7 +81,7 @@ export default function AddCategory({ onBack, refresh, editData }) {
           const formData = new FormData();
           formData.append("title", title);
           if (image) formData.append("image", image);
-          await api.post("/api/category/parent/", formData, {
+          await api.post("/api/category/admin/parent/", formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
         } else {
@@ -89,7 +89,7 @@ export default function AddCategory({ onBack, refresh, editData }) {
           formData.append("title", title);
           formData.append("parent_id", parseInt(parentId));
           if (image) formData.append("image", image);
-          await api.post("/api/category/child/", formData, {
+          await api.post("/api/category/admin/child/", formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
         }

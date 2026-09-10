@@ -19,6 +19,13 @@ from .views import (
     # 🔥 UPLOAD / DELETE GALLERY IMAGE (decoupled, no news_id needed yet)
     UploadNewsGalleryImage,
     DeleteNewsGalleryImage,
+
+    # UPLOAD GALLERY IMAGE (attached directly to an existing tutorial_id)
+    TutorialGalleryUploadView,
+
+    # 🔥 UPLOAD / DELETE GALLERY IMAGE (decoupled, no tutorial_id needed yet)
+    UploadTutorialGalleryImage,
+    DeleteTutorialGalleryImage,
 )
 
 urlpatterns = [
@@ -55,4 +62,15 @@ urlpatterns = [
     # -----------------------------
     path("admin/news-gallery/upload/", UploadNewsGalleryImage.as_view()),
     path("admin/news-gallery/<int:image_id>/", DeleteNewsGalleryImage.as_view()),
+
+    # -----------------------------
+    # UPLOAD GALLERY IMAGE (attached to an existing tutorial item)
+    # -----------------------------
+    path("admin/tutorials/<int:tutorial_id>/gallery/upload/", TutorialGalleryUploadView.as_view()),
+
+    # -----------------------------
+    # 🔥 UPLOAD / DELETE GALLERY IMAGE (decoupled - like the main image)
+    # -----------------------------
+    path("admin/tutorial-gallery/upload/", UploadTutorialGalleryImage.as_view()),
+    path("admin/tutorial-gallery/<int:image_id>/", DeleteTutorialGalleryImage.as_view()),
 ]

@@ -1,8 +1,7 @@
-// Imagedetail.jsx
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import styles from "./Imagedetail.module.css";
 
@@ -26,6 +25,13 @@ export default function Imagedetail({
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+
+  // ✅ فقط بعد از mount شدن روی کلاینت true می‌شه - برای اینکه بشه با
+  // خیال راحت به document.body پورتال زد (روی سرور document وجود نداره)
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -79,8 +85,76 @@ export default function Imagedetail({
     setSelectedIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1));
   };
 
-  const openLightbox = () => setIsOpen(true);
+  const openLightbox = (e) => {
+    if (e) e.stopPropagation();
+    setIsOpen(true);
+  };
   const closeLightbox = () => setIsOpen(false);
+
+  // ⚠️ لایت‌باکس دیگر مستقیم داخل galleryShell رندر نمی‌شود؛ چون
+  // position:fixed این المان اگر داخل یک والد با transform قرار بگیرد
+  // (مثلاً هاور کارت تصویر که transform:translateY داره) دیگه نسبت به کل
+  // صفحه fix نمی‌مونه و رفتار عجیب/فلیکر می‌ده. با پورتال، مستقیم زیر
+  // document.body رندر می‌شه و کاملاً مستقل از هر والدیه.
+  const lightboxNode =
+    isOpen && mounted ? (
+      <div className={styles.lightbox} onClick={closeLightbox}>
+        <button
+          type="button"
+          className={`${styles.lightboxBtn} ${styles.closeBtn}`}
+          onClick={closeLightbox}
+          aria-label="بستن"
+        >
+          ×
+        </button>
+
+        {gallery.length > 1 && (
+          <>
+            <button
+              type="button"
+              className={`${styles.lightboxBtn} ${styles.prevBtn}`}
+              onClick={goPrev}
+              aria-label="تصویر قبلی"
+            >
+              ›
+            </button>
+
+            <button
+              type="button"
+              className={`${styles.lightboxBtn} ${styles.nextBtn}`}
+              onClick={goNext}
+              aria-label="تصویر بعدی"
+            >
+              ‹
+            </button>
+          </>
+        )}
+
+        <div
+          className={styles.lightboxContent}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className={styles.lightboxImageWrapper}>
+            <Image
+              loader={customLoader}
+              src={currentImage}
+              alt="fullscreen-product"
+              width={1200}
+              height={1200}
+              className={styles.lightboxImage}
+              priority
+              quality={95}
+              draggable={false}
+              style={{
+                objectFit: "contain",
+                maxWidth: "90vw",
+                maxHeight: "90vh",
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    ) : null;
 
   return (
     <>
@@ -142,64 +216,9 @@ export default function Imagedetail({
         )}
       </div>
 
-      {isOpen && (
-        <div className={styles.lightbox} onClick={closeLightbox}>
-          <button
-            type="button"
-            className={`${styles.lightboxBtn} ${styles.closeBtn}`}
-            onClick={closeLightbox}
-            aria-label="بستن"
-          >
-            ×
-          </button>
-
-          {gallery.length > 1 && (
-            <>
-              <button
-                type="button"
-                className={`${styles.lightboxBtn} ${styles.prevBtn}`}
-                onClick={goPrev}
-                aria-label="تصویر قبلی"
-              >
-                ›
-              </button>
-
-              <button
-                type="button"
-                className={`${styles.lightboxBtn} ${styles.nextBtn}`}
-                onClick={goNext}
-                aria-label="تصویر بعدی"
-              >
-                ‹
-              </button>
-            </>
-          )}
-
-          <div
-            className={styles.lightboxContent}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={styles.lightboxImageWrapper}>
-              <Image
-                loader={customLoader}
-                src={currentImage}
-                alt="fullscreen-product"
-                width={1200}
-                height={1200}
-                className={styles.lightboxImage}
-                priority
-                quality={95}
-                draggable={false}
-                style={{
-                  objectFit: "contain",
-                  maxWidth: "90vw",
-                  maxHeight: "90vh",
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {mounted && lightboxNode
+        ? createPortal(lightboxNode, document.body)
+        : null}
     </>
   );
 }

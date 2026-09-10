@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import styles from "@/app/Components/Service/Service.module.css";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/Context/Context";
 import Image from "next/image";
 
 export default function Service({ data = [], title, button, onMoreClick }) {
@@ -13,7 +12,6 @@ export default function Service({ data = [], title, button, onMoreClick }) {
   const touchEndX = useRef(0);
   const gap = 20;
 
-  const { addToCart, productbuy, setNotif } = useAuth();
 
   const Active = React.useMemo(
     () =>
@@ -75,34 +73,6 @@ export default function Service({ data = [], title, button, onMoreClick }) {
 
   const translateValue = `translateX(calc(${index * (100 / visibleCards)}% + ${index * (gap / visibleCards)}px))`;
 
-  const isInCart = (id) =>
-    productbuy?.some((p) => (p.product_id || p.id) === id);
-
-  const handleAddToCart = async (item) => {
-    if (isInCart(item.id)) {
-      setNotif({
-        id: Date.now(),
-        message: "این محصول قبلاً به سبد خرید اضافه شده است",
-        type: "warning",
-      });
-      return;
-    }
-    try {
-      await addToCart(item);
-      setNotif({
-        id: Date.now(),
-        message: "محصول با موفقیت به سبد خرید اضافه شد",
-        type: "success",
-      });
-    } catch {
-      setNotif({
-        id: Date.now(),
-        message: "خطا در افزودن محصول",
-        type: "error",
-      });
-    }
-  };
-
   if (Active.length === 0) {
     return (
       <div className={styles.box}>
@@ -157,8 +127,6 @@ export default function Service({ data = [], title, button, onMoreClick }) {
             }}
           >
             {Active.map((item) => {
-              const added = isInCart(item.id);
-
               const hasDiscount = Number(item.discount) > 0;
 
               const finalPrice = hasDiscount
@@ -170,7 +138,9 @@ export default function Service({ data = [], title, button, onMoreClick }) {
                   className={styles.serviceCard}
                   key={item.id}
                   style={{
-                    flex: `0 0 calc(${100 / visibleCards}% - ${(gap * (visibleCards - 1)) / visibleCards}px)`,
+                    flex: `0 0 calc(${100 / visibleCards}% - ${
+                      (gap * (visibleCards - 1)) / visibleCards
+                    }px)`,
                   }}
                 >
                   {hasDiscount && (
@@ -178,6 +148,7 @@ export default function Service({ data = [], title, button, onMoreClick }) {
                       {Number(item.discount)}٪ تخفیف
                     </div>
                   )}
+
                   <Image
                     unoptimized
                     className={styles.serviceImage}
@@ -187,10 +158,13 @@ export default function Service({ data = [], title, button, onMoreClick }) {
                     height={180}
                     onClick={() => router.push(`/ProductDetail/${item.id}`)}
                   />
+
                   <p className={styles.serviceTitle}>{item.title}</p>
+
                   <h2 className={styles.serviceDescription}>
                     {item.description}
                   </h2>
+
                   <div className={styles.servicePrice}>
                     {hasDiscount && (
                       <span className={styles.oldPrice}>
@@ -202,26 +176,12 @@ export default function Service({ data = [], title, button, onMoreClick }) {
                       {finalPrice.toLocaleString("fa-IR")} تومان
                     </span>
                   </div>
+
                   <button
-                    className={`${styles.serviceBtn} ${added ? styles.serviceBtnGreen : ""}`}
-                    onClick={() => handleAddToCart(item)}
+                    className={styles.serviceBtn}
+                    onClick={() => router.push(`/ProductDetail/${item.id}`)}
                   >
-                    {added ? (
-                      <>
-                        به سبد خرید اضافه شد
-                        <svg
-                          className={styles.svg}
-                          viewBox="0 0 24 24"
-                          fill="white"
-                          width="16"
-                          height="16"
-                        >
-                          <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
-                        </svg>
-                      </>
-                    ) : (
-                      "افزودن به سبد خرید"
-                    )}
+                    مشاهده محصول
                   </button>
                 </div>
               );

@@ -4,7 +4,11 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from django.db import transaction
 from django.utils import timezone
 from django.conf import settings
+from django.shortcuts import get_object_or_404, redirect
 import requests
+import httpx
+import ssl
+import urllib3
 
 from authuser.authentication import AdminJWTAuthentication, UserJWTAuthentication
 from .models import Orders, OrderItems, Payments, Cart
@@ -12,19 +16,16 @@ from .serializers import (
     OrderSerializer,
     OrderItemSerializer,
     PaymentSerializer,
-    CartSerializer
+    CartSerializer,
 )
-from catalog.models import Products, ProductVariant  # ✅ اضافه شد
-from django.contrib.auth import get_user_model
-from django.shortcuts import redirect
+from catalog.models import Products, ProductVariant
 
-import httpx
-import ssl
-import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-# CART
+# -------------------------------
+# CART VIEW
+# -------------------------------
 
 class CartView(APIView):
     authentication_classes = [UserJWTAuthentication]
@@ -32,7 +33,12 @@ class CartView(APIView):
 
     def get(self, request):
         user = request.user
-        cart_items = Cart.objects.select_related("product", "variant").filter(user=user)
+        cart_items = Cart.objects.select_related(
+            "product",
+            "variant",
+            "product__category_id",
+            "product__category_id__parent",
+        ).prefetch_related("product__images")
 
         items_data = []
         total_amount = 0
@@ -40,32 +46,94 @@ class CartView(APIView):
 
         for item in cart_items:
             product = item.product
-            variant = getattr(item, "variant", None)
+            variant = item.variant
 
-            # ✅ اگر Variant هست، قیمت از Variant؛ اگر نه، از محصول
-            unit_price = variant.price if variant else product.sell_price
-            item_total = unit_price * item.quantity
+            # دسته‌بندی
+            category_obj = getattr(product, "category_id", None)
+            category_title = category_obj.title if category_obj else None
+            brand_title = (
+                category_obj.parent.title
+                if category_obj and category_obj.parent
+                else None
+            )
 
-            items_data.append({
-                "product_id": product.id,
-                "variant_id": variant.id if variant else None,
-                "name": product.name,
-                "price": unit_price,
-                "cart_quantity": item.quantity,
-                "quantity": variant.quantity if variant else product.quantity,
-                "total_price": item_total,
-                "image": product.images.first().image.url if product.images.exists() else None
-            })
+            # تصویر
+            main_image = product.images.filter(is_main=True).first()
+            if not main_image:
+                main_image = product.images.first()
 
-            total_amount += item_total
-            total_quantity += item.quantity
+            image_url = (
+                main_image.image.url if main_image and main_image.image else None
+            )
 
-        return Response({
-            "items": items_data,
-            "total_amount": total_amount,
-            "total_quantity": total_quantity
-        })
+            # قیمت و تخفیف
+            if variant:
+                original_price = int(variant.price or 0)
+                discount_percent = float(variant.discount or 0)
+            else:
+                original_price = int(product.sell_price or 0)
+                discount_percent = float(product.discount or 0)
 
+            if discount_percent > 0:
+                price = int(original_price * (100 - discount_percent) / 100)
+            else:
+                price = original_price
+
+            cart_quantity = item.quantity
+            total_price = price * cart_quantity
+
+            # موجودی
+            inventory_quantity = variant.quantity if variant else product.quantity
+
+            items_data.append(
+                {
+                    "product_id": product.id,
+                    "variant_id": variant.id if variant else None,
+                    "name": product.name,
+                    "image": image_url,
+                    "original_price": original_price,
+                    "discount_percent": discount_percent,
+                    "price": price,
+                    "cart_quantity": cart_quantity,
+                    "quantity": inventory_quantity,
+                    "total_price": total_price,
+                    "description": product.descriptions,
+                    "more_description": product.more_description,
+                    "sku": product.product_code,
+                    "brand": brand_title,
+                    "category": category_title,
+                    "color": (getattr(variant, "color", None) if variant else None),
+                    "duration_months": (
+                        getattr(variant, "duration_months", None) if variant else None
+                    ),
+                    "condition": (
+                        getattr(variant, "condition", None) if variant else None
+                    ),
+                    "warranty": (
+                        getattr(variant, "warranty", None) if variant else None
+                    ),
+                    "warranty_months": (
+                        getattr(variant, "warranty_months", None) if variant else None
+                    ),
+                }
+            )
+
+            total_amount += total_price
+            total_quantity += cart_quantity
+
+        return Response(
+            {
+                "items": items_data,
+                "total_amount": total_amount,
+                "total_quantity": total_quantity,
+            },
+            status=200,
+        )
+
+
+# -------------------------------
+# ADD TO CART
+# -------------------------------
 
 class AddToCart(APIView):
     authentication_classes = [UserJWTAuthentication]
@@ -74,7 +142,6 @@ class AddToCart(APIView):
     def post(self, request):
         user = request.user
 
-        # product_id
         product_id = request.data.get("product_id")
         if not product_id:
             return Response({"error": "product_id is required"}, status=400)
@@ -84,10 +151,9 @@ class AddToCart(APIView):
         except Products.DoesNotExist:
             return Response({"error": "Product not found"}, status=404)
 
-        # quantity
         try:
             quantity = int(request.data.get("quantity", 1))
-        except:
+        except Exception:
             return Response({"error": "Invalid quantity"}, status=400)
 
         if quantity <= 0:
@@ -96,13 +162,16 @@ class AddToCart(APIView):
         if product.status != "active":
             return Response({"error": "Product is inactive"}, status=400)
 
-        # ✅ variant_id (اختیاری)
         variant_id = request.data.get("variant_id")
         variant = None
 
         if variant_id:
             try:
-                variant = ProductVariant.objects.get(id=variant_id, product=product, is_active=True)
+                variant = ProductVariant.objects.get(
+                    id=variant_id,
+                    product=product,
+                    is_active=True,
+                )
             except ProductVariant.DoesNotExist:
                 return Response({"error": "Variant not found"}, status=404)
 
@@ -112,11 +181,18 @@ class AddToCart(APIView):
             if product.quantity < quantity:
                 return Response({"error": "Insufficient inventory"}, status=400)
 
-        # ✅ اگر variant هست، cart بر اساس product + variant؛ اگر نه، فقط product
         if variant:
-            cart_item = Cart.objects.filter(user=user, product=product, variant=variant).first()
+            cart_item = Cart.objects.filter(
+                user=user,
+                product=product,
+                variant=variant,
+            ).first()
         else:
-            cart_item = Cart.objects.filter(user=user, product=product, variant__isnull=True).first()
+            cart_item = Cart.objects.filter(
+                user=user,
+                product=product,
+                variant__isnull=True,
+            ).first()
 
         if cart_item:
             new_quantity = cart_item.quantity + quantity
@@ -135,11 +211,15 @@ class AddToCart(APIView):
                 user=user,
                 product=product,
                 variant=variant,
-                quantity=quantity
+                quantity=quantity,
             )
 
         return Response({"message": "Added to cart"}, status=200)
 
+
+# -------------------------------
+# REMOVE FROM CART
+# -------------------------------
 
 class RemoveFromCart(APIView):
     authentication_classes = [UserJWTAuthentication]
@@ -148,7 +228,7 @@ class RemoveFromCart(APIView):
     def post(self, request):
         user = request.user
         product_id = request.data.get("product_id")
-        variant_id = request.data.get("variant_id")  # ✅ اختیاری
+        variant_id = request.data.get("variant_id")
 
         if not product_id:
             return Response({"error": "product_id is required"}, status=400)
@@ -157,6 +237,8 @@ class RemoveFromCart(APIView):
 
         if variant_id:
             qs = qs.filter(variant_id=variant_id)
+        else:
+            qs = qs.filter(variant__isnull=True)
 
         try:
             item = qs.get()
@@ -164,8 +246,13 @@ class RemoveFromCart(APIView):
             return Response({"error": "Item not found"}, status=404)
 
         item.delete()
+
         return Response({"message": "Removed from cart"}, status=200)
 
+
+# -------------------------------
+# UPDATE QUANTITY
+# -------------------------------
 
 class UpdateQuantity(APIView):
     authentication_classes = [UserJWTAuthentication]
@@ -174,7 +261,7 @@ class UpdateQuantity(APIView):
     def post(self, request):
         user = request.user
         product_id = request.data.get("product_id")
-        variant_id = request.data.get("variant_id")  # ✅ اختیاری
+        variant_id = request.data.get("variant_id")
         quantity = request.data.get("quantity")
 
         if not product_id or quantity is None:
@@ -182,22 +269,24 @@ class UpdateQuantity(APIView):
 
         try:
             quantity = int(quantity)
-        except:
+        except Exception:
             return Response({"error": "Invalid quantity"}, status=400)
 
         if quantity <= 0:
             return Response({"error": "Quantity must be greater than zero"}, status=400)
 
         qs = Cart.objects.filter(user=user, product_id=product_id)
+
         if variant_id:
             qs = qs.filter(variant_id=variant_id)
+        else:
+            qs = qs.filter(variant__isnull=True)
 
         try:
             item = qs.get()
         except Cart.DoesNotExist:
             return Response({"error": "Item not found"}, status=404)
 
-        # ✅ موجودی بر اساس variant یا product
         if item.variant:
             if quantity > item.variant.quantity:
                 return Response({"error": "Insufficient inventory for this variant"}, status=400)
@@ -211,7 +300,9 @@ class UpdateQuantity(APIView):
         return Response({"message": "Quantity updated"}, status=200)
 
 
+# -------------------------------
 # CREATE ORDER
+# -------------------------------
 
 class CreateOrder(APIView):
     authentication_classes = [UserJWTAuthentication]
@@ -235,48 +326,64 @@ class CreateOrder(APIView):
             if product.status != "active":
                 return Response({"error": f"{product.name} is inactive"}, status=400)
 
-            # ✅ موجودی بر اساس variant یا product
             if variant:
                 if item.quantity > variant.quantity:
                     return Response({"error": f"Insufficient inventory for {product.name} (variant)"}, status=400)
-                unit_price = variant.price
+
+                original_price = int(variant.price or 0)
+                discount_percent = float(variant.discount or 0)
             else:
                 if item.quantity > product.quantity:
                     return Response({"error": f"Insufficient inventory for {product.name}"}, status=400)
-                unit_price = product.sell_price
+
+                original_price = int(product.sell_price or 0)
+                discount_percent = float(product.discount or 0)
+
+            if discount_percent > 0:
+                unit_price = int(original_price * (100 - discount_percent) / 100)
+            else:
+                unit_price = original_price
 
             total_amount += unit_price * item.quantity
 
-        # DB transaction
         with transaction.atomic():
             order = Orders.objects.create(
                 user_id=user_id,
                 total_amount=total_amount,
                 status="failed",
-                product_status="failed"
+                product_status="failed",
             )
 
             for item in cart_items:
                 product = item.product
                 variant = item.variant
 
-                unit_price = variant.price if variant else product.sell_price
+                if variant:
+                    original_price = int(variant.price or 0)
+                    discount_percent = float(variant.discount or 0)
+                else:
+                    original_price = int(product.sell_price or 0)
+                    discount_percent = float(product.discount or 0)
+
+                if discount_percent > 0:
+                    unit_price = int(original_price * (100 - discount_percent) / 100)
+                else:
+                    unit_price = original_price
 
                 OrderItems.objects.create(
                     order_id=order.id,
                     product_id=product.id,
+                    variant=variant,
                     quantity=item.quantity,
-                    price=unit_price
-                    # ✅ اگر بعداً خواستی، می‌تونی فیلد variant_id هم به OrderItems اضافه کنی
+                    price=unit_price,
                 )
 
             payment = Payments.objects.create(
                 order_id=order.id,
                 gateway="Zarinpal",
-                status="failed"
+                status="failed",
             )
 
-        # Zarinpal request
         data = {
             "merchant_id": settings.ZARINPAL_MERCHANT_ID,
             "amount": int(total_amount * 10),
@@ -293,8 +400,9 @@ class CreateOrder(APIView):
                 resp = client.post(
                     "https://payment.zarinpal.com/pg/v4/payment/request.json",
                     json=data,
-                    timeout=15
+                    timeout=15,
                 )
+
             response = resp.json()
 
         except Exception as e:
@@ -302,27 +410,38 @@ class CreateOrder(APIView):
             payment.save()
             order.status = "failed"
             order.save()
-            return Response({"error": "Gateway unreachable", "details": str(e)}, status=502)
+
+            return Response(
+                {"error": "Gateway unreachable", "details": str(e)},
+                status=502,
+            )
 
         if response.get("data", {}).get("code") == 100:
             authority = response["data"]["authority"]
             payment.authority = authority
             payment.save()
 
-            return Response({
-                "payment_url": f"https://payment.zarinpal.com/pg/StartPay/{authority}",
-                "payment_id": payment.id
-            })
-        else:
-            payment.status = "failed"
-            payment.save()
-            order.status = "failed"
-            order.save()
             return Response(
-                {"error": "Payment gateway error", "details": response.get("errors")},
-                status=502
+                {
+                    "payment_url": f"https://payment.zarinpal.com/pg/StartPay/{authority}",
+                    "payment_id": payment.id,
+                }
             )
 
+        payment.status = "failed"
+        payment.save()
+        order.status = "failed"
+        order.save()
+
+        return Response(
+            {"error": "Payment gateway error", "details": response.get("errors")},
+            status=502,
+        )
+
+
+# -------------------------------
+# UPDATE PAYMENT
+# -------------------------------
 
 class UpdatePayment(APIView):
     permission_classes = [IsAuthenticated]
@@ -355,6 +474,10 @@ class UpdatePayment(APIView):
         return Response({"message": "Payment updated"})
 
 
+# -------------------------------
+# ZARINPAL VERIFY
+# -------------------------------
+
 class ZarinpalVerify(APIView):
     permission_classes = [AllowAny]
 
@@ -366,9 +489,7 @@ class ZarinpalVerify(APIView):
             return redirect("https://mr-apple.ir/Payment?status=false")
 
         try:
-            payment = Payments.objects.select_related("order", "order__user").get(
-                authority=authority
-            )
+            payment = Payments.objects.select_related("order", "order__user").get(authority=authority)
         except Payments.DoesNotExist:
             return redirect("https://mr-apple.ir/Payment?status=false")
 
@@ -391,7 +512,6 @@ class ZarinpalVerify(APIView):
             )
 
             response.raise_for_status()
-
             result = response.json()
 
         except requests.RequestException as e:
@@ -406,7 +526,6 @@ class ZarinpalVerify(APIView):
 
         data = result.get("data", {})
         errors = result.get("errors", {})
-
         code = data.get("code")
 
         if code == 100:
@@ -420,29 +539,43 @@ class ZarinpalVerify(APIView):
             order.paid_at = timezone.now()
             order.save()
 
+            # کم کردن موجودی
+            for item in order.items.select_related("product", "variant"):
+                if item.variant:
+                    if item.quantity <= item.variant.quantity:
+                        item.variant.quantity -= item.quantity
+                        item.variant.save()
+                else:
+                    if item.quantity <= item.product.quantity:
+                        item.product.quantity -= item.quantity
+                        item.product.save()
+
             Cart.objects.filter(user=order.user).delete()
 
             return redirect(
                 f"https://mr-apple.ir/Payment?status=true&ref_id={payment.ref_id}"
             )
 
-        elif code == 101:
+        if code == 101:
             return redirect(
                 f"https://mr-apple.ir/Payment?status=true&ref_id={payment.ref_id}"
             )
 
-        else:
-            print("Zarinpal Verify Error:", errors)
+        print("Zarinpal Verify Error:", errors)
 
-            payment.status = "failed"
-            payment.save(update_fields=["status"])
+        payment.status = "failed"
+        payment.save(update_fields=["status"])
 
-            error_code = errors.get("code", "unknown")
+        error_code = errors.get("code", "unknown")
 
-            return redirect(
-                f"https://mr-apple.ir/Payment?status=false&error={error_code}"
-            )
+        return redirect(
+            f"https://mr-apple.ir/Payment?status=false&error={error_code}"
+        )
 
+
+# -------------------------------
+# ADMIN ORDER LIST
+# -------------------------------
 
 class AdminOrderListView(APIView):
     authentication_classes = [AdminJWTAuthentication]
@@ -458,45 +591,47 @@ class AdminOrderListView(APIView):
             total_quantity = 0
 
             for item in order.items.all():
-                items.append({
-                    "product_id": item.product.id,
-                    "product_name": item.product.name,
-                    "product_code": item.product.product_code,
-                    "quantity": item.quantity,
-                    "price": item.price,
-                    "total_price": item.quantity * item.price
-                })
+                items.append(
+                    {
+                        "product_id": item.product.id,
+                        "variant_id": item.variant.id if item.variant else None,
+                        "product_name": item.product.name,
+                        "product_code": item.product.product_code,
+                        "quantity": item.quantity,
+                        "price": item.price,
+                        "total_price": item.quantity * item.price,
+                    }
+                )
                 total_quantity += item.quantity
 
-            data.append({
-                "id": order.id,
-                "order_number": f"ORD-{order.created_at.strftime('%Y%m%d')}-{order.id:04d}",
-                "user": {
-                    "id": order.user.id,
-                    "firstname": order.user.firstname,
-                    "lastname": order.user.lastname,
-                    "phone": order.user.phone,
-                    "email": order.user.email,
-                    "postal_code": order.user.postal_code,
-                    "address": order.user.address,
-                },
-                "items": items,
-                "total_amount": order.total_amount,
-                "total_quantity": total_quantity,
-                "status": order.status,
-                "product_status": order.product_status,
-                "payment_status": order.payments.last().status if order.payments.exists() else "failed",
-                "payment_method": "online",
-                "shipping_address": {
-                    "postal_code": getattr(order, "shipping_postal_code", None),
-                    "address": getattr(order, "shipping_address", None)
-                },
-                "notes": getattr(order, "notes", ""),
-                "created_at": order.created_at,
-                "paid_at": order.paid_at,
-                "shipped_at": getattr(order, "shipped_at", None),
-                "delivered_at": getattr(order, "delivered_at", None),
-            })
+            data.append(
+                {
+                    "id": order.id,
+                    "order_number": f"ORD-{order.created_at.strftime('%Y%m%d')}-{order.id:04d}",
+                    "user": {
+                        "id": order.user.id,
+                        "firstname": order.user.firstname,
+                        "lastname": order.user.lastname,
+                        "phone": order.user.phone,
+                        "email": order.user.email,
+                        "postal_code": order.user.postal_code,
+                        "address": order.user.address,
+                    },
+                    "items": items,
+                    "total_amount": order.total_amount,
+                    "total_quantity": total_quantity,
+                    "status": order.status,
+                    "product_status": order.product_status,
+                    "payment_status": (
+                        order.payments.last().status if order.payments.exists() else "failed"
+                    ),
+                    "payment_method": "online",
+                    "shipping_address": {
+                        "postal_code": getattr(order, "shipping_postal_code", None),
+                        "address": getattr(order, "shipping_address", None),
+                    },
+                }
+            )
 
         return Response(data, status=200)
 
@@ -505,39 +640,22 @@ class AdminOrderUpdateView(APIView):
     authentication_classes = [AdminJWTAuthentication]
     permission_classes = [IsAdminUser]
 
-    def put(self, request, order_id):
-        try:
-            order = Orders.objects.get(id=order_id)
-        except Orders.DoesNotExist:
-            return Response({"error": "Order not found"}, status=404)
+    def patch(self, request, order_id):
+        order = get_object_or_404(Orders, id=order_id)
 
-        status_value = request.data.get("status")
-        product_status = request.data.get("product_status")
-        payment_status = request.data.get("payment_status")
-        shipped_at = request.data.get("shipped_at")
-        delivered_at = request.data.get("delivered_at")
+        if "status" in request.data:
+            order.status = request.data["status"]
+        if "product_status" in request.data:
+            order.product_status = request.data["product_status"]
 
-        if status_value:
-            order.status = status_value
-
-        if product_status:
-            order.product_status = product_status
-
-        if payment_status:
-            payment = order.payments.last()
-            if payment:
-                payment.status = payment_status
-                payment.save()
-
-        if shipped_at:
-            order.shipped_at = shipped_at
-
-        if delivered_at:
-            order.delivered_at = delivered_at
+        if not {"status", "product_status"}.intersection(request.data):
+            return Response(
+                {"error": "status or product_status is required"},
+                status=400,
+            )
 
         order.save()
-
-        return Response({"message": "Order updated successfully"}, status=200)
+        return Response(OrderSerializer(order).data, status=200)
 
 
 class MyOrdersView(APIView):
@@ -545,36 +663,10 @@ class MyOrdersView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        user_id = user.id
-        orders = Orders.objects.filter(user_id=user_id).prefetch_related("items")
-
-        data = []
-
-        for order in orders:
-            items = []
-            for item in order.items.all():
-                items.append({
-                    "product_id": item.product.id,
-                    "product_name": item.product.name,
-                    "product_code": item.product.product_code,
-                    "quantity": item.quantity,
-                    "price": item.price,
-                    "total_price": item.quantity * item.price,
-                    "image": item.product.images.first().image.url if item.product.images.exists() else None
-                })
-
-            data.append({
-                "id": order.id,
-                "total_amount": order.total_amount,
-                "status": order.status,
-                "product_status": order.product_status,
-                "created_at": order.created_at,
-                "paid_at": order.paid_at,
-                "items": items
-            })
-
-        return Response(data, status=200)
+        orders = Orders.objects.filter(user=request.user).prefetch_related(
+            "items", "payments"
+        )
+        return Response(OrderSerializer(orders, many=True).data, status=200)
 
 
 class MyOrderDetailView(APIView):
@@ -582,32 +674,9 @@ class MyOrderDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, order_id):
-        user = request.user
-        user_id = user.id
-
-        try:
-            order = Orders.objects.get(id=order_id, user_id=user_id)
-        except Orders.DoesNotExist:
-            return Response({"error": "Order not found"}, status=404)
-
-        items = []
-        for item in order.items.all():
-            items.append({
-                "product_id": item.product.id,
-                "product_name": item.product.name,
-                "product_code": item.product.product_code,
-                "quantity": item.quantity,
-                "price": item.price,
-                "total_price": item.quantity * item.price,
-                "image": item.product.images.first().image.url if item.product.images.exists() else None
-            })
-
-        return Response({
-            "id": order.id,
-            "total_amount": order.total_amount,
-            "status": order.status,
-            "product_status": order.product_status,
-            "created_at": order.created_at,
-            "paid_at": order.paid_at,
-            "items": items
-        }, status=200)
+        order = get_object_or_404(
+            Orders.objects.prefetch_related("items", "payments"),
+            id=order_id,
+            user=request.user,
+        )
+        return Response(OrderSerializer(order).data, status=200)

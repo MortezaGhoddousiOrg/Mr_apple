@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import styles from "@/app/Components/ServiceSpecial/ServiceSpecial.module.css";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/Context/Context";
 import Image from "next/image";
 
 export default function ServiceSpecial({
@@ -21,42 +20,10 @@ export default function ServiceSpecial({
 
   const router = useRouter();
 
-  const { productbuy, addToCart, setNotif } = useAuth();
   const Active = data.filter(
-    (item) => item.status === "active" && item.category,
+    (item) =>
+      item.status === "active" && item.category && Number(item.discount) > 0,
   );
-
-  const isInCart = (id) => {
-    return productbuy?.some((p) => (p.product_id || p.id) === id);
-  };
-
-  const handleAddToCart = async (item) => {
-    if (isInCart(item.id)) {
-      setNotif({
-        id: Date.now(),
-        message: "این محصول قبلاً به سبد خرید اضافه شده است",
-        type: "warning",
-      });
-
-      return;
-    }
-
-    try {
-      await addToCart(item);
-
-      setNotif({
-        id: Date.now(),
-        message: "محصول با موفقیت به سبد خرید اضافه شد",
-        type: "success",
-      });
-    } catch (err) {
-      setNotif({
-        id: Date.now(),
-        message: "خطا در افزودن محصول",
-        type: "error",
-      });
-    }
-  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -156,8 +123,6 @@ export default function ServiceSpecial({
               }}
             >
               {Active.map((item) => {
-                const added = isInCart(item.id);
-
                 const hasDiscount = Number(item.discount) > 0;
 
                 const finalPrice = hasDiscount
@@ -179,6 +144,7 @@ export default function ServiceSpecial({
                         {Number(item.discount)}٪ تخفیف
                       </div>
                     )}
+
                     <Image
                       unoptimized
                       className={styles.serviceImage}
@@ -208,28 +174,10 @@ export default function ServiceSpecial({
                     </div>
 
                     <button
-                      className={`${styles.serviceBtn} ${
-                        added ? styles.serviceBtnGreen : ""
-                      }`}
-                      onClick={() => handleAddToCart(item)}
+                      className={styles.serviceBtn}
+                      onClick={() => router.push(`/ProductDetail/${item.id}`)}
                     >
-                      {added ? (
-                        <>
-                          به سبد خرید اضافه شد
-                          <svg
-                            className={styles.svg}
-                            viewBox="0 0 24 24"
-                            fill="white"
-                            width="18"
-                            height="18"
-                            style={{ marginLeft: "8px" }}
-                          >
-                            <path d="M20.656 2.993L10.007 13.642l-3.471-3.471a.995.995 0 0 0-1.403 1.403l4.173 4.173a.994.994 0 0 0 1.403 0l11.355-11.355a.995.995 0 0 0-1.403-1.403z" />
-                          </svg>
-                        </>
-                      ) : (
-                        "افزودن به سبد خرید"
-                      )}
+                      مشاهده محصول
                     </button>
                   </div>
                 );
