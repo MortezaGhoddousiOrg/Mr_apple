@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import style from "@/app/Components/Content/Content.module.css";
 
-const HERO_VIDEO = "/image-content/hero.mp4";
+const HERO_VIDEO = "/new-photos/VID_20261013_164817.mp4";
 const SMALL_HERO_VIDEO = "/image-content/smallHero.mp4";
 
 export default function Content() {

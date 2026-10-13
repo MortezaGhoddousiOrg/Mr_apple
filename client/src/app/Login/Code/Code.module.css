@@ -1,108 +1,317 @@
 .bodyCode {
   width: 100%;
-  min-height: auto;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  box-sizing: border-box;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
+
+  padding: 0;
+  margin: 0;
 }
 
 .boxContainer {
   width: 100%;
   max-width: 500px;
+  min-width: 0;
+  min-height: 0;
+  height: auto;
+  box-sizing: border-box;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 30px;
+  gap: 24px;
+
   margin: 0 auto;
 }
 
-.boxContainer h2 {
-  color: #ffffff; 
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0;
-  text-align: center;
-}
+.iconWrap {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
 
-.boxCodeContainer {
-  width: 100%;
   display: flex;
-  flex-direction: row-reverse;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+}
+
+.phoneIcon {
+  width: 28px;
+  height: 28px;
+  color: #fff;
+}
+
+.headingGroup {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.boxContainer h2 {
+  width: 100%;
+  margin: 0;
+
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.6;
+  text-align: center;
+
+  overflow-wrap: anywhere;
+}
+
+.description {
+  width: 100%;
+  max-width: 420px;
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 14px;
+  line-height: 1.9;
+  text-align: center;
+
+  overflow-wrap: anywhere;
+}
+
+.phoneRow {
+  width: 100%;
+  display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  direction: rtl;
+}
+
+.phoneNumber {
+  max-width: 100%;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  direction: ltr;
+  overflow-wrap: anywhere;
+}
+
+.editPhoneButton {
+  flex-shrink: 0;
+  padding: 5px 8px;
+
+  color: rgba(255, 255, 255, 0.8);
+  font-family: inherit;
+  font-size: 13px;
+
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.editPhoneButton:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* شش خانه کد، از چپ به راست */
+.boxCodeContainer {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 12px;
+
+  direction: ltr;
 }
 
 .boxCodeInput {
-  width: 60px;
+  width: 56px;
   height: 60px;
-  background: #f9fafb;
-  border: 1px solid #d1d5db; 
+  min-width: 0;
+  flex: 0 1 56px;
+  box-sizing: border-box;
+  padding: 0;
+
   color: #020204;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
   border-radius: 12px;
   outline: none;
+
   text-align: center;
+  direction: ltr;
+  font-family: inherit;
   font-size: 24px;
-  font-weight: bold;
-  transition: all 0.3s ease;
+  font-weight: 700;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .boxCodeInput:focus {
-  border-color: #0f73b3;
   background: #fff;
+  border-color: #0f73b3;
   box-shadow: 0 0 0 4px rgba(15, 115, 179, 0.15);
 }
 
-@media (max-width: 768px) {
+.helperText {
+  width: 100%;
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  line-height: 1.8;
+  text-align: center;
+}
+
+.loadingText {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  text-align: center;
+}
+
+.boxContainer form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+}
+
+.boxContainer button[type="submit"] {
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 12px 16px;
+
+  color: #111;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+
+  background: linear-gradient(135deg, #fff, #d9d9d9);
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.boxContainer button[type="submit"]:hover {
+  opacity: 0.92;
+}
+
+.boxContainer button[type="submit"]:active {
+  transform: scale(0.99);
+}
+
+.boxContainer button[type="submit"]:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
   .boxContainer {
-    gap: 20px;
+    gap: 22px;
   }
-  .boxContainer h2 {
-    font-size: 20px;
-  }
+
   .boxCodeContainer {
-    gap: 12px;
+    gap: 10px;
   }
+
   .boxCodeInput {
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
+    width: 52px;
+    height: 56px;
+    flex-basis: 52px;
+    font-size: 22px;
   }
 }
 
 @media (max-width: 480px) {
   .bodyCode {
-    padding: 10px;
+    padding: 0;
   }
+
   .boxContainer {
-    gap: 15px;
+    width: 100%;
+    gap: 18px;
   }
+
+  .iconWrap {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+  }
+
+  .phoneIcon {
+    width: 24px;
+    height: 24px;
+  }
+
   .boxContainer h2 {
-    font-size: 18px;
+    font-size: 20px;
   }
+
+  .description {
+    font-size: 13px;
+  }
+
   .boxCodeContainer {
     gap: 8px;
   }
+
   .boxCodeInput {
-    width: 42px;
-    height: 42px;
-    font-size: 18px;
+    width: 46px;
+    height: 52px;
+    flex-basis: 46px;
     border-radius: 10px;
+    font-size: 21px;
   }
 }
 
 @media (max-width: 360px) {
-  .boxCodeContainer {
-    gap: 6px;
+  .boxContainer {
+    gap: 15px;
   }
+
+  .boxCodeContainer {
+    gap: 5px;
+  }
+
   .boxCodeInput {
     width: 38px;
-    height: 38px;
-    font-size: 16px;
-    border-radius: 8px;
+    height: 44px;
+    flex-basis: 38px;
+    font-size: 19px;
+  }
+
+  .boxContainer h2 {
+    font-size: 18px;
+  }
+
+  .phoneNumber {
+    font-size: 13px;
   }
 }

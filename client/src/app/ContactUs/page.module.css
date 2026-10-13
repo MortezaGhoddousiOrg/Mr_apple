@@ -120,7 +120,7 @@
 }
 
 .heroImg {
-  transform: scale(2);
+  transform: scale(1.7);
   object-fit: contain;
   filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.6));
   position: absolute;
@@ -348,7 +348,7 @@
 .modalForm {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 25px;
   position: relative;
   z-index: 5;
   width: 100%;

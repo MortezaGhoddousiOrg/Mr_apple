@@ -13,15 +13,14 @@ export default function Login() {
   const [code, setCode] = useState(false);
 
   const { sendCode, isLoggedIn, authLoading, setNotif } = useAuth();
-  
 
- useEffect(() => {
-  if (authLoading) return;
+  useEffect(() => {
+    if (authLoading) return;
 
-  if (isLoggedIn) {
-    router.replace("/PanelUser");
-  }
-}, [isLoggedIn, authLoading, router]);
+    if (isLoggedIn) {
+      router.replace("/PanelUser");
+    }
+  }, [isLoggedIn, authLoading, router]);
 
   const toggleshowpass = () => {
     setPsssShow((prev) => !prev);
@@ -45,18 +44,24 @@ export default function Login() {
     const phoneRegex = /^09\d{9}$/;
 
     if (!phoneRegex.test(loginData.phone)) {
-      return setNotif({ id: Date.now(), message: "شماره موبایل معتبر نیست", type: "error" });
+      return setNotif({
+        id: Date.now(),
+        message: "شماره موبایل معتبر نیست",
+        type: "error",
+      });
     }
 
     try {
       const phone = loginData.phone;
 
       const res = await sendCode(phone);
-      
-      setNotif({ id: Date.now(), message: "کد تایید برای شما ارسال شد", type: "success" });
-      setCode(true);
-      
 
+      setNotif({
+        id: Date.now(),
+        message: "کد تایید برای شما ارسال شد",
+        type: "success",
+      });
+      setCode(true);
     } catch (err) {
       console.error(err);
       setNotif({
@@ -75,23 +80,22 @@ export default function Login() {
           برای دسترسی به امکانات ویژه و تجربه شخصی سازی شده، لطفا وارد حساب
           کاربری خود شوبد
         </p>
-
         {code ? (
-          <Code phone={loginData.phone} />
+          <Code phone={loginData.phone} onEditPhone={() => setCode(false)} />
         ) : (
           <form className={style.loginFirst} onSubmit={handleSubmit} noValidate>
-            <div className={style.loginInput}>
+            <div className={style.field}>
               <input
+                id="phone"
                 type="tel"
                 name="phone"
                 value={loginData.phone}
                 onChange={handleChange}
+                placeholder=" "
                 required
               />
-
-              <label>شماره تلفن</label>
+              <label htmlFor="phone">شماره تلفن</label>
             </div>
-
             <button type="submit">ورود</button>
           </form>
         )}

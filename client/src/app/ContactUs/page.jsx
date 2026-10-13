@@ -165,7 +165,7 @@ export default function Contactus() {
         </div>
         <div className={style.heroImageContainer}>
           <Image
-            src="/image-contact/IMG_SEGMENT_20260531_104249.png"
+            src="/new-photos/new image iphone 18.png"
             alt="Contact us"
             sizes="190vm"
             width={420}

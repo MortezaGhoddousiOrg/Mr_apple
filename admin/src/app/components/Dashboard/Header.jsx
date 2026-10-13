@@ -62,7 +62,6 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
     return () => clearTimeout(delaySearch);
   }, [searchTerm, selectedCategory]);
 
-  // بستن نتایج با کلیک خارج
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -116,11 +115,6 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
   };
 
   return (
-    // ⚠️ z-[60] به‌جای z-50: چون این هدر position:fixed داره و یک stacking context
-    // جدید می‌سازه، باید از هر عنصر دیگه‌ای (مثل ساید‌بار) بالاتر باشه وگرنه
-    // باکس نتایج جستجوی داخلش (با اینکه خودش هم z بالایی داره) ممکنه پشت
-    // ساید‌بار بره. اگه جایی توی پروژه از z-index بالاتر از ۶۰ استفاده شده،
-    // همینجا هم عدد رو بالاتر ببر.
     <header className="fixed top-0 right-0 left-0 h-16 bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg shadow-blue-900/20 z-[60]">
       <div className="h-full px-3 sm:px-4 md:px-6 flex justify-between items-center">
         <div className="flex items-center gap-2 sm:gap-3">
@@ -173,7 +167,6 @@ export default function Header({ toggleSidebar, isSidebarOpen }) {
           </h2>
         </div>
 
-        {/* باکس سرچ */}
         <div
           ref={searchRef}
           className="hidden md:flex items-center gap-2 flex-1 max-w-xl mx-4 relative"
